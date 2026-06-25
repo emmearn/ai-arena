@@ -30,15 +30,15 @@ public class FakeAiAdapter implements AiClientPort {
 
 	@Override
 	public TeamPlan planTeam(Question question, ArenaLimits limits) {
-		Objects.requireNonNull(question, "question must not be null");
+		String text = Objects.requireNonNull(question, "question must not be null").text().toLowerCase(Locale.ROOT);
 		Objects.requireNonNull(limits, "limits must not be null");
-		int specialistCount = Math.min(limits.maxSpecialists(), 3);
-		List<String> roles = List.of("Analyst", "Critic", "Synthesizer").subList(0, specialistCount);
+		PlanningProfile profile = PlanningProfile.forDomain(classifyDomain(text));
+		int specialistCount = Math.min(limits.maxSpecialists(), profile.roles().size());
 		return new TeamPlan(
-			List.of("analysis", "critique", "synthesis").subList(0, specialistCount),
+			profile.skills().subList(0, specialistCount),
 			specialistCount,
-			roles,
-			"Explore the question, challenge assumptions, then converge."
+			profile.roles().subList(0, specialistCount),
+			profile.strategy()
 		);
 	}
 
@@ -102,6 +102,15 @@ public class FakeAiAdapter implements AiClientPort {
 		if (text.contains("fitness") || text.contains("nutrition")) {
 			return "wellness";
 		}
+		if (text.contains("travel") || text.contains("trip") || text.contains("itinerary")) {
+			return "travel";
+		}
+		if (text.contains("finance") || text.contains("budget") || text.contains("investment")) {
+			return "finance";
+		}
+		if (text.contains("study") || text.contains("learn") || text.contains("productivity")) {
+			return "learning";
+		}
 		return "general";
 	}
 
@@ -110,6 +119,12 @@ public class FakeAiAdapter implements AiClientPort {
 			case "Analyst" -> "precise and evidence-oriented";
 			case "Critic" -> "careful and challenging";
 			case "Synthesizer" -> "balanced and decision-oriented";
+			case "Architect" -> "structural and pragmatic";
+			case "Risk Reviewer" -> "skeptical and safety-oriented";
+			case "Coach" -> "supportive and behavior-oriented";
+			case "Planner" -> "organized and constraint-aware";
+			case "Budget Analyst" -> "quantitative and trade-off aware";
+			case "Learning Strategist" -> "methodical and goal-oriented";
 			default -> "professional and focused";
 		};
 	}
@@ -131,5 +146,43 @@ public class FakeAiAdapter implements AiClientPort {
 			case CONVERGENCE -> "aligns the debate toward a final synthesis.";
 			case INFO -> "adds neutral context.";
 		};
+	}
+
+	private record PlanningProfile(List<String> skills, List<String> roles, String strategy) {
+
+		private static PlanningProfile forDomain(String domain) {
+			return switch (domain) {
+				case "software" -> new PlanningProfile(
+					List.of("architecture", "risk analysis", "implementation synthesis"),
+					List.of("Architect", "Risk Reviewer", "Synthesizer"),
+					"Frame the technical trade-offs, challenge implementation risk, then converge."
+				);
+				case "wellness" -> new PlanningProfile(
+					List.of("habit analysis", "safety review", "practical planning"),
+					List.of("Coach", "Risk Reviewer", "Planner"),
+					"Balance ambition, safety, and sustainable action."
+				);
+				case "travel" -> new PlanningProfile(
+					List.of("itinerary planning", "constraint analysis", "experience synthesis"),
+					List.of("Planner", "Risk Reviewer", "Synthesizer"),
+					"Compare constraints and shape a practical itinerary direction."
+				);
+				case "finance" -> new PlanningProfile(
+					List.of("budget analysis", "risk review", "decision synthesis"),
+					List.of("Budget Analyst", "Risk Reviewer", "Synthesizer"),
+					"Separate assumptions, risk, and options before a cautious synthesis."
+				);
+				case "learning" -> new PlanningProfile(
+					List.of("goal analysis", "method critique", "learning plan synthesis"),
+					List.of("Learning Strategist", "Critic", "Synthesizer"),
+					"Clarify the learning goal, test the method, then define next steps."
+				);
+				default -> new PlanningProfile(
+					List.of("analysis", "critique", "synthesis"),
+					List.of("Analyst", "Critic", "Synthesizer"),
+					"Explore the question, challenge assumptions, then converge."
+				);
+			};
+		}
 	}
 }
