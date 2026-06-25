@@ -41,12 +41,13 @@ Stati: `TODO`, `IMPLEMENTED`, `VERIFIED_STATIC`, `BLOCKED_RUNTIME`, `DONE`.
 
 | Task | Stato | Evidenza | Note |
 | --- | --- | --- | --- |
-| `TASK-001` | `VERIFIED_STATIC` | Package principali creati; wrapper Windows corretto; compilazione statica eseguita. | Avvio/test runtime bloccati da `java.exe` locale. |
-| `TASK-002` | `VERIFIED_STATIC` | `ArenaProperties`, default applicativi e test sorgente aggiunti; compilazione statica OK. | JUnit runtime non eseguibile localmente. |
-| `TASK-003` | `VERIFIED_STATIC` | Modello dominio creato; sorgenti main/test compilati staticamente. | JUnit runtime non eseguibile localmente. |
-| `TASK-004` | `VERIFIED_STATIC` | Validazioni di dominio su domanda e limiti presenti; compilazione statica OK. | JUnit runtime non eseguibile localmente. |
-| `TASK-005` | `VERIFIED_STATIC` | Porte AI e `FakeAiAdapter` deterministico creati; test sorgente compilati staticamente. | JUnit runtime non eseguibile localmente. |
-| `TASK-006` | `TODO` | Non iniziato. | Prossimo task operativo. |
+| `TASK-001` | `DONE` | Package principali creati; wrapper Windows corretto; `mvnw clean test` passa. | Verificato con Java 21.0.11. |
+| `TASK-002` | `DONE` | `ArenaProperties`, default applicativi e test sorgente aggiunti; `mvnw clean test` passa. | Verificato con Java 21.0.11. |
+| `TASK-003` | `DONE` | Modello dominio creato; test dominio eseguiti da Maven. | Verificato con Java 21.0.11. |
+| `TASK-004` | `DONE` | Validazioni di dominio su domanda e limiti presenti; test eseguiti da Maven. | Verificato con Java 21.0.11. |
+| `TASK-005` | `DONE` | Porte AI e `FakeAiAdapter` deterministico creati; test fake eseguiti da Maven. | Verificato con Java 21.0.11. |
+| `TASK-006` | `DONE` | `ValidationService` con controlli locali su vuoto, lunghezza e prompt ostili; test eseguiti da Maven. | Verificato con Java 21.0.11. |
+| `TASK-007` | `TODO` | Non iniziato. | Prossimo task operativo. |
 
 ## 4. Task
 
