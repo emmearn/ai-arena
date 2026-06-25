@@ -35,6 +35,19 @@ Obiettivo: ogni milestone lascia l'app eseguibile e testabile, anche usando prov
 | M5 - AI reale controllata | Adapter LLM configurabile, output validato, segreti sicuri. | `TASK-020`-`TASK-024` |
 | M6 - Hardening | Test, logging, rate limit, edge case e demo readiness. | `TASK-025`-`TASK-030` |
 
+## 3.1 Stato avanzamento
+
+Stati: `TODO`, `IMPLEMENTED`, `VERIFIED_STATIC`, `BLOCKED_RUNTIME`, `DONE`.
+
+| Task | Stato | Evidenza | Note |
+| --- | --- | --- | --- |
+| `TASK-001` | `VERIFIED_STATIC` | Package principali creati; wrapper Windows corretto; compilazione statica eseguita. | Avvio/test runtime bloccati da `java.exe` locale. |
+| `TASK-002` | `VERIFIED_STATIC` | `ArenaProperties`, default applicativi e test sorgente aggiunti; compilazione statica OK. | JUnit runtime non eseguibile localmente. |
+| `TASK-003` | `VERIFIED_STATIC` | Modello dominio creato; sorgenti main/test compilati staticamente. | JUnit runtime non eseguibile localmente. |
+| `TASK-004` | `VERIFIED_STATIC` | Validazioni di dominio su domanda e limiti presenti; compilazione statica OK. | JUnit runtime non eseguibile localmente. |
+| `TASK-005` | `VERIFIED_STATIC` | Porte AI e `FakeAiAdapter` deterministico creati; test sorgente compilati staticamente. | JUnit runtime non eseguibile localmente. |
+| `TASK-006` | `TODO` | Non iniziato. | Prossimo task operativo. |
+
 ## 4. Task
 
 | ID | Descrizione | Prio | Dipendenze | Requisiti | Riferimenti | Completamento | Verifica/test |
