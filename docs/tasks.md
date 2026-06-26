@@ -50,7 +50,8 @@ Stati: `TODO`, `IMPLEMENTED`, `VERIFIED_STATIC`, `BLOCKED_RUNTIME`, `DONE`.
 | `TASK-007` | `DONE` | `PlanningService` e planning fake domain-aware con fallback generale e limiti specialisti; test eseguiti da Maven. | Verificato con Java 21.0.11. |
 | `TASK-008` | `DONE` | `SpecialistFactory`, specialisti con identita' completa e accento UI stabile; test eseguiti da Maven. | Verificato con Java 21.0.11. |
 | `TASK-009` | `DONE` | `DebateOrchestrator` sequenziale con stop reason per convergenza, limiti, timeout e decisioni incoerenti; test eseguiti da Maven. | Verificato con Java 21.0.11. |
-| `TASK-010` | `TODO` | Non iniziato. | Prossimo task operativo. |
+| `TASK-010` | `DONE` | `RunArenaSessionUseCase`, `FinalAnswerService` e sintesi fake derivata dal dibattito; test end-to-end applicativi eseguiti da Maven. | Verificato con Java 21.0.11. |
+| `TASK-011` | `TODO` | Non iniziato. | Prossimo task operativo. |
 
 ## 4. Task
 

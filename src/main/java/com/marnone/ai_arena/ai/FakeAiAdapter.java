@@ -89,9 +89,15 @@ public class FakeAiAdapter implements AiClientPort {
 	public FinalAnswer synthesize(Question question, List<DebateMessage> messages, String stopReason) {
 		Objects.requireNonNull(question, "question must not be null");
 		Objects.requireNonNull(messages, "messages must not be null");
+		String debateBasis = messages.isEmpty()
+			? "No debate messages were available."
+			: "Key debate basis: " + messages.stream()
+				.map(DebateMessage::content)
+				.limit(3)
+				.toList();
 		return new FinalAnswer(
-			"Fake final answer for: " + question.text(),
-			"Synthesized from " + messages.size() + " deterministic debate messages.",
+			"Fake final answer for: " + question.text() + ". " + debateBasis,
+			"Synthesized from " + messages.size() + " deterministic debate messages and stop reason: " + stopReason,
 			stopReason
 		);
 	}
