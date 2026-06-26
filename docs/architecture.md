@@ -66,7 +66,8 @@ src/main/java/com/marnone/ai_arena/
     ArenaErrorResponse
   application/
     RunArenaSessionUseCase
-    ArenaSessionService
+    ArenaSessionResult
+    SessionEvent / SessionEventMapper
     ValidationService
     PlanningService
     SpecialistFactory
