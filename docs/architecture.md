@@ -61,8 +61,7 @@ src/main/java/com/marnone/ai_arena/
   AiArenaApplication.java
   web/
     ArenaController
-    ArenaEvent
-    ArenaRequest
+    ArenaQuestionRequest
     ArenaErrorResponse
   application/
     RunArenaSessionUseCase
@@ -275,6 +274,18 @@ Test minimi tracciati:
 - nessun accesso diretto al provider AI fuori da `ai`;
 - niente persistenza finche' non esiste requisito approvato;
 - evitare nuove librerie senza decisione motivata.
+
+Documentazione del codice:
+- commenti e Javadoc nel codice sono in inglese;
+- usare Javadoc breve sulle classi applicative principali quando aiuta a chiarire ruolo, confini o uso;
+- commentare solo metodi o passaggi con logica non immediata, vincoli di dominio, trade-off, assunzioni non ovvie o comportamenti sorprendenti;
+- non commentare getter/setter, assegnazioni o codice gia' evidente dai nomi;
+- preferire nomi chiari a commenti esplicativi quando possibile.
+
+README.md:
+- e' la guida d'ingresso per umani;
+- contiene solo informazioni operative utili a un nuovo lettore: scopo, stack, prerequisiti, comandi di avvio/test/build, configurazione essenziale senza segreti, struttura progetto, entry point principali e rimandi a `docs/`;
+- non duplica requirements, architecture, security, tasks, decisions o workflow.
 
 ## 13. Decisioni architetturali
 

@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import com.marnone.ai_arena.ai.DebateAiPort;
 import com.marnone.ai_arena.ai.SupervisorAiPort;
@@ -41,8 +42,14 @@ public class DebateOrchestrator {
 	}
 
 	public DebateResult run(Question question, List<Specialist> team, ArenaLimits limits) {
+		return run(question, team, limits, message -> {
+		});
+	}
+
+	public DebateResult run(Question question, List<Specialist> team, ArenaLimits limits, Consumer<DebateMessage> messageConsumer) {
 		Objects.requireNonNull(question, "question must not be null");
 		Objects.requireNonNull(limits, "limits must not be null");
+		Objects.requireNonNull(messageConsumer, "messageConsumer must not be null");
 		List<Specialist> specialists = List.copyOf(Objects.requireNonNull(team, "team must not be null"));
 		if (specialists.isEmpty()) {
 			return new DebateResult(List.of(), EMPTY_TEAM_STOP);
@@ -68,6 +75,7 @@ public class DebateOrchestrator {
 				return new DebateResult(messages, INVALID_MESSAGE_STOP);
 			}
 			messages.add(message);
+			messageConsumer.accept(message);
 
 			if (isTimedOut(startedAt, limits.timeout())) {
 				return new DebateResult(messages, TIMEOUT_STOP);

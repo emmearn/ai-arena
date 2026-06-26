@@ -19,7 +19,7 @@ Regole base:
 | `agents/agent-factory-agent.md` | Creazione/proposta di agenti specializzati solo se necessari e riutilizzabili. |
 | `agents/context-agent.md` | Lettura e sintesi minima del contesto documentale. |
 | `agents/security-agent.md` | Verifica rischi, guardrail e vincoli di sicurezza. |
-| `agents/review-agent.md` | Review finale di risultato, coerenza, regressioni e agenti creati. |
+| `agents/review-agent.md` | Review finale di risultato, coerenza, regressioni, documentazione essenziale e agenti creati. |
 
 ## 3. Orchestrator Workflow
 
@@ -72,6 +72,18 @@ Non creare agenti per:
 - Se i documenti sono incoerenti, proporre correzione documentale minima prima dell'implementazione.
 - Non duplicare contenuto di `docs/` dentro `docs/workflow.md` o `agents/`.
 
+Documentazione del codice:
+- applicare la policy di `docs/architecture.md#12-convenzioni-di-sviluppo`;
+- quando una classe applicativa principale e' completata o stabilizzata, verificare se serve una breve Javadoc in inglese;
+- quando un flusso applicativo e' completato, rivedere entry point e componenti attraversati per aggiungere, aggiornare o rimuovere commenti dove utile;
+- commentare solo logica non immediata, vincoli di dominio, trade-off, assunzioni o comportamenti sorprendenti;
+- evitare commenti banali e contenuti gia' evidenti dai nomi.
+
+README.md:
+- aggiornare `README.md` solo quando cambia l'esperienza di ingresso al progetto: setup, prerequisiti, comandi di avvio/test/build, configurazione richiesta, modalita' d'uso, funzionalita' principali, stato MVP o informazioni necessarie a un nuovo lettore;
+- mantenerlo sintetico, operativo e non duplicativo rispetto a `docs/`;
+- rimandare a `docs/` per requisiti, architettura, sicurezza, task, decisioni e workflow dettagliati.
+
 ## 7. Execution Workflow
 
 | Fase | Regola |
@@ -82,7 +94,7 @@ Non creare agenti per:
 | Execution | Applicare modifiche nello scope minimo. |
 | Security | Verificare rischi e controlli proporzionati. |
 | Testing | Eseguire test rilevanti o indicare perche' non sono eseguibili. |
-| Review | Verificare coerenza, regressioni, duplicazioni, overengineering e necessita' degli agenti creati. |
+| Review | Verificare coerenza, regressioni, duplicazioni, overengineering, commenti/Javadoc e README quando rilevanti, e necessita' degli agenti creati. |
 | Closure | Riportare risultato, test, documenti aggiornati, agenti creati e rischi residui. |
 
 ## 8. Anti-Proliferation Rules

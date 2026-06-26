@@ -23,6 +23,7 @@ Obiettivo: ogni milestone lascia l'app eseguibile e testabile, anche usando prov
 3. Riduzione rischio: validazione, limiti, output handling e fake AI prima dell'integrazione LLM.
 4. Verifica semplice: ogni task ha test o controllo manuale oggettivo.
 5. Vertical slices: evitare layer completi non utilizzabili.
+6. Documentazione proporzionata: quando rilevante, il completamento include commenti/Javadoc essenziali nel codice e aggiornamento di `README.md` solo se cambiano setup, prerequisiti, comandi, configurazione, uso, funzionalita' principali, stato MVP o informazioni necessarie a un nuovo lettore.
 
 ## 3. Milestone incrementali
 
@@ -52,7 +53,8 @@ Stati: `TODO`, `IMPLEMENTED`, `VERIFIED_STATIC`, `BLOCKED_RUNTIME`, `DONE`.
 | `TASK-009` | `DONE` | `DebateOrchestrator` sequenziale con stop reason per convergenza, limiti, timeout e decisioni incoerenti; test eseguiti da Maven. | Verificato con Java 21.0.11. |
 | `TASK-010` | `DONE` | `RunArenaSessionUseCase`, `FinalAnswerService` e sintesi fake derivata dal dibattito; test end-to-end applicativi eseguiti da Maven. | Verificato con Java 21.0.11. |
 | `TASK-011` | `DONE` | Eventi applicativi `SessionEvent*` e mapping ordinato da risultato sessione; test eseguiti da Maven. | Verificato con Java 21.0.11. |
-| `TASK-012` | `TODO` | Non iniziato. | Prossimo task operativo. |
+| `TASK-012` | `DONE` | Endpoint `POST /api/arena/sessions` con stream SSE da eventi applicativi; integration test web eseguiti da Maven. | Verificato con Java 21.0.11. |
+| `TASK-013` | `TODO` | Non iniziato. | Prossimo task operativo. |
 
 ## 4. Task
 
@@ -109,6 +111,8 @@ Priorita' test:
 - smoke E2E con provider fake deterministico.
 
 Regola: nessun task `MUST` e' completo senza verifica indicata nel task.
+
+La documentazione essenziale fa parte della closure del task solo quando il cambiamento la rende utile: aggiornare commenti/Javadoc secondo `docs/architecture.md#12-convenzioni-di-sviluppo` e aggiornare `README.md` solo se cambia l'esperienza di ingresso al progetto. Non trasformare task applicativi in task documentali e non avanzare lo stato di un task solo per aggiornamenti documentali.
 
 ## 7. Sicurezza integrata
 
