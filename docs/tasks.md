@@ -48,7 +48,8 @@ Stati: `TODO`, `IMPLEMENTED`, `VERIFIED_STATIC`, `BLOCKED_RUNTIME`, `DONE`.
 | `TASK-005` | `DONE` | Porte AI e `FakeAiAdapter` deterministico creati; test fake eseguiti da Maven. | Verificato con Java 21.0.11. |
 | `TASK-006` | `DONE` | `ValidationService` con controlli locali su vuoto, lunghezza e prompt ostili; test eseguiti da Maven. | Verificato con Java 21.0.11. |
 | `TASK-007` | `DONE` | `PlanningService` e planning fake domain-aware con fallback generale e limiti specialisti; test eseguiti da Maven. | Verificato con Java 21.0.11. |
-| `TASK-008` | `TODO` | Non iniziato. | Prossimo task operativo. |
+| `TASK-008` | `DONE` | `SpecialistFactory`, specialisti con identita' completa e accento UI stabile; test eseguiti da Maven. | Verificato con Java 21.0.11. |
+| `TASK-009` | `TODO` | Non iniziato. | Prossimo task operativo. |
 
 ## 4. Task
 

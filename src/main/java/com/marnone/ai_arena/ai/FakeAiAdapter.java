@@ -50,10 +50,11 @@ public class FakeAiAdapter implements AiClientPort {
 			String role = plan.roles().get(index);
 			specialists.add(new Specialist(
 				"agent-" + (index + 1),
-				role,
+				nameFor(role),
 				role,
 				personalityFor(role),
-				"Contribute as " + role + " to the arena debate."
+				missionFor(role),
+				uiAccentFor(role, index)
 			));
 		}
 		return List.copyOf(specialists);
@@ -114,6 +115,21 @@ public class FakeAiAdapter implements AiClientPort {
 		return "general";
 	}
 
+	private static String nameFor(String role) {
+		return switch (role) {
+			case "Analyst" -> "Prism";
+			case "Critic" -> "Sentinel";
+			case "Synthesizer" -> "Keystone";
+			case "Architect" -> "Blueprint";
+			case "Risk Reviewer" -> "Guardrail";
+			case "Coach" -> "Momentum";
+			case "Planner" -> "Compass";
+			case "Budget Analyst" -> "Ledger";
+			case "Learning Strategist" -> "Method";
+			default -> role + " Agent";
+		};
+	}
+
 	private static String personalityFor(String role) {
 		return switch (role) {
 			case "Analyst" -> "precise and evidence-oriented";
@@ -126,6 +142,32 @@ public class FakeAiAdapter implements AiClientPort {
 			case "Budget Analyst" -> "quantitative and trade-off aware";
 			case "Learning Strategist" -> "methodical and goal-oriented";
 			default -> "professional and focused";
+		};
+	}
+
+	private static String missionFor(String role) {
+		return switch (role) {
+			case "Analyst" -> "Map the facts and assumptions that shape the arena debate.";
+			case "Critic" -> "Challenge weak claims and expose blind spots in the arena debate.";
+			case "Synthesizer" -> "Connect the strongest arguments into a balanced arena debate conclusion.";
+			case "Architect" -> "Structure the solution space and technical trade-offs for the arena debate.";
+			case "Risk Reviewer" -> "Identify constraints, failure modes, and safety concerns in the arena debate.";
+			case "Coach" -> "Translate goals into sustainable actions for the arena debate.";
+			case "Planner" -> "Sequence options and constraints into a practical path for the arena debate.";
+			case "Budget Analyst" -> "Compare costs, trade-offs, and risk exposure in the arena debate.";
+			case "Learning Strategist" -> "Shape goals, methods, and feedback loops for the arena debate.";
+			default -> "Contribute a focused professional perspective to the arena debate.";
+		};
+	}
+
+	private static String uiAccentFor(String role, int index) {
+		return switch (role) {
+			case "Analyst", "Architect", "Learning Strategist" -> "#2FB7C8";
+			case "Critic", "Risk Reviewer" -> "#C84A5D";
+			case "Synthesizer" -> "#D7A84F";
+			case "Coach", "Planner" -> "#4FAE7B";
+			case "Budget Analyst" -> "#8E7BE8";
+			default -> List.of("#2FB7C8", "#C84A5D", "#D7A84F", "#4FAE7B").get(Math.floorMod(index, 4));
 		};
 	}
 

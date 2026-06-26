@@ -36,9 +36,9 @@ class ArenaSessionStateTests {
 
 		ArenaSessionState state = new ArenaSessionState("session-1", question, team, messages, SessionStatus.PLANNED, limits);
 
-		team.add(new Specialist("s1", "Analyst", "Analyst", "precise", "inspect"));
+		team.add(new Specialist("s1", "Analyst", "Analyst", "precise", "inspect", "#2FB7C8"));
 		assertThat(state.team()).isEmpty();
-		assertThatThrownBy(() -> state.team().add(new Specialist("s2", "Critic", "Critic", "careful", "challenge")))
+		assertThatThrownBy(() -> state.team().add(new Specialist("s2", "Critic", "Critic", "careful", "challenge", "#C84A5D")))
 			.isInstanceOf(UnsupportedOperationException.class);
 	}
 }
