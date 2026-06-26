@@ -142,7 +142,7 @@ Nessuna persistenza richiesta nell'MVP. Il modello e' in memoria per durata dell
 | `ValidationResult` | `status`, `reason`, `classificationHint` | Precede piano; se rifiutato chiude il flusso. |
 | `RequestClassification` | `domain`, `intent`, `confidence`, `notes` | Guida il piano. |
 | `TeamPlan` | `skills`, `specialistCount`, `roles`, `initialStrategy` | Origina specialisti. |
-| `Specialist` | `id`, `name`, `role`, `personality`, `mission` | Autore dei messaggi. |
+| `Specialist` | `id`, `name`, `role`, `personality`, `mission`, `uiAccent` | Autore dei messaggi e identita' UI stabile. |
 | `DebateMessage` | `id`, `specialistId`, `turn`, `type`, `content`, `createdAt` | Appartiene alla sessione. |
 | `SupervisorDecision` | `action`, `reason`, `nextSpecialistId` | Controlla turni/arresto. |
 | `FinalAnswer` | `content`, `rationale`, `stopReason` | Output finale. |
