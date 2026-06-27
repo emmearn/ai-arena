@@ -3,8 +3,10 @@ package com.marnone.ai_arena.web;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import org.slf4j.MDC;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,7 +38,9 @@ public class ArenaController {
 	)
 	public SseEmitter runSession(@RequestBody ArenaQuestionRequest request) {
 		SseEmitter emitter = new SseEmitter();
+		String requestId = UUID.randomUUID().toString();
 		CompletableFuture.runAsync(() -> {
+			MDC.put("requestId", requestId);
 			try {
 				runArenaSessionUseCase.run(request.question(), event -> sendUnchecked(emitter, event));
 				emitter.complete();
@@ -50,6 +54,9 @@ public class ArenaController {
 				catch (IOException sendError) {
 					emitter.completeWithError(sendError);
 				}
+			}
+			finally {
+				MDC.remove("requestId");
 			}
 		});
 		return emitter;

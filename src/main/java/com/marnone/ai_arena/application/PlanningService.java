@@ -2,6 +2,9 @@ package com.marnone.ai_arena.application;
 
 import java.util.Objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.marnone.ai_arena.ai.PlanningAiPort;
 import com.marnone.ai_arena.config.ArenaProperties;
 import com.marnone.ai_arena.domain.ArenaLimits;
@@ -12,6 +15,8 @@ import com.marnone.ai_arena.domain.TeamPlan;
  * Builds and validates the domain-agnostic specialist plan for an accepted question.
  */
 public class PlanningService {
+
+	private static final Logger log = LoggerFactory.getLogger(PlanningService.class);
 
 	private final PlanningAiPort planningAiPort;
 	private final ArenaProperties arenaProperties;
@@ -42,12 +47,27 @@ public class PlanningService {
 	private static void ensureWithinLimits(TeamPlan plan, ArenaLimits limits) {
 		Objects.requireNonNull(plan, "plan must not be null");
 		if (plan.specialistCount() > limits.maxSpecialists()) {
+			log.warn(
+				"AI team plan rejected because specialist count exceeds limit specialistCount={} maxSpecialists={}",
+				plan.specialistCount(),
+				limits.maxSpecialists()
+			);
 			throw new IllegalStateException("team plan exceeds max specialists");
 		}
 		if (plan.roles().size() != plan.specialistCount()) {
+			log.warn(
+				"AI team plan rejected because roles do not match specialist count roleCount={} specialistCount={}",
+				plan.roles().size(),
+				plan.specialistCount()
+			);
 			throw new IllegalStateException("team plan roles must match specialist count");
 		}
 		if (plan.skills().size() < plan.specialistCount()) {
+			log.warn(
+				"AI team plan rejected because skills are missing skillCount={} specialistCount={}",
+				plan.skills().size(),
+				plan.specialistCount()
+			);
 			throw new IllegalStateException("team plan must provide skills for each specialist");
 		}
 	}
