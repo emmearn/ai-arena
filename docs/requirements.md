@@ -6,9 +6,9 @@ Fonte di verita' del comportamento atteso di AI Arena. Il documento descrive cos
 
 | Area | Contenuto |
 | --- | --- |
-| Scopo | Mostrare in modo intuitivo come una risposta possa migliorare tramite confronto, revisione e sintesi tra specialisti virtuali creati per la richiesta. |
+| Scopo | Mostrare in modo intuitivo come una risposta possa migliorare tramite confronto, revisione e sintesi tra esperti AI orchestrati creati per la richiesta. |
 | Problema | Una singola risposta opaca non rende visibile il processo di ragionamento, critica e convergenza. |
-| Utenti target | Visitatori, stakeholder tecnici, team prodotto e sviluppatori che vogliono osservare una demo multi-specialista domain-agnostic. |
+| Utenti target | Visitatori, stakeholder tecnici, team prodotto e sviluppatori che vogliono osservare una demo domain-agnostic con piu' esperti AI orchestrati. |
 | Valore atteso | Esperienza educativa e funzionale: l'utente vede validazione, team, dibattito, controllo del flusso e risposta finale motivata. |
 
 ## 2. Ambito
@@ -17,8 +17,8 @@ Incluse:
 - inserimento di una domanda utente;
 - validazione della richiesta prima del dibattito;
 - classificazione della richiesta;
-- pianificazione dinamica del team di specialisti;
-- creazione runtime di specialisti con ruolo, personalita' e missione;
+- pianificazione dinamica del team di ruoli AI orchestrati;
+- creazione runtime di esperti AI orchestrati con ruolo, personalita' e missione;
 - dibattito osservabile in tempo reale;
 - controllo di turni, limiti e arresto;
 - sintesi finale motivata;
@@ -28,7 +28,7 @@ Incluse:
 Escluse dall'MVP:
 - cronologia persistente delle conversazioni;
 - memoria utente persistente;
-- agenti permanenti di dominio;
+- esperti AI permanenti di dominio;
 - tool esterni, RAG, MCP, modelli multipli, votazione strutturata;
 - valutazione automatica oggettiva della qualita' della risposta;
 - profili utente, autenticazione e autorizzazioni.
@@ -41,16 +41,18 @@ MVP:
 - risposta finale sempre presente per richieste valide.
 
 Evoluzioni future:
-- tool calling, MCP, RAG, memoria persistente, agenti paralleli, votazione, modelli differenti, cronologia conversazioni.
+- tool calling, MCP, RAG, memoria persistente, ruoli AI paralleli, votazione, modelli differenti, cronologia conversazioni;
+- LLM-as-a-Judge separato dal supervisore, con valutazione qualitativa strutturata di contributi, dibattito o risposta finale.
 
 ## 3. Attori e casi d'uso
 
 | Attore | Ruolo |
 | --- | --- |
 | Utente | Inserisce una domanda e osserva dibattito e risposta finale. |
-| Sistema | Valida, pianifica, crea specialisti, coordina dibattito, arresta e sintetizza. |
-| Specialista virtuale | Contribuisce al dibattito secondo ruolo, missione e personalita'. |
-| Supervisore | Gestisce turni, limiti, loop, criterio di arresto e sintesi finale. |
+| Sistema | Valida, pianifica, crea esperti AI orchestrati, coordina dibattito, arresta e sintetizza. |
+| Esperto AI orchestrato | Contribuisce al dibattito secondo ruolo, missione e personalita'. |
+| Supervisore | Gestisce turni, limiti, loop, criterio di arresto e sintesi finale nell'MVP. |
+| Judge | Evoluzione futura: valuta qualita' di contributi, dibattito o risposta finale con rubrica esplicita e output strutturato. |
 
 | Caso d'uso | Flusso principale | Alternative/errori |
 | --- | --- | --- |
@@ -65,11 +67,12 @@ Evoluzioni future:
 | --- | --- | --- | --- | --- |
 | Acquisizione domanda | Testo domanda | Richiesta pronta alla validazione | Domanda obbligatoria e non vuota | Utente, sistema |
 | Validazione richiesta | Domanda | Esito valido/rifiutato con motivazione | Nessun dibattito se non valida | Sistema |
-| Pianificazione team | Richiesta valida | Competenze, numero specialisti, ruoli, strategia | Team creato per richiesta, non permanente | Sistema |
-| Creazione specialisti | Piano | Specialisti con nome, ruolo, personalita', missione | Personalita' distinguibili e coerenti | Sistema |
-| Dibattito | Team e domanda | Messaggi progressivi | Gli specialisti propongono, criticano, correggono, convergono | Specialisti, supervisore |
+| Pianificazione team | Richiesta valida | Competenze, numero di ruoli AI orchestrati, ruoli, strategia | Team creato per richiesta, non permanente | Sistema |
+| Creazione esperti AI orchestrati | Piano | Esperti con nome, ruolo, personalita', missione | Personalita' distinguibili e coerenti | Sistema |
+| Dibattito | Team e domanda | Messaggi progressivi | Gli esperti AI orchestrati propongono, criticano, correggono, convergono | Esperti AI orchestrati, supervisore |
 | Supervisione | Messaggi, limiti, stato | Prossimo turno, arresto o sintesi | Prevenire loop e rispettare limiti | Supervisore |
 | Risposta finale | Dibattito concluso | Risposta motivata | Presente per ogni richiesta valida conclusa | Sistema |
+| Valutazione qualitativa | Contributi, dibattito o risposta finale | Giudizio strutturato | Evoluzione non MVP: migliorare qualita' e affidabilita' senza sostituire i controlli applicativi | Judge, sistema |
 | UI singola | Stati e risultati | Vista completa del processo | Processo decisionale osservabile | Utente |
 
 ## 5. User stories
@@ -120,7 +123,7 @@ Evoluzioni future:
 | Impatti | Sicurezza: rilevazione input ostili; Operativita': errori gestiti in modo osservabile. |
 | Priorita' | `MUST` |
 | Stato | `Draft` |
-| Tracciabilita' | Origine: `docs/vision.md#6-validation-agent`; Task: Da definire; Decisioni: Da definire; Test: Da definire; Rischi: Da definire |
+| Tracciabilita' | Origine: `docs/vision.md#6-ruolo-di-validazione`; Task: Da definire; Decisioni: Da definire; Test: Da definire; Rischi: Da definire |
 
 ### REQ-003 - Classificazione richiesta
 
@@ -139,45 +142,45 @@ Evoluzioni future:
 | Impatti | Nessuno rilevante. |
 | Priorita' | `MUST` |
 | Stato | `Draft` |
-| Tracciabilita' | Origine: `docs/vision.md#6-validation-agent`; Task: Da definire; Decisioni: Da definire; Test: Da definire; Rischi: Da definire |
+| Tracciabilita' | Origine: `docs/vision.md#6-ruolo-di-validazione`; Task: Da definire; Decisioni: Da definire; Test: Da definire; Rischi: Da definire |
 
 ### REQ-004 - Pianificazione team
 
 | Campo | Contenuto |
 | --- | --- |
 | ID | `REQ-004` |
-| Titolo | Piano degli specialisti |
-| Descrizione | Il sistema deve produrre un piano con competenze richieste, numero di specialisti, ruoli e strategia iniziale. |
+| Titolo | Piano dei ruoli AI orchestrati |
+| Descrizione | Il sistema deve produrre un piano con competenze richieste, numero di ruoli AI orchestrati, ruoli e strategia iniziale. |
 | Motivazione | Rendere il dibattito intenzionale e proporzionato alla domanda. |
 | Attori | Sistema |
 | Precondizioni | La richiesta e' valida e classificata. |
 | Flusso principale | Il sistema definisce il team necessario e la strategia iniziale. |
 | Alternative/errori | Se la domanda e' semplice, il sistema puo' scegliere un team minimo entro i limiti configurati. |
 | Regole di dominio | Il piano non deve rispondere direttamente alla domanda. |
-| Criteri di accettazione | Given una richiesta valida, When il piano e' prodotto, Then contiene competenze, numero specialisti, ruoli e strategia iniziale. |
-| Impatti | Performance: il numero di specialisti deve rispettare i limiti. |
+| Criteri di accettazione | Given una richiesta valida, When il piano e' prodotto, Then contiene competenze, numero di ruoli AI orchestrati, ruoli e strategia iniziale. |
+| Impatti | Performance: il numero di ruoli AI orchestrati deve rispettare i limiti. |
 | Priorita' | `MUST` |
 | Stato | `Draft` |
-| Tracciabilita' | Origine: `docs/vision.md#7-planner-agent`; Task: Da definire; Decisioni: Da definire; Test: Da definire; Rischi: Da definire |
+| Tracciabilita' | Origine: `docs/vision.md#7-ruolo-planner`; Task: Da definire; Decisioni: Da definire; Test: Da definire; Rischi: Da definire |
 
-### REQ-005 - Creazione dinamica specialisti
+### REQ-005 - Creazione dinamica degli esperti AI orchestrati
 
 | Campo | Contenuto |
 | --- | --- |
 | ID | `REQ-005` |
-| Titolo | Specialisti runtime |
-| Descrizione | Il sistema deve creare specialisti virtuali per la singola richiesta, ciascuno con nome, ruolo, personalita' e missione. |
+| Titolo | Esperti AI orchestrati |
+| Descrizione | Il sistema deve creare esperti AI orchestrati per la singola richiesta, ciascuno con nome, ruolo, personalita' e missione. Gli esperti AI orchestrati sono ruoli AI generati per la singola richiesta e guidati dall'orchestratore; non sono agenti indipendenti, processi autonomi o modelli distinti. |
 | Motivazione | Dimostrare adattamento dinamico al problema dell'utente. |
-| Attori | Sistema, specialista virtuale |
+| Attori | Sistema, esperto AI orchestrato |
 | Precondizioni | Esiste un piano approvato dal sistema. |
-| Flusso principale | Il sistema crea specialisti coerenti con il piano e li rende visibili all'utente. |
+| Flusso principale | Il sistema crea esperti AI orchestrati coerenti con il piano e li rende visibili all'utente. |
 | Alternative/errori | Se non e' possibile creare un team completo, il sistema segnala errore o procede solo se il team minimo e' sufficiente. |
-| Regole di dominio | Non esistono specialisti permanenti di dominio nell'MVP. |
-| Criteri di accettazione | Given un piano valido, When il team e' creato, Then ogni specialista ha nome, ruolo, personalita' e missione osservabili. |
+| Regole di dominio | Non esistono esperti AI permanenti di dominio nell'MVP. |
+| Criteri di accettazione | Given un piano valido, When il team e' creato, Then ogni esperto AI orchestrato ha nome, ruolo, personalita' e missione osservabili. |
 | Impatti | Dati: i metadati del team devono essere consistenti durante la richiesta. |
 | Priorita' | `MUST` |
 | Stato | `Draft` |
-| Tracciabilita' | Origine: `docs/vision.md#8-runtime-agent-builder`; Task: Da definire; Decisioni: Da definire; Test: Da definire; Rischi: Da definire |
+| Tracciabilita' | Origine: `docs/vision.md#8-costruttore-ruoli-runtime`; Task: Da definire; Decisioni: Da definire; Test: Da definire; Rischi: Da definire |
 
 ### REQ-006 - Differenziazione personalita'
 
@@ -185,14 +188,14 @@ Evoluzioni future:
 | --- | --- |
 | ID | `REQ-006` |
 | Titolo | Personalita' distinguibili |
-| Descrizione | Il sistema deve assegnare agli specialisti personalita' professionali coerenti e distinguibili. |
+| Descrizione | Il sistema deve assegnare agli esperti AI orchestrati personalita' professionali coerenti e distinguibili. |
 | Motivazione | Evitare contributi percepiti come copie equivalenti e rendere leggibile il confronto. |
-| Attori | Sistema, specialista virtuale, utente |
+| Attori | Sistema, esperto AI orchestrato, utente |
 | Precondizioni | Il team e' stato creato. |
-| Flusso principale | Ogni specialista partecipa secondo ruolo, missione e tono coerenti. |
+| Flusso principale | Ogni esperto AI orchestrato partecipa secondo ruolo, missione e tono coerenti. |
 | Alternative/errori | Se i contributi risultano ridondanti, il supervisore puo' favorire convergenza o arresto. |
 | Regole di dominio | Le personalita' devono restare professionali e coerenti con il ruolo. |
-| Criteri di accettazione | Given un team creato, When l'utente visualizza i membri, Then puo' distinguere ruoli e missioni. Given il dibattito, When piu' specialisti rispondono, Then i contributi riflettono prospettive differenti. |
+| Criteri di accettazione | Given un team creato, When l'utente visualizza i membri, Then puo' distinguere ruoli e missioni. Given il dibattito, When piu' esperti AI orchestrati rispondono, Then i contributi riflettono prospettive differenti. |
 | Impatti | Nessuno rilevante. |
 | Priorita' | `SHOULD` |
 | Stato | `Draft` |
@@ -204,14 +207,14 @@ Evoluzioni future:
 | --- | --- |
 | ID | `REQ-007` |
 | Titolo | Dibattito progressivo |
-| Descrizione | Il sistema deve mostrare progressivamente i messaggi del dibattito tra specialisti. |
+| Descrizione | Il sistema deve mostrare progressivamente i messaggi del dibattito tra esperti AI orchestrati. |
 | Motivazione | Il valore della demo nasce dall'osservabilita' del confronto. |
-| Attori | Utente, specialista virtuale, supervisore |
+| Attori | Utente, esperto AI orchestrato, supervisore |
 | Precondizioni | Team creato e richiesta valida. |
-| Flusso principale | Gli specialisti producono contributi visibili in sequenza durante la discussione. |
+| Flusso principale | Gli esperti AI orchestrati producono contributi visibili in sequenza durante la discussione. |
 | Alternative/errori | Se il dibattito non puo' continuare, il sistema comunica arresto o errore. |
 | Regole di dominio | I contributi devono includere proposta, critica, correzione o convergenza quando rilevante. |
-| Criteri di accettazione | Given un dibattito avviato, When vengono generati contributi, Then l'utente li vede progressivamente associati agli specialisti. |
+| Criteri di accettazione | Given un dibattito avviato, When vengono generati contributi, Then l'utente li vede progressivamente associati agli esperti AI orchestrati. |
 | Impatti | Performance: aggiornamento progressivo senza attesa della risposta finale; Accessibilita': messaggi leggibili e ordinati. |
 | Priorita' | `MUST` |
 | Stato | `Draft` |
@@ -242,14 +245,14 @@ Evoluzioni future:
 | --- | --- |
 | ID | `REQ-009` |
 | Titolo | Rispetto dei limiti di esecuzione |
-| Descrizione | Il sistema deve rispettare limiti definiti per massimo specialisti, turni, messaggi e timeout. |
+| Descrizione | Il sistema deve rispettare limiti definiti per massimo esperti AI orchestrati, turni, messaggi e timeout. |
 | Motivazione | Controllare durata, costo, risorse e prevedibilita' dell'esperienza. |
 | Attori | Sistema, supervisore |
 | Precondizioni | Limiti disponibili al sistema. |
 | Flusso principale | Il sistema applica i limiti durante pianificazione e dibattito. |
 | Alternative/errori | Se un limite viene raggiunto, il sistema arresta o rifiuta l'azione eccedente. |
 | Regole di dominio | Nessun flusso deve superare i limiti attivi. |
-| Criteri di accettazione | Given limiti definiti, When il sistema pianifica o dibatte, Then numero specialisti, turni, messaggi e durata restano entro i limiti. |
+| Criteri di accettazione | Given limiti definiti, When il sistema pianifica o dibatte, Then numero di esperti AI orchestrati, turni, messaggi e durata restano entro i limiti. |
 | Impatti | Performance: controllo risorse; Operativita': comportamento prevedibile. |
 | Priorita' | `MUST` |
 | Stato | `Draft` |
@@ -267,7 +270,7 @@ Evoluzioni future:
 | Precondizioni | Dibattito concluso o arrestato in modo controllato. |
 | Flusso principale | Il supervisore sintetizza il risultato del confronto e lo presenta all'utente. |
 | Alternative/errori | Se il dibattito termina per limite, la risposta finale deve basarsi sui contributi disponibili e indicare il contesto dell'arresto. |
-| Regole di dominio | La risposta finale deriva dal dibattito, non da un singolo contributo isolato. |
+| Regole di dominio | La risposta finale deriva dal dibattito, non da un singolo contributo isolato. Come evoluzione, la risposta finale deve essere valutabile prima della consegna tramite giudizio strutturato, senza rendere obbligatorio lo scoring automatico nell'MVP. |
 | Criteri di accettazione | Given un dibattito concluso, When la sintesi e' prodotta, Then l'utente vede una risposta finale motivata. |
 | Impatti | Nessuno rilevante. |
 | Priorita' | `MUST` |
@@ -299,14 +302,14 @@ Evoluzioni future:
 | --- | --- |
 | ID | `REQ-012` |
 | Titolo | Supporto a domande di domini diversi |
-| Descrizione | Il sistema deve accettare domande valide appartenenti a domini diversi senza richiedere specialisti permanenti predefiniti. |
+| Descrizione | Il sistema deve accettare domande valide appartenenti a domini diversi senza richiedere esperti AI permanenti predefiniti. |
 | Motivazione | Dimostrare la natura domain-agnostic del prodotto. |
 | Attori | Utente, sistema |
 | Precondizioni | La domanda supera la validazione. |
 | Flusso principale | Il sistema adatta classificazione, piano e team al dominio della domanda. |
-| Alternative/errori | Se il dominio non e' riconosciuto, il sistema usa specialisti generali o rifiuta solo se la richiesta viola le policy. |
+| Alternative/errori | Se il dominio non e' riconosciuto, il sistema usa ruoli AI generali o rifiuta solo se la richiesta viola le policy. |
 | Regole di dominio | Esempi supportati: programmazione, fitness, alimentazione, viaggi, finanza, studio, produttivita'. |
-| Criteri di accettazione | Given domande valide di domini diversi, When vengono elaborate, Then il sistema crea team coerenti senza dipendere da specialisti permanenti. |
+| Criteri di accettazione | Given domande valide di domini diversi, When vengono elaborate, Then il sistema crea team coerenti senza dipendere da esperti AI permanenti. |
 | Impatti | Scalabilita': adattamento funzionale a domini diversi. |
 | Priorita' | `SHOULD` |
 | Stato | `Draft` |
@@ -331,17 +334,18 @@ Evoluzioni future:
 | Domanda utente | Testo libero inviato dall'utente | Obbligatoria, non vuota, ammessa dalle policy, elaborabile entro limiti. |
 | Esito validazione | Stato della richiesta | Deve distinguere richiesta valida, rifiutata, errore. |
 | Piano team | Competenze, numero, ruoli, strategia | Deve rispettare limiti e non rispondere direttamente alla domanda. |
-| Specialista | Nome, ruolo, personalita', missione | Deve essere coerente con piano e distinguibile dagli altri. |
-| Messaggio dibattito | Contributo attribuito a uno specialista | Deve essere ordinato, leggibile e associato al mittente. |
+| Esperto AI orchestrato | Nome, ruolo, personalita', missione | Deve essere coerente con piano e distinguibile dagli altri. |
+| Messaggio dibattito | Contributo attribuito a un esperto AI orchestrato | Deve essere ordinato, leggibile e associato al mittente. |
 | Decisione supervisore | Prossimo turno, arresto, motivazione | Deve rispettare limiti e rendere osservabile la ragione dell'arresto. |
 | Risposta finale | Sintesi motivata | Deve derivare dal dibattito concluso o arrestato. |
+| Giudizio qualitativo | Verdict, rubrica, motivazione sintetica | Evoluzione futura: deve essere strutturato, validato e non sostituire i controlli di sicurezza. |
 
 ## 9. Regole di dominio, policy, assunzioni e vincoli
 
 Regole di dominio:
 - il sistema e' domain-agnostic;
 - il team viene creato per ogni richiesta valida;
-- non esistono specialisti permanenti di dominio nell'MVP;
+- non esistono esperti AI permanenti di dominio nell'MVP;
 - il dibattito non parte senza validazione positiva;
 - il piano definisce il team ma non risponde alla domanda;
 - ogni dibattito deve terminare entro limiti;
@@ -350,7 +354,7 @@ Regole di dominio:
 Policy:
 - rifiutare richieste non valide o ostili con motivazione osservabile;
 - non esporre dettagli interni non necessari negli errori;
-- applicare limiti di agenti, turni, messaggi e timeout;
+- applicare limiti di esperti AI orchestrati, turni, messaggi e timeout;
 - mostrare stato e progressione del processo all'utente.
 
 Assunzioni:
@@ -358,7 +362,7 @@ Assunzioni:
 - gli utenti non sono autenticati;
 - la persistenza della cronologia non e' richiesta;
 - i limiti operativi esistono come valori disponibili al sistema;
-- la qualita' della risposta e' valutata tramite osservabilita' del processo e presenza di sintesi motivata, non tramite scoring automatico.
+- la qualita' della risposta e' valutata nell'MVP tramite osservabilita' del processo e presenza di sintesi motivata; scoring automatico e Judge strutturato sono evoluzioni documentate, non requisito immediato.
 
 Vincoli:
 - sorgente vision: `docs/vision.md`;
@@ -371,9 +375,9 @@ Vincoli:
 | --- | --- | --- | --- | --- | --- |
 | `docs/vision.md#1-vision` | `REQ-012`, `NFR-007` | Da definire | Da definire | Da definire | Da definire |
 | `docs/vision.md#3-esperienza-utente` | `REQ-001`, `REQ-007`, `REQ-010`, `NFR-001` | Da definire | Da definire | Da definire | Da definire |
-| `docs/vision.md#6-validation-agent` | `REQ-002`, `REQ-003`, `NFR-003` | Da definire | Da definire | Da definire | Da definire |
-| `docs/vision.md#7-planner-agent` | `REQ-004` | Da definire | Da definire | Da definire | Da definire |
-| `docs/vision.md#8-runtime-agent-builder` | `REQ-005` | Da definire | Da definire | Da definire | Da definire |
+| `docs/vision.md#6-ruolo-di-validazione` | `REQ-002`, `REQ-003`, `NFR-003` | Da definire | Da definire | Da definire | Da definire |
+| `docs/vision.md#7-ruolo-planner` | `REQ-004` | Da definire | Da definire | Da definire | Da definire |
+| `docs/vision.md#8-costruttore-ruoli-runtime` | `REQ-005` | Da definire | Da definire | Da definire | Da definire |
 | `docs/vision.md#9-personalita` | `REQ-006` | Da definire | Da definire | Da definire | Da definire |
 | `docs/vision.md#10-dibattito` | `REQ-007` | Da definire | Da definire | Da definire | Da definire |
 | `docs/vision.md#11-supervisor` | `REQ-008`, `REQ-010`, `NFR-002` | Da definire | Da definire | Da definire | Da definire |

@@ -56,6 +56,13 @@ Output AI:
 - sanitizzare contenuti mostrati in UI;
 - non mostrare stacktrace, prompt interni, configurazioni, API key, path locali o dettagli provider.
 
+Output Judge futuro:
+- trattare il giudizio LLM-as-a-Judge come output AI non fidato finche' non e' validato;
+- accettare solo verdict previsti (`ACCEPT`, `REVISE`, `REJECT`) e rubrica strutturata con campi obbligatori;
+- non usare il Judge come unico controllo di sicurezza, policy, compliance o blocco contenuti;
+- se il Judge non e' disponibile o produce output malformato, degradare in modo controllato secondo policy applicativa;
+- non loggare prompt, input utente, dibattito completo, risposta finale o giudizi sensibili prodotti dal Judge.
+
 ## 6. Logging ed error handling
 
 Logging:
@@ -104,6 +111,7 @@ Provider LLM:
 - retry limitati, con backoff, solo per errori transitori;
 - validare request costruite verso provider e response ricevute;
 - non affidare al provider decisioni di sicurezza senza controlli applicativi;
+- non affidare al Judge decisioni di sicurezza esclusive: il suo verdetto e' un segnale qualitativo, non una policy engine;
 - separare prompt/template interni dall'input utente;
 - output provider non e' fidato finche' non validato.
 
@@ -154,10 +162,11 @@ Futuro:
 | --- | --- | --- | --- |
 | Prompt injection/jailbreak | `REQ-002`, Validation, AI adapter | Validazione dedicata, prompt separati, rifiuto motivato, output non fidato. | Possibili bypass semantici; richiede test continuo. |
 | Esfiltrazione segreti via output AI | AI adapter, UI | Segreti mai nel prompt se non indispensabili; output sanitizzato; nessun segreto al browser. | Provider o log mal configurati possono esporre dati. |
-| Cost/resource abuse | `REQ-009`, Orchestrator | Rate limit, max input, max turni/messaggi/agenti, timeout. | Picchi pubblici richiedono tuning dei limiti. |
+| Cost/resource abuse | `REQ-009`, Orchestrator | Rate limit, max input, max turni/messaggi/esperti AI orchestrati, timeout. | Picchi pubblici richiedono tuning dei limiti. |
 | XSS da contenuto generato | UI, stream eventi | Render come testo, sanitizzazione, nessun HTML generato fidato. | Rischio se in futuro si abilita Markdown/HTML. |
 | Disclosure tecnica | Error handling, logging | Messaggi utente generici, stacktrace solo log sicuri, path e provider nascosti. | Log accessibili impropriamente restano rischio operativo. |
 | Output AI malformato | Planning, team, supervisor, final answer | Response validation, fallback/errore controllato, test con risposte simulate. | LLM puo' produrre casi non previsti. |
+| Giudizio Judge instabile o allucinato | Judge futuro, final answer, supervisor consultivo | Rubrica esplicita, output strutturato validato, fallback controllato, test su verdict e risposte malformate. | Bias, variabilita' e falsa sicurezza restano rischi residui del modello. |
 | Trasporto insicuro | Web app, provider LLM | HTTPS/TLS, no verifica TLS disabilitata. | Configurazione deploy errata. |
 | Persistenza involontaria dati | Logging, temp files | Minimizzazione, divieto log payload completi, niente DB MVP. | Provider esterno puo' avere policy proprie da valutare. |
 
@@ -176,3 +185,5 @@ Futuro:
 - Rendering HTML non sanitizzato da contenuto utente o AI.
 - Dipendenze obsolete, non mantenute o non motivate.
 - API key o configurazioni provider esposte al frontend.
+- Decisioni di sicurezza affidate esclusivamente al Judge.
+- Log di prompt/input utente, dibattito completo, risposta finale o output Judge sensibili.

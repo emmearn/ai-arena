@@ -8,7 +8,7 @@ MVP minimo:
 - domanda utente valida/non valida;
 - validazione e rifiuto sicuro;
 - piano team domain-agnostic;
-- specialisti runtime distinguibili;
+- esperti AI orchestrati distinguibili;
 - dibattito progressivo con limiti;
 - sintesi finale motivata;
 - schermata unica coerente con design system;
@@ -35,7 +35,8 @@ Obiettivo: ogni milestone lascia l'app eseguibile e testabile, anche usando prov
 | M3 - Web e streaming | Endpoint e SSE espongono eventi progressivi e stati errore. | `TASK-011`-`TASK-014` |
 | M4 - UI MVP | Schermata unica usabile, accessibile e coerente col design. | `TASK-015`-`TASK-019` |
 | M5 - AI reale controllata | Adapter LLM configurabile, output validato, segreti sicuri. | `TASK-020`-`TASK-024` |
-| M6 - Hardening | Test, logging, rate limit, edge case e demo readiness. | `TASK-025`-`TASK-030` |
+| M6 - Hardening | Test, logging, rate limit, edge case, terminologia tecnica coerente e demo readiness. | `TASK-025`-`TASK-031` |
+| M7 - Judge strutturato | Evoluzione incrementale per valutazione qualitativa separata dal Supervisor. | `TASK-032`-`TASK-036` |
 
 ## 3.1 Stato avanzamento
 
@@ -49,36 +50,42 @@ Stati: `TODO`, `IMPLEMENTED`, `VERIFIED_STATIC`, `BLOCKED_RUNTIME`, `DONE`.
 | `TASK-004` | `DONE` | Validazioni di dominio su domanda e limiti presenti; test eseguiti da Maven. | Verificato con Java 21.0.11. |
 | `TASK-005` | `DONE` | Porte AI e `FakeAiAdapter` deterministico creati; test fake eseguiti da Maven. | Verificato con Java 21.0.11. |
 | `TASK-006` | `DONE` | `ValidationService` con controlli locali su vuoto, lunghezza e prompt ostili; test eseguiti da Maven. | Verificato con Java 21.0.11. |
-| `TASK-007` | `DONE` | `PlanningService` e planning fake domain-aware con fallback generale e limiti specialisti; test eseguiti da Maven. | Verificato con Java 21.0.11. |
-| `TASK-008` | `DONE` | `SpecialistFactory`, specialisti con identita' completa e accento UI stabile; test eseguiti da Maven. | Verificato con Java 21.0.11. |
+| `TASK-007` | `DONE` | `PlanningService` e planning fake domain-aware con fallback generale e limiti per esperti AI orchestrati; test eseguiti da Maven. | Verificato con Java 21.0.11. |
+| `TASK-008` | `DONE` | `OrchestratedAiExpertFactory`, esperti AI orchestrati con identita' completa e accento UI stabile; test eseguiti da Maven. | Verificato con Java 21.0.11. |
 | `TASK-009` | `DONE` | `DebateOrchestrator` sequenziale con stop reason per convergenza, limiti, timeout e decisioni incoerenti; test eseguiti da Maven. | Verificato con Java 21.0.11. |
 | `TASK-010` | `DONE` | `RunArenaSessionUseCase`, `FinalAnswerService` e sintesi fake derivata dal dibattito; test end-to-end applicativi eseguiti da Maven. | Verificato con Java 21.0.11. |
 | `TASK-011` | `DONE` | Eventi applicativi `SessionEvent*` e mapping ordinato da risultato sessione; test eseguiti da Maven. | Verificato con Java 21.0.11. |
 | `TASK-012` | `DONE` | Endpoint `POST /api/arena/sessions` con stream SSE da eventi applicativi; integration test web eseguiti da Maven. | Verificato con Java 21.0.11. |
 | `TASK-013` | `TODO` | Non iniziato. | Prossimo task operativo. |
+| `TASK-031` | `DONE` | Nomi tecnici migrati a `OrchestratedAiExpert`/`expert`; evento SSE `EXPERT_CREATED`; property `arena.limits.max-experts`; `mvnw test` passa. | Verificato con Java 21.0.11. |
+| `TASK-032` | `TODO` | Non iniziato. | Evoluzione non MVP: modello dominio Judge. |
+| `TASK-033` | `TODO` | Non iniziato. | Evoluzione non MVP: porta AI dedicata al Judge. |
+| `TASK-034` | `TODO` | Non iniziato. | Evoluzione non MVP: quality gate post-sintesi. |
+| `TASK-035` | `TODO` | Non iniziato. | Evoluzione non MVP: uso consultivo nel Supervisor dopo test. |
+| `TASK-036` | `TODO` | Non iniziato. | Evoluzione non MVP: test fallback e output malformati. |
 
 ## 4. Task
 
 | ID | Descrizione | Prio | Dipendenze | Requisiti | Riferimenti | Completamento | Verifica/test |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `TASK-001` | Creare struttura package prevista e mantenere app avviabile. | `MUST` | Nessuna | `NFR-006` | `docs/architecture.md#4-struttura-progetto` | Package principali presenti; app compila e parte. | Test smoke Spring esistente passa. |
-| `TASK-002` | Definire properties tipizzate per limiti MVP. | `MUST` | `TASK-001` | `REQ-009` | `docs/architecture.md#9-configurazione`, `docs/security.md#5-input-validation-e-output-handling` | Limiti max specialisti, turni, messaggi, timeout e max input configurabili con default. | Unit test binding/validazione limiti. |
-| `TASK-003` | Implementare domain model minimo in memoria. | `MUST` | `TASK-001` | `REQ-001`-`REQ-010` | `docs/architecture.md#6-modello-dati` | Tipi domain essenziali rappresentano domanda, validazione, piano, specialisti, messaggi, decisione, risposta, stato. | Unit test costruttori/invarianti base. |
+| `TASK-002` | Definire properties tipizzate per limiti MVP. | `MUST` | `TASK-001` | `REQ-009` | `docs/architecture.md#9-configurazione`, `docs/security.md#5-input-validation-e-output-handling` | Limiti max esperti AI orchestrati, turni, messaggi, timeout e max input configurabili con default. | Unit test binding/validazione limiti. |
+| `TASK-003` | Implementare domain model minimo in memoria. | `MUST` | `TASK-001` | `REQ-001`-`REQ-010` | `docs/architecture.md#6-modello-dati` | Tipi domain essenziali rappresentano domanda, validazione, piano, esperti AI orchestrati, messaggi, decisione, risposta, stato. | Unit test costruttori/invarianti base. |
 | `TASK-004` | Implementare invarianti dominio su input vuoto e limiti. | `MUST` | `TASK-002`, `TASK-003` | `REQ-001`, `REQ-009` | `docs/requirements.md#8-input-output-e-validazioni-di-dominio` | Input vuoto e limiti non validi non producono sessione valida. | Unit test input vuoto, limiti zero/negativi, superamento max. |
 | `TASK-005` | Creare porte AI e adapter fake deterministico. | `MUST` | `TASK-003` | `REQ-002`-`REQ-010` | `docs/architecture.md#3-architettura-applicativa` | Interfacce AI mockabili; fake produce validazione, piano, messaggi e sintesi prevedibili. | Unit test fake con domanda valida e rifiutata. |
 | `TASK-006` | Implementare `ValidationService` con controlli locali minimi. | `MUST` | `TASK-004`, `TASK-005` | `REQ-002`, `NFR-003` | `docs/security.md#5-input-validation-e-output-handling` | Domanda vuota/troppo lunga/ostile nota viene rifiutata prima del dibattito. | Unit test valida, vuota, oltre limite, pattern injection/jailbreak di base. |
-| `TASK-007` | Implementare classificazione e pianificazione fake coerenti coi limiti. | `MUST` | `TASK-005`, `TASK-006` | `REQ-003`, `REQ-004`, `REQ-012` | `docs/architecture.md#5-componenti-principali` | Piano contiene competenze, numero, ruoli, strategia e rispetta max specialisti. | Unit test domini diversi, dominio incerto, limite specialisti. |
-| `TASK-008` | Implementare factory specialisti runtime. | `MUST` | `TASK-007` | `REQ-005`, `REQ-006` | `docs/design.md#3-personalita-visiva-degli-agenti` | Ogni specialista ha id, nome, ruolo, personalita', missione e accento UI stabile. | Unit test completezza e distinzione specialisti. |
+| `TASK-007` | Implementare classificazione e pianificazione fake coerenti coi limiti. | `MUST` | `TASK-005`, `TASK-006` | `REQ-003`, `REQ-004`, `REQ-012` | `docs/architecture.md#5-componenti-principali` | Piano contiene competenze, numero, ruoli, strategia e rispetta max esperti AI orchestrati. | Unit test domini diversi, dominio incerto, limite esperti AI orchestrati. |
+| `TASK-008` | Implementare factory esperti AI orchestrati. | `MUST` | `TASK-007` | `REQ-005`, `REQ-006` | `docs/design.md#3-personalita-visiva-degli-esperti-ai-orchestrati` | Ogni esperto AI orchestrato ha id, nome, ruolo, personalita', missione e accento UI stabile. | Unit test completezza e distinzione esperti AI orchestrati. |
 | `TASK-009` | Implementare orchestrator sequenziale del dibattito. | `MUST` | `TASK-008` | `REQ-007`, `REQ-008`, `REQ-009` | `docs/architecture.md#7-flussi-applicativi` | Genera messaggi ordinati, applica turni/messaggi/timeout, produce ragione stop. | Unit test ordine turni, limite messaggi, limite turni, timeout simulato. |
 | `TASK-010` | Implementare sintesi finale fake e use case end-to-end. | `MUST` | `TASK-009` | `REQ-010`, `NFR-002` | `docs/architecture.md#5-componenti-principali` | Richiesta valida termina con risposta finale; rifiuto non crea team. | Unit test use case valido, rifiutato, stop per limite. |
-| `TASK-011` | Definire eventi applicativi di sessione. | `MUST` | `TASK-010` | `REQ-007`, `REQ-011` | `docs/architecture.md#7-flussi-applicativi` | Eventi minimi disponibili: validation, team, specialist, message, decision, final, error. | Unit test mapping stato -> evento. |
+| `TASK-011` | Definire eventi applicativi di sessione. | `MUST` | `TASK-010` | `REQ-007`, `REQ-011` | `docs/architecture.md#7-flussi-applicativi` | Eventi minimi disponibili: validation, team, expert, message, decision, final, error. | Unit test mapping stato -> evento. |
 | `TASK-012` | Implementare endpoint invio domanda con stream SSE. | `MUST` | `TASK-011` | `REQ-001`, `REQ-007`, `NFR-001` | `docs/architecture.md#2-stack-tecnologico` | Endpoint accetta domanda, emette eventi ordinati e chiude stream a fine sessione. | Integration test SSE con fake AI. |
 | `TASK-013` | Implementare error mapping web sicuro. | `MUST` | `TASK-012` | `NFR-004` | `docs/security.md#6-logging-ed-error-handling` | Errori utente e interni producono messaggi standard senza stacktrace. | Integration test input invalido, errore fake provider, nessuno stacktrace in response. |
 | `TASK-014` | Applicare limiti HTTP e rate limit minimo. | `MUST` | `TASK-012` | `REQ-009`, `NFR-003` | `docs/security.md#9-api-e-integrazioni` | Payload troppo grande o richieste eccessive vengono rifiutati in modo controllato. | Integration test limite payload; test/manuale rate limit. |
 | `TASK-015` | Creare pagina unica base con asset logo. | `MUST` | `TASK-012` | `REQ-011`, `NFR-007` | `docs/design.md`, `assets/logo/` | Pagina caricabile con logo, input, area stato, team, dibattito, sintesi. | Test/manuale browser: pagina carica senza errori console critici. |
 | `TASK-016` | Implementare input domanda e stati validazione UI. | `MUST` | `TASK-015` | `REQ-001`, `REQ-002` | `docs/design.md#7-componenti-ui` | Invio da tastiera/click; errore vuoto vicino al campo; stato accepted/rejected visibile. | UI test domanda vuota e domanda valida. |
-| `TASK-017` | Implementare rendering team e identita' agenti. | `MUST` | `TASK-016` | `REQ-005`, `REQ-006` | `docs/design.md#3-personalita-visiva-degli-agenti` | Card agenti con avatar/colore/ruolo coerenti e non tabellari. | UI test presenza agenti; controllo visuale responsive. |
-| `TASK-018` | Implementare rendering dibattito progressivo e turno attivo. | `MUST` | `TASK-017` | `REQ-007`, `NFR-001` | `docs/design.md#11-animazioni-e-microinterazioni` | Messaggi appaiono progressivamente, associati ad agente, senza HTML eseguibile. | UI/integration test evento message; test XSS renderizzato come testo. |
+| `TASK-017` | Implementare rendering team e identita' esperti AI orchestrati. | `MUST` | `TASK-016` | `REQ-005`, `REQ-006` | `docs/design.md#3-personalita-visiva-degli-esperti-ai-orchestrati` | Card esperti AI orchestrati con avatar/colore/ruolo coerenti e non tabellari. | UI test presenza esperti AI orchestrati; controllo visuale responsive. |
+| `TASK-018` | Implementare rendering dibattito progressivo e turno attivo. | `MUST` | `TASK-017` | `REQ-007`, `NFR-001` | `docs/design.md#11-animazioni-e-microinterazioni` | Messaggi appaiono progressivamente, associati a un esperto AI orchestrato, senza HTML eseguibile. | UI/integration test evento message; test XSS renderizzato come testo. |
 | `TASK-019` | Implementare sintesi finale, stop reason ed errori UI. | `MUST` | `TASK-018` | `REQ-008`, `REQ-010`, `REQ-011` | `docs/design.md#9-ux-guidelines`, `docs/security.md#10-frontend-e-ux-di-sicurezza` | Giudice/sintesi distinguibile; stop/errori comprensibili e non tecnici. | UI test final answer, validation rejected, timeout/limite fake. |
 | `TASK-020` | Registrare decisione provider/modello LLM. | `MUST` | `TASK-010` | `REQ-002`-`REQ-010` | `docs/architecture.md#13-decisioni-architetturali`, `docs/security.md#9-api-e-integrazioni` | Decisione pronta per `docs/decisions.md` con provider, modello, motivazione, alternative, impatti. | Review documentale; nessun codice richiesto. |
 | `TASK-021` | Aggiungere dipendenze Spring AI minime per provider scelto. | `MUST` | `TASK-020` | `REQ-002`-`REQ-010` | `docs/architecture.md#2-stack-tecnologico` | Build usa solo starter necessari; fake resta disponibile per test. | Build e test passano. |
@@ -91,16 +98,23 @@ Stati: `TODO`, `IMPLEMENTED`, `VERIFIED_STATIC`, `BLOCKED_RUNTIME`, `DONE`.
 | `TASK-028` | Verificare responsive e demo readiness. | `SHOULD` | `TASK-019` | `REQ-011` | `docs/design.md#12-consistenza-visiva` | UI leggibile su desktop/laptop/mobile; nessun overlap su contenuti lunghi. | Screenshot/controllo manuale viewport principali. |
 | `TASK-029` | Eseguire hardening dipendenze e build. | `MUST` | `TASK-024` | `NFR-006` | `docs/security.md#12-dipendenze` | Dipendenze minime, build pulita, nessuna libreria non motivata. | Build/test completi; review `pom.xml`. |
 | `TASK-030` | Preparare smoke test end-to-end MVP. | `MUST` | `TASK-029` | Tutti i `REQ-*` MVP | Tutti i documenti | Scenario valido e scenario rifiutato verificabili con fake e, se configurato, provider reale. | E2E light o checklist eseguibile documentata nel test. |
+| `TASK-031` | Allineare nomi tecnici a esperti AI orchestrati. | `MUST` | `TASK-008`, `TASK-012` | `REQ-005`, `REQ-007`, `REQ-009` | `docs/requirements.md#req-005-creazione-dinamica-degli-esperti-ai-orchestrati`, `docs/architecture.md#4-struttura-progetto` | Codice, eventi SSE, property e documentazione usano `expert`/`OrchestratedAiExpert` invece di `specialist`, salvo compatibilita' esplicitamente documentata. | Suite Maven completa; ricerca residui `Specialist`/`specialist` limitata a riferimenti storici o assenti. |
+| `TASK-032` | Definire modello dominio Judge. | `SHOULD` | `TASK-023`, `TASK-020` | Evoluzione Judge | `docs/architecture.md#6-modello-dati`, `docs/decisions.md#dec-002-separare-supervisor-e-llm-as-a-judge` | Introdurre, solo quando il task viene implementato, `JudgeRequest`, `Judgement`, `JudgeVerdict` e `JudgeRubric` con rubrica relevance, correctness, completeness, clarity, safety, overall. | Unit test invarianti, verdict `ACCEPT`/`REVISE`/`REJECT`, scoring/rubrica valida e campi obbligatori. |
+| `TASK-033` | Introdurre `JudgeAiPort` separata da `SupervisorAiPort`. | `SHOULD` | `TASK-032` | Evoluzione Judge | `docs/architecture.md#3-architettura-applicativa`, `docs/security.md#5-input-validation-e-output-handling` | La porta Judge restituisce solo output strutturato validato e non decide direttamente turni, limiti o policy di sicurezza. | Contract test con output valido, campi mancanti, verdict non ammesso e provider error. |
+| `TASK-034` | Integrare `JudgeService` dopo la sintesi finale. | `SHOULD` | `TASK-033`, `TASK-023` | `REQ-010`, Evoluzione Judge | `docs/architecture.md#7-flussi-applicativi` | La risposta finale puo' essere accettata, revisionata o rifiutata in modo controllato prima della consegna, con fallback se il Judge non e' disponibile. | Test use case su `ACCEPT`, `REVISE`, `REJECT`, unavailable e output malformato. |
+| `TASK-035` | Usare il giudizio nel Supervisor solo come segnale consultivo. | `COULD` | `TASK-034` | `REQ-008`, Evoluzione Judge | `docs/architecture.md#3-architettura-applicativa` | Il Supervisor puo' usare `Judgement` per continuare, revisionare, accettare o fermare, ma resta responsabile di limiti, loop e timeout. | Test orchestrator con giudizio consultivo, limiti prevalenti e nessun loop aggiuntivo. |
+| `TASK-036` | Rafforzare test Judge, fallback e output AI malformato. | `SHOULD` | `TASK-033` | `NFR-002`, `NFR-003`, Evoluzione Judge | `docs/security.md#13-minacce-mitigazioni-e-rischi-residui` | Coprire verdict instabili, hallucination del Judge, bias evidente nei fixture, output incompleto e degradazione controllata. | Suite unit/contract dedicata; log capture verifica assenza di prompt/input/output sensibili. |
 
 ## 5. Vertical slices
 
 | Slice | Include | Esclude |
 | --- | --- | --- |
 | Validazione visibile | Input, validation service, evento, UI stato, test. | Team, dibattito, AI reale. |
-| Dibattito fake | Piano, specialisti, messaggi, supervisione, sintesi deterministica. | Provider reale. |
+| Dibattito fake | Piano, esperti AI orchestrati, messaggi, supervisione, sintesi deterministica. | Provider reale. |
 | Streaming osservabile | SSE, eventi ordinati, UI progressiva, error mapping. | Ottimizzazioni avanzate. |
 | AI controllata | Adapter provider, output validation, segreti, timeout, fallback. | Memoria, RAG, tool calling. |
 | Demo hardening | Accessibilita', responsive, logging, rate limit, smoke test. | Funzionalita' future. |
+| Judge strutturato | Rubrica esplicita, `JudgeAiPort`, quality gate post-sintesi e fallback. | Sostituzione del Supervisor o decisioni di sicurezza affidate solo al Judge. |
 
 ## 6. Testing
 
@@ -128,6 +142,7 @@ Task con sicurezza obbligatoria:
 - `TASK-025`: log minimizzati;
 - `TASK-026`: test minacce note;
 - `TASK-029`: dipendenze minime e mantenute.
+- `TASK-033`-`TASK-036`: output Judge strutturato, validato, minimizzato nei log e degradazione controllata.
 
 ## 8. Debito tecnico
 
@@ -137,6 +152,7 @@ Task con sicurezza obbligatoria:
 | `DEBT-002` | Nessun database e nessuna cronologia. | Esclusi dall'MVP. | Requisito approvato per memoria o storico. |
 | `DEBT-003` | Rate limit semplice in-process. | Sufficiente per MVP/demo. | Deploy pubblico con traffico reale o piu' istanze. |
 | `DEBT-004` | Scoring qualita' risposta assente. | Escluso dai requisiti MVP. | Requisito approvato di valutazione automatica. |
+| `DEBT-005` | `SupervisorAiPort` copre oggi sia decisione di flusso sia sintesi. | Accettabile nell'MVP fake e nel flusso core gia' implementato. | Avvio dei task `TASK-032`-`TASK-034` per separare il Judge. |
 
 ## 9. Funzionalita' future
 
@@ -146,9 +162,10 @@ Task con sicurezza obbligatoria:
 | `FUTURE-002` | Memoria persistente. | Privacy, retention, modello dati persistente. |
 | `FUTURE-003` | Tool calling / MCP. | Security review integrazioni e autorizzazioni tool. |
 | `FUTURE-004` | RAG. | Data governance, fonti, privacy, modello dati. |
-| `FUTURE-005` | Agenti paralleli. | Nuova architettura concorrenza e gestione costi. |
+| `FUTURE-005` | Ruoli AI paralleli. | Nuova architettura concorrenza e gestione costi. |
 | `FUTURE-006` | Votazione strutturata. | Nuovi requisiti di decisione/supervisione. |
-| `FUTURE-007` | Modelli differenti per agenti. | Decisione costi, provider, fallback. |
+| `FUTURE-007` | Modelli differenti per ruoli AI orchestrati. | Decisione costi, provider, fallback. |
+| `FUTURE-008` | LLM-as-a-Judge separato dal Supervisor. | `DEC-002`, modello dominio Judge, porta AI dedicata, fallback e test. |
 
 ## 10. Tracciabilita'
 
@@ -158,14 +175,15 @@ Task con sicurezza obbligatoria:
 | `REQ-002` | `TASK-006`, `TASK-013`, `TASK-022`, `TASK-026` |
 | `REQ-003` | `TASK-007`, `TASK-022` |
 | `REQ-004` | `TASK-007`, `TASK-022` |
-| `REQ-005` | `TASK-008`, `TASK-017` |
+| `REQ-005` | `TASK-008`, `TASK-017`, `TASK-031` |
 | `REQ-006` | `TASK-008`, `TASK-017` |
-| `REQ-007` | `TASK-009`, `TASK-011`, `TASK-012`, `TASK-018`, `TASK-023` |
+| `REQ-007` | `TASK-009`, `TASK-011`, `TASK-012`, `TASK-018`, `TASK-023`, `TASK-031` |
 | `REQ-008` | `TASK-009`, `TASK-019`, `TASK-023` |
-| `REQ-009` | `TASK-002`, `TASK-004`, `TASK-009`, `TASK-014` |
+| `REQ-009` | `TASK-002`, `TASK-004`, `TASK-009`, `TASK-014`, `TASK-031` |
 | `REQ-010` | `TASK-010`, `TASK-019`, `TASK-023` |
 | `REQ-011` | `TASK-015`-`TASK-019`, `TASK-027`, `TASK-028` |
 | `REQ-012` | `TASK-007`, `TASK-022` |
 | Provider/modello LLM | `TASK-020`, `TASK-021`, `TASK-024` |
 | Limiti iniziali | `TASK-002`, decisione futura in `docs/decisions.md` |
 | Rate limit/CORS/retry | `TASK-014`, `TASK-020`, decisione futura in `docs/decisions.md` |
+| `DEC-002` Separare Supervisor e LLM-as-a-Judge | `TASK-032`, `TASK-033`, `TASK-034`, `TASK-035`, `TASK-036` |

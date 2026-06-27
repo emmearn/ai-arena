@@ -26,23 +26,24 @@ Da evitare:
 | --- | --- |
 | Chiarezza teatrale | Ogni stato deve essere immediatamente leggibile, ma presentato con presenza scenica. |
 | Gerarchia del dibattito | Il contenuto parlato ha priorita' su decorazioni, metriche e ornamenti. |
-| Personalita' controllata | Ogni agente ha identita' visiva distinta senza rompere il sistema. |
+| Personalita' controllata | Ogni esperto AI orchestrato ha identita' visiva distinta senza rompere il sistema. |
 | Tensione ordinata | Contrasto, movimento e colore indicano confronto; layout e spacing mantengono calma. |
-| Giudice centrale | La figura di giudizio/sintesi deve apparire piu' autorevole degli agenti. |
+| Giudice centrale | La figura di giudizio/sintesi deve apparire piu' autorevole degli esperti AI orchestrati, anche se internamente Supervisor e Judge possono essere responsabilita' distinte. |
 | Progressione visibile | L'utente deve percepire avanzamento, turno attivo, arresto e conclusione. |
 | Business-ready | Ogni scelta deve reggere in demo aziendale: pulita, credibile, non caricaturale. |
 
-## 3. Personalita' visiva degli agenti
+## 3. Personalita' visiva degli esperti AI orchestrati
 
-Gli agenti sono identificati visivamente per ruolo e tono, non tramite elementi infantili.
+Gli esperti AI orchestrati sono identificati visivamente per ruolo e tono, non tramite elementi infantili.
 
 Regole:
-- ogni agente ha accento colore, icona/avatar astratto, iniziali o simbolo professionale;
+- ogni esperto AI orchestrato ha accento colore, icona/avatar astratto, iniziali o simbolo professionale;
 - avatar geometrici, non cartoon;
 - stessa struttura visiva per tutti, variazione solo su accento, pattern sottile e icona;
 - il turno attivo aumenta contrasto, bordo, glow leggero o motion, senza cambiare layout;
-- messaggi dello stesso agente mantengono colore e identificatore costanti;
+- messaggi dello stesso esperto AI orchestrato mantengono colore e identificatore costanti;
 - il giudice/supervisore usa trattamento distinto: piu' neutro, centrale, autorevole, con accento metallico/luce calda.
+- la UI puo' rappresentare giudice, supervisione e sintesi come una figura unica per semplicita' narrativa, senza imporre che l'architettura mantenga Supervisor e Judge nello stesso componente.
 
 Archetipi visuali consigliati:
 
@@ -61,12 +62,12 @@ Non progettare schermate fisse, ma rispettare queste regole:
 - esperienza single-screen con aree chiaramente distinguibili;
 - input utente sempre riconoscibile come punto di partenza;
 - dibattito come area dominante;
-- team/agenti come cast laterale o fascia di presenza, mai tabella gestionale;
+- team/esperti AI orchestrati come cast laterale o fascia di presenza, mai tabella gestionale;
 - giudice/sintesi con peso visivo superiore e posizione stabile;
 - stati di validazione, avanzamento, arresto ed errore come segnali compatti;
 - su mobile, priorita': input, stato corrente, messaggi, sintesi; elementi secondari comprimibili;
 - nessuna card dentro card;
-- card solo per elementi individuali: agente, messaggio, sintesi, stato;
+- card solo per elementi individuali: esperto AI orchestrato, messaggio, sintesi, stato;
 - radius massimo 8px salvo avatar circolari;
 - griglie dense ma ariose, con spacing costante.
 
@@ -82,7 +83,7 @@ Palette base scura premium con accenti controllati. Evitare dominanza monocromat
 | `color-border` | `rgba(255,255,255,0.14)` | Separazioni. |
 | `color-text` | `#F3F5F7` | Testo primario. |
 | `color-muted` | `#A7AFBC` | Testo secondario. |
-| `color-cyan` | `#4CC9D8` | Agente analitico, focus freddo. |
+| `color-cyan` | `#4CC9D8` | Esperto analitico, focus freddo. |
 | `color-coral` | `#E46363` | Critica, rischio, contrasto dialettico. |
 | `color-gold` | `#D8B45A` | Giudizio, sintesi, momento decisivo. |
 | `color-teal` | `#51B89F` | Validazione positiva, tecnico. |
@@ -123,8 +124,8 @@ Componenti ammessi nel design system:
 | --- | --- |
 | Input domanda | Ampio, chiaro, orientato all'azione; stato focus evidente; errore vicino al campo. |
 | Pulsante primario | Forte ma sobrio; icona + label quando utile; stato loading visibile. |
-| Card agente | Avatar, nome, ruolo, accento colore, stato; contenuto compatto. |
-| Avatar agente | Geometrico/astratto; colore coerente; iniziali o icona. |
+| Card esperto AI orchestrato | Avatar, nome, ruolo, accento colore, stato; contenuto compatto. |
+| Avatar esperto AI orchestrato | Geometrico/astratto; colore coerente; iniziali o icona. |
 | Messaggio dibattito | Autore, ruolo, contenuto, turno; accento laterale o top border. |
 | Indicatore turno | Evidenzia chi parla con bordo, luce o pulse discreto. |
 | Stato processo | Validazione, planning, dibattito, sintesi, errore; breve e non invasivo. |
@@ -162,8 +163,9 @@ Illustrazioni:
 - Il turno corrente deve essere piu' evidente dei turni passati.
 - I messaggi non devono spostare layout critici in modo brusco.
 - La risposta finale deve essere chiaramente separata dal dibattito.
+- L'eventuale valutazione Judge futura non deve aggiungere complessita' visiva obbligatoria: puo' restare implicita nella qualita' della sintesi o apparire come stato compatto solo se utile.
 - Gli errori devono spiegare il problema senza linguaggio tecnico non necessario.
-- Non usare tabelle per contenuti di dibattito o agenti nella UI finale.
+- Non usare tabelle per contenuti di dibattito o esperti AI orchestrati nella UI finale.
 - Non sovraccaricare l'utente con configurazioni avanzate nell'MVP.
 - La UI deve funzionare bene anche quando il contenuto testuale e' lungo.
 
@@ -208,7 +210,7 @@ Token e regole:
 - border 1px con opacita' controllata;
 - shadow morbide e rare, mai pesanti;
 - glass effect solo su pannelli principali o overlay, non su ogni elemento;
-- massimo 1 accento dominante per agente in una card;
+- massimo 1 accento dominante per esperto AI orchestrato in una card;
 - componenti con stesso ruolo devono mantenere struttura identica;
 - stati semantici sempre con stesso colore;
 - UI leggibile in demo su schermo grande e laptop.
@@ -223,6 +225,7 @@ Token e regole:
 - Non usare testi in-app per spiegare il design o le feature.
 - Ogni componente interattivo deve avere stati hover/focus/disabled/loading quando applicabili.
 - Ogni stato applicativo visibile deve avere label breve, icona o segnale coerente.
-- Ogni agente visualizzato deve avere identita' cromatica e avatar coerenti per tutta la sessione.
-- Il giudice/sintesi deve essere sempre distinguibile dagli agenti.
+- Ogni esperto AI orchestrato visualizzato deve avere identita' cromatica e avatar coerenti per tutta la sessione.
+- Il giudice/sintesi deve essere sempre distinguibile dagli esperti AI orchestrati.
+- La distinzione interna Supervisor/Judge non richiede nuove aree UI nell'MVP.
 - L'implementazione deve preservare leggibilita', accessibilita' e gerarchia anche con contenuti generati lunghi.
