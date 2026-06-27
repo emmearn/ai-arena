@@ -16,6 +16,9 @@ import com.marnone.ai_arena.application.ErrorEvent;
 import com.marnone.ai_arena.application.RunArenaSessionUseCase;
 import com.marnone.ai_arena.application.SessionEvent;
 
+/**
+ * HTTP entry point for starting an arena session and streaming session events with SSE.
+ */
 @RestController
 @RequestMapping("/api/arena")
 public class ArenaController {
@@ -40,6 +43,7 @@ public class ArenaController {
 			}
 			catch (RuntimeException ex) {
 				try {
+					// Keep unexpected failures observable without exposing internals over the public stream.
 					send(emitter, SessionEvent.error(new ErrorEvent("Unable to run arena session.")));
 					emitter.complete();
 				}

@@ -17,6 +17,9 @@ import com.marnone.ai_arena.domain.SupervisorDecision;
 import com.marnone.ai_arena.domain.TeamPlan;
 import com.marnone.ai_arena.domain.ValidationResult;
 
+/**
+ * Deterministic AI adapter for local development and tests until a real LLM provider is selected.
+ */
 public class FakeAiAdapter implements AiClientPort {
 
 	@Override

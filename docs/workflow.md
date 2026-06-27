@@ -79,6 +79,14 @@ Documentazione del codice:
 - commentare solo logica non immediata, vincoli di dominio, trade-off, assunzioni o comportamenti sorprendenti;
 - evitare commenti banali e contenuti gia' evidenti dai nomi.
 
+Logging:
+- quando un flusso applicativo e' completato, rivedere entry point, confini del sistema, integrazioni, decisioni operative ed errori gestibili;
+- aggiungere log solo se aiutano diagnosi, audit tecnico, troubleshooting o comprensione dello stato operativo;
+- rimuovere log temporanei, rumorosi, duplicati o banali, incluse semplici tracce di ingresso/uscita metodo;
+- verificare che i log rispettino `docs/security.md#6-logging-ed-error-handling`;
+- nel Dynamic Agent-Driven Workflow, il Review Agent rileva log mancanti o superflui rispetto alla policy di `docs/architecture.md#8-error-handling-e-logging`;
+- non introdurre nuovi agenti solo per logging.
+
 README.md:
 - aggiornare `README.md` solo quando cambia l'esperienza di ingresso al progetto: setup, prerequisiti, comandi di avvio/test/build, configurazione richiesta, modalita' d'uso, funzionalita' principali, stato MVP o informazioni necessarie a un nuovo lettore;
 - mantenerlo sintetico, operativo e non duplicativo rispetto a `docs/`;
@@ -94,7 +102,7 @@ README.md:
 | Execution | Applicare modifiche nello scope minimo. |
 | Security | Verificare rischi e controlli proporzionati. |
 | Testing | Eseguire test rilevanti o indicare perche' non sono eseguibili. |
-| Review | Verificare coerenza, regressioni, duplicazioni, overengineering, commenti/Javadoc e README quando rilevanti, e necessita' degli agenti creati. |
+| Review | Verificare coerenza, regressioni, duplicazioni, overengineering, commenti/Javadoc, logging proporzionato e README quando rilevanti, e necessita' degli agenti creati. |
 | Closure | Riportare risultato, test, documenti aggiornati, agenti creati e rischi residui. |
 
 ## 8. Anti-Proliferation Rules

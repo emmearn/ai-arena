@@ -196,7 +196,12 @@ Regole tecniche:
 - errori di input diventano rifiuti o validation error osservabili;
 - errori AI, timeout e risultati non parsabili diventano errori applicativi gestiti;
 - ogni sessione ha `sessionId` tecnico per correlare log ed eventi;
-- loggare stato, componente, durata, esito e ragione di arresto;
+- loggare solo quando il dato aiuta diagnosi, troubleshooting, audit tecnico o comprensione dello stato operativo;
+- loggare eventi applicativi significativi, confini del sistema, integrazioni esterne, decisioni operative rilevanti ed errori gestibili;
+- includere stato, componente, durata, esito e ragione di arresto quando sono utili al contesto;
+- usare livelli coerenti con lo stack: `DEBUG` solo per diagnostica locale non sensibile, `INFO` per stati principali, `WARN` per condizioni gestite anomale, `ERROR` per fallimenti inattesi o non recuperabili;
+- usare correlation/request id per flussi multi-step, API o operazioni asincrone quando aiutano a ricostruire la richiesta;
+- evitare log rumorosi, duplicati, temporanei o banali, incluse semplici tracce di ingresso/uscita metodo;
 - non loggare prompt completi, segreti o dati sensibili non necessari;
 - messaggi utente devono essere comprensibili e non esporre stack trace;
 - policy di sicurezza dettagliate rimandate a `docs/security.md`.

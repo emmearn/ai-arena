@@ -8,6 +8,9 @@ import com.marnone.ai_arena.domain.ArenaLimits;
 import com.marnone.ai_arena.domain.Question;
 import com.marnone.ai_arena.domain.TeamPlan;
 
+/**
+ * Builds and validates the domain-agnostic specialist plan for an accepted question.
+ */
 public class PlanningService {
 
 	private final PlanningAiPort planningAiPort;

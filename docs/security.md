@@ -60,14 +60,18 @@ Output AI:
 
 Logging:
 - usare correlation/session id tecnico per ogni richiesta;
-- loggare evento, componente, esito, durata, ragione di rifiuto/arresto e categoria errore;
-- non loggare segreti, prompt completi, risposte complete del provider o dati personali non necessari;
-- distinguere livelli: `INFO` per stati principali, `WARN` per rifiuti/limiti/timeout, `ERROR` per fallimenti inattesi;
-- mascherare eventuali valori sensibili prima del log.
+- loggare solo eventi tecnici utili a diagnosi, troubleshooting, audit tecnico o comprensione dello stato operativo;
+- loggare evento, componente, esito, durata, ragione di rifiuto/arresto e categoria errore solo quando sono necessari e proporzionati;
+- non loggare segreti, token, password, PII, payload sensibili, prompt/input utente o output AI sensibili;
+- non loggare prompt completi, risposte complete del provider, header sensibili o dati personali non necessari;
+- distinguere livelli secondo la policy tecnica in `docs/architecture.md#8-error-handling-e-logging`;
+- mascherare o redigere valori sensibili prima del log quando non si possono omettere;
+- preferire log sintetici e strutturati che supportano la diagnosi senza aumentare il rischio di esposizione dati.
 
 Error handling:
 - errori utente brevi, standardizzati e non tecnici;
-- errori interni con messaggio generico lato UI e dettagli solo nei log sicuri;
+- errori interni con messaggio generico lato UI e dettagli solo nei log sicuri e minimizzati;
+- stacktrace e dettagli interni non devono essere esposti agli utenti;
 - timeout e limiti devono produrre stato osservabile e arresto controllato;
 - ogni errore deve impedire prosecuzione incoerente del dibattito.
 
@@ -161,7 +165,7 @@ Futuro:
 
 - Segreti hardcoded.
 - Segreti in repository, asset, test reali o documentazione.
-- Log di segreti, prompt completi, payload completi o dati sensibili non necessari.
+- Log di segreti, token, password, PII, prompt/input utente, output AI sensibili, payload completi o dati sensibili non necessari.
 - Stacktrace o dettagli interni mostrati all'utente.
 - SSL/TLS disabilitato o verifica certificati disattivata.
 - Endpoint debug pubblici.

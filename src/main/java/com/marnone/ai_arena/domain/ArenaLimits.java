@@ -3,6 +3,9 @@ package com.marnone.ai_arena.domain;
 import java.time.Duration;
 import java.util.Objects;
 
+/**
+ * Execution limits applied before and during a single arena session.
+ */
 public record ArenaLimits(int maxSpecialists, int maxTurns, int maxMessages, Duration timeout, int maxInputCharacters) {
 
 	public ArenaLimits {

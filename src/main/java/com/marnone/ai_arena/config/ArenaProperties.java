@@ -4,6 +4,9 @@ import java.time.Duration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * Runtime configuration for arena limits that constrain planning and debate execution.
+ */
 @ConfigurationProperties(prefix = "arena")
 public class ArenaProperties {
 

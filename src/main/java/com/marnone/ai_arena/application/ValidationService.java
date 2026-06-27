@@ -11,6 +11,9 @@ import com.marnone.ai_arena.config.ArenaProperties;
 import com.marnone.ai_arena.domain.Question;
 import com.marnone.ai_arena.domain.ValidationResult;
 
+/**
+ * Applies local request checks before delegating semantic validation to the AI port.
+ */
 public class ValidationService {
 
 	private static final List<String> HOSTILE_PATTERNS = List.of(
@@ -41,6 +44,7 @@ public class ValidationService {
 			return ValidationResult.rejected("Question must not be empty.");
 		}
 		String text = input.trim();
+		// Local guards reject obvious invalid or hostile requests before any AI call can spend resources.
 		if (text.length() > arenaProperties.getLimits().getMaxInputCharacters()) {
 			return ValidationResult.rejected("Question exceeds the maximum allowed length.");
 		}

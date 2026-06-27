@@ -9,6 +9,9 @@ import com.marnone.ai_arena.ai.SpecialistAiPort;
 import com.marnone.ai_arena.domain.Specialist;
 import com.marnone.ai_arena.domain.TeamPlan;
 
+/**
+ * Creates the runtime specialist team and checks that generated identities match the plan.
+ */
 public class SpecialistFactory {
 
 	private final SpecialistAiPort specialistAiPort;

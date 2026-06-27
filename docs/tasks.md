@@ -24,6 +24,7 @@ Obiettivo: ogni milestone lascia l'app eseguibile e testabile, anche usando prov
 4. Verifica semplice: ogni task ha test o controllo manuale oggettivo.
 5. Vertical slices: evitare layer completi non utilizzabili.
 6. Documentazione proporzionata: quando rilevante, il completamento include commenti/Javadoc essenziali nel codice e aggiornamento di `README.md` solo se cambiano setup, prerequisiti, comandi, configurazione, uso, funzionalita' principali, stato MVP o informazioni necessarie a un nuovo lettore.
+7. Logging proporzionato: il completamento include logging essenziale solo quando il task introduce flussi, integrazioni, decisioni operative o failure mode rilevanti.
 
 ## 3. Milestone incrementali
 
@@ -84,7 +85,7 @@ Stati: `TODO`, `IMPLEMENTED`, `VERIFIED_STATIC`, `BLOCKED_RUNTIME`, `DONE`.
 | `TASK-022` | Implementare adapter Spring AI per validazione e planning. | `MUST` | `TASK-021` | `REQ-002`, `REQ-003`, `REQ-004` | `docs/security.md#5-input-validation-e-output-handling` | Output AI validato e trasformato in tipi domain; fallback sicuro su output malformato. | Contract test con risposte simulate valide/malformate. |
 | `TASK-023` | Implementare adapter Spring AI per dibattito, supervisione e sintesi. | `MUST` | `TASK-022` | `REQ-007`, `REQ-008`, `REQ-010` | `docs/architecture.md#7-flussi-applicativi` | Messaggi/decisioni/sintesi rispettano schema e limiti; errori chiudono in modo controllato. | Contract test output valido, stop, malformed, provider error. |
 | `TASK-024` | Configurare segreti e timeout provider senza esposizione frontend. | `MUST` | `TASK-021` | `NFR-003`, `NFR-004` | `docs/security.md#2-segreti`, `docs/security.md#7-comunicazioni` | API key solo env; timeout configurato; nessun segreto in log/UI/repo. | Test config senza key fallisce sicuro; grep manuale segreti placeholder. |
-| `TASK-025` | Implementare logging con correlation id. | `MUST` | `TASK-013` | `NFR-004`, `NFR-006` | `docs/security.md#6-logging-ed-error-handling` | Log includono session id, componente, esito, durata; non includono prompt completi/segretI. | Test/log capture su flusso valido e rifiutato. |
+| `TASK-025` | Implementare logging con correlation id. | `MUST` | `TASK-013` | `NFR-004`, `NFR-006` | `docs/architecture.md#8-error-handling-e-logging`, `docs/security.md#6-logging-ed-error-handling` | Log essenziali includono session id, componente, esito e durata solo dove utili; non includono prompt, segreti o dati sensibili; log temporanei o rumorosi rimossi. | Test/log capture su flusso valido, rifiutato e failure mode rilevante. |
 | `TASK-026` | Rafforzare test di sicurezza input/output. | `MUST` | `TASK-018`, `TASK-023` | `REQ-002`, `NFR-003` | `docs/security.md#13-minacce-mitigazioni-e-rischi-residui` | Coperti injection base, jailbreak base, XSS in output, output AI malformato. | Suite unit/integration dedicata passa. |
 | `TASK-027` | Verificare accessibilita' UI MVP. | `SHOULD` | `TASK-019` | `NFR-005` | `docs/design.md#10-accessibilita` | Focus visibile, tastiera base, contrasto, motion riducibile, testi lunghi senza overflow. | Checklist manuale + eventuale test UI su keyboard path. |
 | `TASK-028` | Verificare responsive e demo readiness. | `SHOULD` | `TASK-019` | `REQ-011` | `docs/design.md#12-consistenza-visiva` | UI leggibile su desktop/laptop/mobile; nessun overlap su contenuti lunghi. | Screenshot/controllo manuale viewport principali. |
@@ -113,6 +114,8 @@ Priorita' test:
 Regola: nessun task `MUST` e' completo senza verifica indicata nel task.
 
 La documentazione essenziale fa parte della closure del task solo quando il cambiamento la rende utile: aggiornare commenti/Javadoc secondo `docs/architecture.md#12-convenzioni-di-sviluppo` e aggiornare `README.md` solo se cambia l'esperienza di ingresso al progetto. Non trasformare task applicativi in task documentali e non avanzare lo stato di un task solo per aggiornamenti documentali.
+
+Il logging fa parte della closure solo quando il task introduce o modifica un flusso applicativo, un'integrazione esterna, una decisione operativa o un failure mode rilevante. Non creare task di logging artificiali, non rendere il logging obbligatorio per ogni task e non segnare task come `DONE` solo per aggiornamenti documentali sulla policy.
 
 ## 7. Sicurezza integrata
 

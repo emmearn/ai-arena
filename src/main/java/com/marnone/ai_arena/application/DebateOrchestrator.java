@@ -17,6 +17,9 @@ import com.marnone.ai_arena.domain.Specialist;
 import com.marnone.ai_arena.domain.SupervisorAction;
 import com.marnone.ai_arena.domain.SupervisorDecision;
 
+/**
+ * Runs the sequential specialist debate and enforces turn, message, timeout, and supervisor limits.
+ */
 public class DebateOrchestrator {
 
 	private static final String MAX_MESSAGES_STOP = "Stopped because the maximum message limit was reached.";

@@ -6,6 +6,9 @@ import com.marnone.ai_arena.ai.SupervisorAiPort;
 import com.marnone.ai_arena.domain.FinalAnswer;
 import com.marnone.ai_arena.domain.Question;
 
+/**
+ * Produces the final answer from the completed or stopped debate.
+ */
 public class FinalAnswerService {
 
 	private final SupervisorAiPort supervisorAiPort;

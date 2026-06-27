@@ -17,6 +17,9 @@ import com.marnone.ai_arena.domain.TeamPlan;
 import com.marnone.ai_arena.domain.ValidationResult;
 import com.marnone.ai_arena.domain.ValidationStatus;
 
+/**
+ * Coordinates the full arena session from validation through final answer generation.
+ */
 public class RunArenaSessionUseCase {
 
 	private final ValidationService validationService;

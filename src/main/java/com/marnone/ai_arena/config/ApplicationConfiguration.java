@@ -13,6 +13,9 @@ import com.marnone.ai_arena.application.SessionEventMapper;
 import com.marnone.ai_arena.application.SpecialistFactory;
 import com.marnone.ai_arena.application.ValidationService;
 
+/**
+ * Wires the application services around the currently selected AI adapter.
+ */
 @Configuration(proxyBeanMethods = false)
 public class ApplicationConfiguration {
 
