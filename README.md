@@ -25,7 +25,7 @@ AI Arena is a Spring Boot web application that turns one user question into a vi
 ```
 
 The app starts on the default Spring Boot port unless overridden with standard Spring configuration.
-Open `http://localhost:8080/` for the single-page arena UI with validation and expert team feedback.
+Open `http://localhost:8080/` for the single-page arena UI with validation, expert team, and debate feedback.
 
 ## Configuration
 

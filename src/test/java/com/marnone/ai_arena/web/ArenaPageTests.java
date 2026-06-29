@@ -40,7 +40,10 @@ class ArenaPageTests {
 		assertThat(body).contains("id=\"validation-status\"");
 		assertThat(body).contains("id=\"expert-list\"");
 		assertThat(body).contains("id=\"team-status\"");
+		assertThat(body).contains("id=\"message-list\"");
+		assertThat(body).contains("id=\"debate-status\"");
 		assertThat(body).contains("Accepted questions will assemble the expert team here.");
+		assertThat(body).contains("Accepted questions will stream debate messages here.");
 		assertThat(body).doesNotContain("<h3>Analyst</h3>");
 		assertThat(body).doesNotContain("Live reasoning arena");
 		assertThat(body).doesNotContain("<h1>AI Arena</h1>");
@@ -59,9 +62,12 @@ class ArenaPageTests {
 		assertThat(body).contains("VALIDATION_ACCEPTED");
 		assertThat(body).contains("VALIDATION_REJECTED");
 		assertThat(body).contains("EXPERT_CREATED");
+		assertThat(body).contains("DEBATE_MESSAGE");
 		assertThat(body).contains("/api/arena/sessions");
 		assertThat(body).contains("document.createElement(\"article\")");
 		assertThat(body).contains("textContent = payload.mission");
+		assertThat(body).contains("textContent = payload.content");
+		assertThat(body).contains("is-active");
 		assertThat(body).contains("safeAccent");
 	}
 }

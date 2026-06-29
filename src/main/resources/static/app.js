@@ -8,9 +8,14 @@ const sessionStatusLabel = document.querySelector("#session-status-label");
 const validationStatus = document.querySelector("#validation-status");
 const teamStatus = document.querySelector("#team-status");
 const expertList = document.querySelector("#expert-list");
+const debateStatus = document.querySelector("#debate-status");
+const messageList = document.querySelector("#message-list");
 
 const defaultTeamStatus = "Waiting for an accepted question.";
 const defaultTeamEmptyState = "Accepted questions will assemble the expert team here.";
+const defaultDebateStatus = "Waiting for the arena to start.";
+const defaultDebateEmptyState = "Accepted questions will stream debate messages here.";
+const expertsById = new Map();
 
 const statusCopy = {
 	idle: "Ready",
@@ -36,6 +41,7 @@ form?.addEventListener("submit", async (event) => {
 	setBusy(true);
 	setValidationState("validating", "Validating question...");
 	resetTeamPanel();
+	resetDebatePanel();
 
 	try {
 		await streamArenaSession(question);
@@ -121,6 +127,14 @@ function handleSseBlock(block) {
 		renderExpert(payload);
 	}
 
+	if (eventType === "DEBATE_MESSAGE") {
+		renderDebateMessage(payload);
+	}
+
+	if (eventType === "SUPERVISOR_DECISION") {
+		debateStatus.textContent = payload.reason || "Supervisor is deciding whether to continue.";
+	}
+
 	if (eventType === "ERROR") {
 		setValidationState("error", payload.message || "Unable to run arena session.");
 	}
@@ -150,8 +164,14 @@ function setSessionState(state) {
 }
 
 function resetTeamPanel() {
+	expertsById.clear();
 	teamStatus.textContent = defaultTeamStatus;
 	expertList.replaceChildren(createEmptyState(defaultTeamEmptyState));
+}
+
+function resetDebatePanel() {
+	debateStatus.textContent = defaultDebateStatus;
+	messageList.replaceChildren(createEmptyState(defaultDebateEmptyState));
 }
 
 function renderTeamPlan(payload) {
@@ -167,14 +187,21 @@ function renderExpert(payload) {
 	if (!payload.name || !payload.role || !payload.mission) {
 		return;
 	}
+	const expert = {
+		id: payload.id || "",
+		name: payload.name,
+		role: payload.role,
+		accent: safeAccent(payload.uiAccent)
+	};
+	expertsById.set(expert.id, expert);
 	if (expertList.querySelector(".empty-state")) {
 		expertList.replaceChildren();
 	}
 
 	const card = document.createElement("article");
 	card.className = "expert-card";
-	card.dataset.expertId = payload.id || "";
-	card.style.setProperty("--accent", safeAccent(payload.uiAccent));
+	card.dataset.expertId = expert.id;
+	card.style.setProperty("--accent", expert.accent);
 
 	const avatar = document.createElement("div");
 	avatar.className = "avatar";
@@ -192,7 +219,7 @@ function renderExpert(payload) {
 
 	const role = document.createElement("span");
 	role.className = "role-badge";
-	role.textContent = payload.role;
+	role.textContent = expert.role;
 
 	headingRow.append(name, role);
 
@@ -209,6 +236,60 @@ function renderExpert(payload) {
 
 	const createdCount = expertList.querySelectorAll(".expert-card").length;
 	teamStatus.textContent = createdCount === 1 ? "1 expert ready." : `${createdCount} experts ready.`;
+}
+
+function renderDebateMessage(payload) {
+	if (!payload.expertId || !payload.content) {
+		return;
+	}
+	if (messageList.querySelector(".empty-state")) {
+		messageList.replaceChildren();
+	}
+
+	const expert = expertsById.get(payload.expertId) || {
+		name: "Arena expert",
+		role: payload.expertId,
+		accent: "#4cc9d8"
+	};
+	const turn = Number(payload.turn) || messageList.querySelectorAll(".message-card").length + 1;
+
+	clearActiveExpert();
+	const activeExpert = expertList.querySelector(`[data-expert-id="${cssEscape(payload.expertId)}"]`);
+	activeExpert?.classList.add("is-active");
+
+	const card = document.createElement("article");
+	card.className = "message-card";
+	card.style.setProperty("--accent", expert.accent);
+	card.dataset.expertId = payload.expertId;
+
+	const meta = document.createElement("div");
+	meta.className = "message-meta";
+
+	const author = document.createElement("strong");
+	author.textContent = expert.name;
+
+	const detail = document.createElement("span");
+	detail.textContent = `Turn ${turn} · ${formatMessageType(payload.messageType)}`;
+
+	meta.append(author, detail);
+
+	const role = document.createElement("p");
+	role.className = "message-role";
+	role.textContent = expert.role;
+
+	const content = document.createElement("p");
+	content.className = "message-content";
+	content.textContent = payload.content;
+
+	card.append(meta, role, content);
+	messageList.append(card);
+	debateStatus.textContent = `${expert.name} is speaking.`;
+}
+
+function clearActiveExpert() {
+	expertList.querySelectorAll(".expert-card.is-active").forEach((card) => {
+		card.classList.remove("is-active");
+	});
 }
 
 function createEmptyState(message) {
@@ -229,6 +310,19 @@ function initialsFor(value) {
 
 function safeAccent(value) {
 	return /^#[0-9a-f]{6}$/i.test(value || "") ? value : "#4cc9d8";
+}
+
+function cssEscape(value) {
+	if (window.CSS?.escape) {
+		return window.CSS.escape(value);
+	}
+	return String(value).replaceAll("\"", "\\\"");
+}
+
+function formatMessageType(value) {
+	return String(value || "message")
+		.toLowerCase()
+		.replaceAll("_", " ");
 }
 
 function showFieldError(message) {
