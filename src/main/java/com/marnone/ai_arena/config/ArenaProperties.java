@@ -150,6 +150,7 @@ public class ArenaProperties {
 	public static class Ai {
 
 		private String provider = "openai";
+		private String adapter = "fake";
 		private String model = "gpt-5-mini";
 		private Duration requestTimeout = Duration.ofSeconds(30);
 
@@ -159,6 +160,14 @@ public class ArenaProperties {
 
 		public void setProvider(String provider) {
 			this.provider = requireText("arena.ai.provider", provider);
+		}
+
+		public String getAdapter() {
+			return adapter;
+		}
+
+		public void setAdapter(String adapter) {
+			this.adapter = requireText("arena.ai.adapter", adapter);
 		}
 
 		public String getModel() {

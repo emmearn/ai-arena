@@ -65,8 +65,8 @@ Stati: `TODO`, `IMPLEMENTED`, `VERIFIED_STATIC`, `BLOCKED_RUNTIME`, `DONE`.
 | `TASK-019` | `DONE` | Sintesi finale da evento `FINAL_ANSWER`, rationale, stop reason e stato error/complete visibili; `ArenaPageTests`; verifica browser su flusso valido e domanda vuota. | Verificato con Java 21.0.11. |
 | `TASK-020` | `DONE` | Decisione `DEC-004`: OpenAI via Spring AI, modello iniziale `gpt-5-mini`, fake AI ancora default locale/test. | Review documentale completata il 2026-06-29. |
 | `TASK-021` | `DONE` | Aggiunti `spring-ai-bom` 2.0.0 e solo starter `spring-ai-starter-model-openai`; dependency tree e `mvnw test` passano. | Verificato con Java 21.0.11. |
-| `TASK-022` | `TODO` | Non iniziato. | Dipende da `TASK-021`. |
-| `TASK-023` | `TODO` | Non iniziato. | Dipende da `TASK-022`. |
+| `TASK-022` | `DONE` | `SpringAiAdapter` implementa validazione e planning via Spring AI con JSON strutturato validato, fallback controllato su validazione malformata e contract test. | Verificato con `.\mvnw.cmd test` il 2026-06-29. |
+| `TASK-023` | `DONE` | `SpringAiAdapter` copre team, dibattito, supervisione e sintesi; fake default e OpenAI opt-in tramite `arena.ai.adapter=openai`. | Verificato con contract test validi/malformed e `.\mvnw.cmd test` il 2026-06-29. |
 | `TASK-024` | `DONE` | Properties `arena.ai.*`, Spring AI model auto-config disabilitate di default, retry limitati, API key assente dal repo; `mvnw test` passa. | Verificato con Java 21.0.11; grep segreti senza match. |
 | `TASK-025` | `TODO` | Non iniziato. | Logging con correlation id. |
 | `TASK-026` | `TODO` | Non iniziato. | Dipende da `TASK-018` e `TASK-023`. |

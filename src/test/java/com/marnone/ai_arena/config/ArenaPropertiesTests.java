@@ -27,6 +27,7 @@ class ArenaPropertiesTests {
 				"arena.http.rate-limit-max-requests=7",
 				"arena.http.rate-limit-window=45s",
 				"arena.ai.provider=openai",
+				"arena.ai.adapter=openai",
 				"arena.ai.model=gpt-5-mini",
 				"arena.ai.request-timeout=20s"
 			)
@@ -45,6 +46,7 @@ class ArenaPropertiesTests {
 				assertThat(http.getRateLimitMaxRequests()).isEqualTo(7);
 				assertThat(http.getRateLimitWindow()).isEqualTo(Duration.ofSeconds(45));
 				assertThat(ai.getProvider()).isEqualTo("openai");
+				assertThat(ai.getAdapter()).isEqualTo("openai");
 				assertThat(ai.getModel()).isEqualTo("gpt-5-mini");
 				assertThat(ai.getRequestTimeout()).isEqualTo(Duration.ofSeconds(20));
 			});
@@ -64,6 +66,7 @@ class ArenaPropertiesTests {
 			assertThat(context.getBean(ArenaProperties.class).getHttp().getRateLimitMaxRequests()).isEqualTo(20);
 			assertThat(context.getBean(ArenaProperties.class).getHttp().getRateLimitWindow()).isEqualTo(Duration.ofMinutes(1));
 			assertThat(context.getBean(ArenaProperties.class).getAi().getProvider()).isEqualTo("openai");
+			assertThat(context.getBean(ArenaProperties.class).getAi().getAdapter()).isEqualTo("fake");
 			assertThat(context.getBean(ArenaProperties.class).getAi().getModel()).isEqualTo("gpt-5-mini");
 			assertThat(context.getBean(ArenaProperties.class).getAi().getRequestTimeout()).isEqualTo(Duration.ofSeconds(30));
 		});

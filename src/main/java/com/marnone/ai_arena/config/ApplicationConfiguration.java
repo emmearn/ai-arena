@@ -2,9 +2,13 @@ package com.marnone.ai_arena.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.ai.chat.model.ChatModel;
 
 import com.marnone.ai_arena.ai.AiClientPort;
 import com.marnone.ai_arena.ai.FakeAiAdapter;
+import com.marnone.ai_arena.ai.SpringAiAdapter;
 import com.marnone.ai_arena.application.DebateOrchestrator;
 import com.marnone.ai_arena.application.FinalAnswerService;
 import com.marnone.ai_arena.application.PlanningService;
@@ -20,6 +24,13 @@ import com.marnone.ai_arena.application.ValidationService;
 public class ApplicationConfiguration {
 
 	@Bean
+	@ConditionalOnProperty(prefix = "arena.ai", name = "adapter", havingValue = "openai")
+	AiClientPort springAiClientPort(ChatModel chatModel, ArenaProperties arenaProperties) {
+		return new SpringAiAdapter(chatModel, arenaProperties.getAi().getRequestTimeout());
+	}
+
+	@Bean
+	@ConditionalOnMissingBean(AiClientPort.class)
 	AiClientPort aiClientPort() {
 		return new FakeAiAdapter();
 	}

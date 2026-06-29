@@ -52,6 +52,7 @@ Input utente:
 
 Output AI:
 - validare output strutturati prima di usarli per piano, team, turni, decisioni o sintesi;
+- `SpringAiAdapter` accetta solo JSON strutturato per validazione, planning, team, turni, supervisione e sintesi;
 - rifiutare/fallback se output mancano campi obbligatori, superano limiti o violano regole;
 - renderizzare messaggi come testo, non HTML eseguibile;
 - sanitizzare contenuti mostrati in UI;
@@ -108,6 +109,7 @@ Filesystem:
 
 Provider LLM:
 - API key solo server-side;
+- adapter OpenAI opt-in: non abilitarlo senza API key server-side e `spring.ai.model.chat=openai`;
 - request timeout obbligatorio;
 - retry limitati, con backoff, solo per errori transitori;
 - validare request costruite verso provider e response ricevute;

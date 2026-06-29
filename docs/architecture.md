@@ -30,7 +30,7 @@ AI Arena e' una web application monolitica, stateless rispetto alla persistenza 
 | HTML/CSS/JavaScript vanilla serviti dall'app | Sufficiente per schermata unica; evita framework frontend non richiesti. |
 | Nessun database nell'MVP | Cronologia e memoria persistente sono escluse; lo stato vive solo durante la richiesta. |
 | JUnit + Spring Boot Test | Gia' presenti; coprono unit e integration test della logica principale. |
-| Provider LLM esterno via Spring AI | OpenAI selezionato come primo provider tramite `DEC-004`; il fake resta default operativo finche' gli adapter reali non sono implementati. |
+| Provider LLM esterno via Spring AI | OpenAI selezionato come primo provider tramite `DEC-004`; il fake resta default operativo, mentre `SpringAiAdapter` e' opt-in. |
 
 Dipendenze applicative previste: starter web, Spring AI OpenAI starter, starter test. Non introdurre database, code, broker, RAG, tool calling o autenticazione finche' non richiesti.
 
@@ -58,6 +58,8 @@ Stato attuale:
 - `SupervisorAiPort` espone oggi sia `decide(...)` per prossimo turno/arresto sia `synthesize(...)` per produrre la risposta finale;
 - `DebateOrchestrator` usa il Supervisor per il controllo sequenziale del dibattito;
 - `FinalAnswerService` delega la sintesi finale al `SupervisorAiPort`;
+- `SpringAiAdapter` implementa le porte AI via Spring AI `ChatModel` con output JSON strutturati e validati;
+- `arena.ai.adapter=fake` mantiene il comportamento locale/test, mentre `arena.ai.adapter=openai` abilita l'adapter reale insieme a `spring.ai.model.chat=openai` e API key server-side;
 - non esiste ancora un componente Judge separato nel codice.
 
 Direzione evolutiva:
@@ -265,17 +267,19 @@ Properties applicative:
 | `arena.http.rate-limit-max-requests` | Numero massimo di richieste per finestra e indirizzo remoto. |
 | `arena.http.rate-limit-window` | Durata della finestra rate limit in-process. |
 | `arena.ai.provider` | Provider LLM selezionato. |
+| `arena.ai.adapter` | Adapter AI runtime; default `fake`, `openai` abilita `SpringAiAdapter`. |
 | `arena.ai.model` | Modello LLM selezionato. |
 | `arena.ai.request-timeout` | Timeout applicativo massimo previsto per chiamata provider. |
 | `arena.ai.temperature.*` | Parametri per validazione, planning, dibattito, sintesi se necessari. |
-| `spring.ai.model.*` | Modalita' model Spring AI; default `none` per chat, embedding, image, audio e moderation finche' gli adapter reali non vengono abilitati. |
-| `spring.ai.openai.chat.model` | Modello OpenAI usato quando la chat Spring AI verra' abilitata. |
+| `spring.ai.model.*` | Modalita' model Spring AI; default `none` per chat, embedding, image, audio e moderation finche' l'adapter OpenAI non viene abilitato. |
+| `spring.ai.openai.chat.model` | Modello OpenAI usato quando la chat Spring AI viene abilitata. |
 | `spring.ai.retry.*` | Retry limitati per errori transitori del provider. |
 
 Segreti:
 - API key e credenziali solo via variabili d'ambiente o secret manager dell'ambiente di deploy;
 - non salvare segreti in repository;
 - per OpenAI usare API key server-side; non sono richieste password ChatGPT o credenziali browser;
+- non abilitare `arena.ai.adapter=openai` senza `spring.ai.model.chat=openai` e secret server-side configurato;
 - dettagli di rotazione, storage e policy in `docs/security.md`.
 
 ## 10. Performance e scalabilita'
@@ -347,10 +351,9 @@ README.md:
 | Separazione Supervisor/Judge | Evitare mescolare orchestrazione, sintesi e valutazione qualitativa. | Lasciare tutto in `SupervisorAiPort`. | Maggiore testabilita' e roadmap per quality gate strutturato. | Si. |
 | Dibattito sequenziale | Chiarezza, controllo limiti, ruoli AI paralleli esclusi dall'MVP. | Esecuzione parallela. | Meno throughput, piu' prevedibilita'. | Si. |
 | Frontend vanilla servito dal backend | Schermata unica e nessun requisito di SPA complessa. | React/Vue/Angular. | Meno dipendenze, UI sufficiente per demo. | Si. |
-| Provider LLM OpenAI | Supportato direttamente da Spring AI e sufficiente per MVP reale controllato. | Anthropic, Gemini, Azure OpenAI, Ollama, solo fake. | Base pronta per adapter reali; segreti server-side e fake default preservato. | `DEC-004` |
+| Provider LLM OpenAI | Supportato direttamente da Spring AI e sufficiente per MVP reale controllato. | Anthropic, Gemini, Azure OpenAI, Ollama, solo fake. | Adapter reale opt-in; segreti server-side e fake default preservato. | `DEC-004` |
 
 Punti aperti:
 - valori iniziali dei limiti `max-experts`, `max-turns`, `max-messages`, `timeout`;
 - target numerici di performance/concorrenza;
-- formato esatto degli output strutturati AI;
 - momento di integrazione del Judge nel flusso runtime: solo post-sintesi o anche consultivo per il Supervisor.

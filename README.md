@@ -7,7 +7,7 @@ AI Arena is a Spring Boot web application that turns one user question into a vi
 - Java 21
 - Maven wrapper
 - Spring Boot Web MVC
-- Spring AI OpenAI starter, disabled by default until real adapters are enabled
+- Spring AI OpenAI starter, disabled by default unless the OpenAI adapter is selected
 - Server-Sent Events for progressive session updates
 - Deterministic fake AI adapter for local development and tests
 
@@ -16,7 +16,7 @@ AI Arena is a Spring Boot web application that turns one user question into a vi
 - JDK 21 available on `PATH`
 - No database is required for the MVP
 - No API key is required while the fake AI adapter is active
-- OpenAI integration will use a server-side API key when real adapters are enabled; no ChatGPT password is used
+- OpenAI integration uses a server-side API key when the OpenAI adapter is enabled; no ChatGPT password is used
 
 ## Commands
 
@@ -43,6 +43,7 @@ arena.http.max-payload-bytes=8192
 arena.http.rate-limit-max-requests=20
 arena.http.rate-limit-window=1m
 arena.ai.provider=openai
+arena.ai.adapter=fake
 arena.ai.model=gpt-5-mini
 arena.ai.request-timeout=30s
 spring.ai.model.chat=none
@@ -55,14 +56,25 @@ spring.ai.openai.chat.model=gpt-5-mini
 spring.ai.retry.max-attempts=2
 ```
 
-Keep secrets out of files and pass future provider credentials through environment variables or a secret manager. The OpenAI starter is on the classpath, but all Spring AI model auto-configurations are set to `none` by default so the app stays runnable without an API key until the real Spring AI adapters are implemented.
+Keep secrets out of files and pass provider credentials through environment variables or a secret manager. The OpenAI starter is on the classpath, but all Spring AI model auto-configurations are set to `none` by default and `arena.ai.adapter=fake` keeps the app runnable without an API key.
+
+To enable the OpenAI adapter locally:
+
+```powershell
+$env:OPENAI_API_KEY="..."
+$env:ARENA_AI_ADAPTER="openai"
+$env:SPRING_AI_MODEL_CHAT="openai"
+.\mvnw spring-boot:run
+```
+
+Use an OpenAI API key only. Do not use a ChatGPT password, browser session, or user credential.
 
 ## Project Structure
 
 - `src/main/java/com/marnone/ai_arena/web`: HTTP/SSE entry points and web DTOs.
 - `src/main/java/com/marnone/ai_arena/application`: validation, planning, orchestrated AI expert creation, debate orchestration, events, and final answer flow.
 - `src/main/java/com/marnone/ai_arena/domain`: immutable domain records and execution limits.
-- `src/main/java/com/marnone/ai_arena/ai`: AI ports and the fake adapter.
+- `src/main/java/com/marnone/ai_arena/ai`: AI ports, fake adapter, and Spring AI adapter.
 - `src/main/java/com/marnone/ai_arena/config`: Spring configuration and typed properties.
 - `src/test/java/com/marnone/ai_arena`: unit and integration tests.
 
