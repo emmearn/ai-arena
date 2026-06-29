@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>AI Arena</title>
+	<link rel="icon" href="/assets/logo-icon.png" type="image/png">
+	<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+	<main class="app-shell">
+		<header class="topbar" aria-label="AI Arena">
+			<div class="brand">
+				<img src="/assets/logo.png" alt="AI Arena" class="brand-logo">
+				<div>
+					<p class="eyebrow">Live reasoning arena</p>
+					<h1>AI Arena</h1>
+				</div>
+			</div>
+			<div class="session-status" aria-live="polite">
+				<span class="status-dot"></span>
+				<span>Ready</span>
+			</div>
+		</header>
+
+		<section class="question-panel" aria-labelledby="question-title">
+			<div class="question-copy">
+				<p class="eyebrow">Ask the arena</p>
+				<h2 id="question-title">One question, multiple expert perspectives.</h2>
+			</div>
+			<form class="question-form">
+				<label class="sr-only" for="question">Question</label>
+				<textarea id="question" name="question" rows="3" placeholder="How should we evaluate this decision?"></textarea>
+				<button type="submit" disabled>
+					<span aria-hidden="true">></span>
+					Start session
+				</button>
+			</form>
+		</section>
+
+		<section class="arena-grid" aria-label="Arena workspace">
+			<aside class="team-panel" aria-labelledby="team-title">
+				<div class="section-heading">
+					<p class="eyebrow">Team</p>
+					<h2 id="team-title">Orchestrated experts</h2>
+				</div>
+				<div class="expert-list">
+					<article class="expert-card accent-cyan">
+						<div class="avatar">A</div>
+						<div>
+							<h3>Analyst</h3>
+							<p>Maps facts, assumptions, and structure.</p>
+						</div>
+					</article>
+					<article class="expert-card accent-coral">
+						<div class="avatar">C</div>
+						<div>
+							<h3>Critic</h3>
+							<p>Challenges risk, gaps, and weak claims.</p>
+						</div>
+					</article>
+					<article class="expert-card accent-gold">
+						<div class="avatar">S</div>
+						<div>
+							<h3>Synthesizer</h3>
+							<p>Turns debate into a decision-ready answer.</p>
+						</div>
+					</article>
+				</div>
+			</aside>
+
+			<section class="debate-panel" aria-labelledby="debate-title">
+				<div class="section-heading">
+					<p class="eyebrow">Debate</p>
+					<h2 id="debate-title">Progressive exchange</h2>
+				</div>
+				<div class="message-list">
+					<article class="message-card accent-cyan">
+						<div class="message-meta">
+							<strong>Analyst</strong>
+							<span>Waiting for validation</span>
+						</div>
+						<p>Accepted questions will stream here as the debate unfolds.</p>
+					</article>
+					<article class="message-card accent-coral">
+						<div class="message-meta">
+							<strong>Critic</strong>
+							<span>Queued</span>
+						</div>
+						<p>Each contribution keeps its expert identity and turn context.</p>
+					</article>
+				</div>
+			</section>
+
+			<section class="final-panel" aria-labelledby="final-title">
+				<div class="judge-mark" aria-hidden="true">O</div>
+				<div>
+					<p class="eyebrow">Synthesis</p>
+					<h2 id="final-title">Final answer</h2>
+					<p>The final response and stop reason will appear here when the arena completes.</p>
+				</div>
+			</section>
+		</section>
+	</main>
+</body>
+</html>
