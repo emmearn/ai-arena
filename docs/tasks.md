@@ -73,7 +73,7 @@ Stati: `TODO`, `IMPLEMENTED`, `VERIFIED_STATIC`, `BLOCKED_RUNTIME`, `DONE`.
 | `TASK-027` | `DONE` | Focus visibile, stato finale annunciabile, errore campo con `aria-invalid`, motion riducibile gia' preservata e testi lunghi senza overflow. | Verifica browser desktop/mobile e `mvnw test`. |
 | `TASK-028` | `DONE` | Palette allineata al nuovo `logo.png`, layout desktop/mobile verificato, logo leggibile, sintesi e metadati responsive senza overlap. | Verifica browser 1280x720 e 390x844; nessun errore console. |
 | `TASK-029` | `DONE` | Review `pom.xml` e dependency tree: dipendenze minime Spring Boot/Spring AI/test, nessun DB/auth/actuator o libreria non motivata. | `dependency:tree` e build completa passano il 2026-06-29. |
-| `TASK-030` | `TODO` | Non iniziato. | Dipende da `TASK-029`. |
+| `TASK-030` | `DONE` | Aggiunto smoke test MVP con fake adapter: shell UI, scenario valido completo via SSE e scenario ostile rifiutato prima di team/finale. | Verificato con `ArenaMvpSmokeTests` e suite Maven completa il 2026-06-29. |
 | `TASK-031` | `DONE` | Nomi tecnici migrati a `OrchestratedAiExpert`/`expert`; evento SSE `EXPERT_CREATED`; property `arena.limits.max-experts`; `mvnw test` passa. | Verificato con Java 21.0.11. |
 | `TASK-032` | `TODO` | Non iniziato. | Evoluzione non MVP: modello dominio Judge. |
 | `TASK-033` | `TODO` | Non iniziato. | Evoluzione non MVP: porta AI dedicata al Judge. |
