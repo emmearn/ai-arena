@@ -76,4 +76,23 @@ class ArenaPageTests {
 		assertThat(body).contains("is-active");
 		assertThat(body).contains("safeAccent");
 	}
+
+	@Test
+	void rendersGeneratedOutputWithTextContentOnly() throws Exception {
+		String body = mockMvc.perform(get("/app.js"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith("text/javascript"))
+			.andReturn()
+			.getResponse()
+			.getContentAsString();
+
+		assertThat(body).contains("mission.textContent = payload.mission");
+		assertThat(body).contains("personality.textContent = payload.personality");
+		assertThat(body).contains("content.textContent = payload.content");
+		assertThat(body).contains("finalAnswer.textContent = payload.content");
+		assertThat(body).contains("finalRationale.textContent = payload.rationale");
+		assertThat(body).contains("finalStopReason.textContent = payload.stopReason");
+		assertThat(body).doesNotContain(".innerHTML");
+		assertThat(body).doesNotContain("insertAdjacentHTML");
+	}
 }

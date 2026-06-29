@@ -112,6 +112,19 @@ class SpringAiAdapterTests {
 	}
 
 	@Test
+	void rejectsMalformedFinalAnswerOutput() {
+		SpringAiAdapter adapter = adapterWith(
+			"""
+			{"content":"","rationale":"missing user-facing content","stopReason":"done"}
+			"""
+		);
+
+		assertThatThrownBy(() -> adapter.synthesize(QUESTION, List.of(message()), "done"))
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessageContaining("content must not be blank");
+	}
+
+	@Test
 	void continuesWithNextExpertWhenSupervisorRequestsAnotherTurn() {
 		SpringAiAdapter adapter = adapterWith(
 			"""

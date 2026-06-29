@@ -69,6 +69,16 @@ $env:SPRING_AI_MODEL_CHAT="openai"
 
 Use an OpenAI API key only. Do not use a ChatGPT password, browser session, or user credential.
 
+Environment variables:
+
+| Variable | Required when | Purpose |
+| --- | --- | --- |
+| `OPENAI_API_KEY` | `ARENA_AI_ADAPTER=openai` | Server-side OpenAI API key used by Spring AI. |
+| `ARENA_AI_ADAPTER` | Optional | Runtime adapter selector. Default is `fake`; use `openai` for `SpringAiAdapter`. |
+| `SPRING_AI_MODEL_CHAT` | `ARENA_AI_ADAPTER=openai` | Enables Spring AI chat auto-configuration; use `openai`. |
+
+With `arena.ai.adapter=fake`, AI Arena uses the deterministic local adapter. It does not call external services, does not need credentials, and produces predictable validation, team planning, debate messages, supervisor decisions, and final answers for local development, tests, and demos.
+
 ## Project Structure
 
 - `src/main/java/com/marnone/ai_arena/web`: HTTP/SSE entry points and web DTOs.

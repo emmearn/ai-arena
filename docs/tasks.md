@@ -68,11 +68,11 @@ Stati: `TODO`, `IMPLEMENTED`, `VERIFIED_STATIC`, `BLOCKED_RUNTIME`, `DONE`.
 | `TASK-022` | `DONE` | `SpringAiAdapter` implementa validazione e planning via Spring AI con JSON strutturato validato, fallback controllato su validazione malformata e contract test. | Verificato con `.\mvnw.cmd test` il 2026-06-29. |
 | `TASK-023` | `DONE` | `SpringAiAdapter` copre team, dibattito, supervisione e sintesi; fake default e OpenAI opt-in tramite `arena.ai.adapter=openai`. | Verificato con contract test validi/malformed e `.\mvnw.cmd test` il 2026-06-29. |
 | `TASK-024` | `DONE` | Properties `arena.ai.*`, Spring AI model auto-config disabilitate di default, retry limitati, API key assente dal repo; `mvnw test` passa. | Verificato con Java 21.0.11; grep segreti senza match. |
-| `TASK-025` | `TODO` | Non iniziato. | Logging con correlation id. |
-| `TASK-026` | `TODO` | Non iniziato. | Dipende da `TASK-018` e `TASK-023`. |
+| `TASK-025` | `DONE` | Log essenziali con correlation id/MDC, stage, esito, durata e categorie senza prompt/input/output; aggiunti log capture su flusso valido, rifiuto e failure. | Verificato con test mirati e build completa il 2026-06-29. |
+| `TASK-026` | `DONE` | Rafforzati test su injection/system prompt, jailbreak esistente, rendering output via `textContent` e output AI malformato. | Verificato con test mirati e build completa il 2026-06-29. |
 | `TASK-027` | `DONE` | Focus visibile, stato finale annunciabile, errore campo con `aria-invalid`, motion riducibile gia' preservata e testi lunghi senza overflow. | Verifica browser desktop/mobile e `mvnw test`. |
 | `TASK-028` | `DONE` | Palette allineata al nuovo `logo.png`, layout desktop/mobile verificato, logo leggibile, sintesi e metadati responsive senza overlap. | Verifica browser 1280x720 e 390x844; nessun errore console. |
-| `TASK-029` | `TODO` | Non iniziato. | Dipende da `TASK-024`. |
+| `TASK-029` | `DONE` | Review `pom.xml` e dependency tree: dipendenze minime Spring Boot/Spring AI/test, nessun DB/auth/actuator o libreria non motivata. | `dependency:tree` e build completa passano il 2026-06-29. |
 | `TASK-030` | `TODO` | Non iniziato. | Dipende da `TASK-029`. |
 | `TASK-031` | `DONE` | Nomi tecnici migrati a `OrchestratedAiExpert`/`expert`; evento SSE `EXPERT_CREATED`; property `arena.limits.max-experts`; `mvnw test` passa. | Verificato con Java 21.0.11. |
 | `TASK-032` | `TODO` | Non iniziato. | Evoluzione non MVP: modello dominio Judge. |
