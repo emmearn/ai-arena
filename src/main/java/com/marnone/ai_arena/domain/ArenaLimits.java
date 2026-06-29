@@ -6,10 +6,10 @@ import java.util.Objects;
 /**
  * Execution limits applied before and during a single arena session.
  */
-public record ArenaLimits(int maxSpecialists, int maxTurns, int maxMessages, Duration timeout, int maxInputCharacters) {
+public record ArenaLimits(int maxExperts, int maxTurns, int maxMessages, Duration timeout, int maxInputCharacters) {
 
 	public ArenaLimits {
-		requirePositive("maxSpecialists", maxSpecialists);
+		requirePositive("maxExperts", maxExperts);
 		requirePositive("maxTurns", maxTurns);
 		requirePositive("maxMessages", maxMessages);
 		requirePositive("maxInputCharacters", maxInputCharacters);

@@ -1,124 +1,156 @@
-# Dynamic Agent-Driven Workflow
+# Document-Driven Workflow
 
 ## 1. Workflow Overview
 
-Dynamic Agent-Driven Workflow coordina lavoro di coding e documentazione usando `docs/` come unica fonte di verita' e `agents/` come set minimo di agenti operativi. Gli agenti iniziali sono pochi, riutilizzabili e non contengono conoscenza di dominio: leggono i documenti necessari, applicano il task corrente e creano agenti specializzati solo quando serve.
+AI Arena usa un Document-Driven Workflow per il lavoro di coding, review e manutenzione. `docs/` e' l'unica fonte di verita' operativa per l'AI coding assistant: requisiti, architettura, sicurezza, task, design e decisioni guidano ogni intervento.
+
+Non esistono agenti di sviluppo persistenti nel repository. L'AI coding assistant assume dinamicamente il ruolo necessario al task corrente, per esempio architect, developer, reviewer, security reviewer, tester, documentation maintainer o frontend implementer.
 
 Regole base:
-- `docs/` resta l'unica fonte di verita' per requirements, architecture, security, tasks, design e decisions.
-- `agents/` contiene solo agenti minimi iniziali e agenti dinamici eventualmente creati.
-- Il comportamento operativo vive solo in `docs/workflow.md` e `agents/`.
-- Questo workflow e' alternativo a Document-Driven Workflow e Agent-Driven Workflow statico; non li modifica e non li rigenera.
-- La PoC Spring AI deve supportare agenti specializzati creati a runtime, senza trasformare il repository in un set statico di ruoli.
+- `docs/` resta l'unica fonte di verita' per requirements, architecture, security, tasks, design, decisions e workflow.
+- Ogni richiesta parte dalla lettura dei documenti rilevanti.
+- Lo scope resta limitato alla richiesta o al task corrente.
+- Non creare cartelle o file di agenti di sviluppo persistenti.
+- Non confondere il workflow di coding con i ruoli AI orchestrati dell'applicazione: esperti AI orchestrati, supervisor, planner, costruttore ruoli runtime, debate orchestrator e componenti simili sono parte del dominio di AI Arena e restano documentati nei documenti di prodotto e architettura.
 
-## 2. Core Agents
-
-| Agente | Scopo |
-| --- | --- |
-| `agents/orchestrator-agent.md` | Punto di ingresso, coordinamento, scope, esecuzione, test e closure. |
-| `agents/agent-factory-agent.md` | Creazione/proposta di agenti specializzati solo se necessari e riutilizzabili. |
-| `agents/context-agent.md` | Lettura e sintesi minima del contesto documentale. |
-| `agents/security-agent.md` | Verifica rischi, guardrail e vincoli di sicurezza. |
-| `agents/review-agent.md` | Review finale di risultato, coerenza, regressioni, documentazione essenziale e agenti creati. |
-
-## 3. Orchestrator Workflow
+## 2. Startup Workflow
 
 1. Ricevere la richiesta utente.
-2. Usare Context Agent per leggere solo documentazione rilevante.
-3. Classificare task, scope, rischi, dipendenze e documenti impattati.
-4. Decidere se bastano agenti esistenti.
-5. Coinvolgere Agent Factory solo se serve un agente specializzato riutilizzabile.
-6. Coordinare esecuzione nello scope minimo.
-7. Eseguire test rilevanti o indicare perche' non sono eseguibili.
-8. Coinvolgere Security Agent per rischi o superfici toccate.
-9. Coinvolgere Review Agent per coerenza finale, regressioni, duplicazioni e agenti creati.
-10. Aggiornare `docs/tasks.md` solo se cambiano roadmap, stato, priorita' o dipendenze.
-11. Aggiornare `docs/decisions.md` solo per decisioni significative.
-12. Produrre risultato finale con modifiche, test, documenti aggiornati, agenti creati e rischi residui.
+2. Identificare i documenti rilevanti in `docs/`.
+3. Leggere sempre `docs/workflow.md` per il processo operativo.
+4. Leggere, in base al task:
+   - `docs/requirements.md` per comportamento atteso e vincoli di prodotto;
+   - `docs/architecture.md` per struttura tecnica, package, componenti, logging e convenzioni;
+   - `docs/security.md` per rischi, guardrail e pratiche vietate;
+   - `docs/tasks.md` per roadmap, priorita', stato e verifiche richieste;
+   - `docs/design.md` per UI/UX e frontend, se il task tocca interfaccia o asset visivi;
+   - `docs/decisions.md` se presente, per decisioni gia' prese o da aggiornare.
+5. Sintetizzare solo il contesto minimo necessario: vincoli, requisiti, task, decisioni e rischi applicabili.
+6. Se i documenti sono incoerenti o insufficienti per procedere, proporre o applicare la correzione documentale minima prima dell'implementazione.
 
-## 4. Agent Factory Workflow
+## 3. Dynamic Role Assumption
 
-1. Analizzare task, documenti rilevanti e agenti esistenti.
-2. Verificare se un agente esistente copre adeguatamente il bisogno.
-3. Creare o proporre un nuovo agente solo se necessario, riutilizzabile e con ambito chiaro.
-4. Definire solo: Mission, Responsibilities, Read, Write, Forbidden Actions.
-5. Evitare agenti troppo specifici, ridondanti, temporanei o basati su preferenze stilistiche.
-6. Mantenere ogni agente compatto, prescrittivo e non duplicativo dei documenti.
-7. Registrare in `docs/decisions.md` la creazione se significativa per il processo.
+L'AI coding assistant assume ruoli temporanei e proporzionati, senza persisterli come file:
 
-## 5. Dynamic Agent Creation Rules
+| Ruolo dinamico | Quando usarlo |
+| --- | --- |
+| Architect | Scelte strutturali, confini di layer, dipendenze, contratti applicativi. |
+| Developer | Implementazione nello scope del task. |
+| Reviewer | Verifica finale di bug, regressioni, duplicazioni, overengineering e coerenza documentale. |
+| Security | Task che toccano input, output, AI, segreti, log, errori, endpoint, dipendenze o superfici pubbliche. |
+| Tester | Definizione o aggiornamento di unit, integration, contract, UI o smoke test. |
+| Frontend | UI, design system, accessibilita', responsive, stati visuali e rendering sicuro. |
+| Documentation Maintainer | Aggiornamenti a workflow, requirements, architecture, security, tasks, design, README o decisions. |
 
-Creare un agente solo se:
-- il task richiede competenze ricorrenti e specializzate;
-- nessun agente esistente copre adeguatamente il bisogno;
-- l'agente puo' essere riutilizzato in task futuri;
-- l'ambito e' chiaro, limitato e documentabile.
+Un singolo task puo' richiedere piu' ruoli dinamici. La responsabilita' resta unitaria: leggere i documenti, applicare modifiche minime, verificare e chiudere con report.
 
-Non creare agenti per:
-- task singoli e banali;
-- modifiche locali;
-- responsabilita' gia' coperte;
-- preferenze stilistiche;
-- duplicare documentazione di dominio;
-- generare set statici come backend/frontend/database/devops senza motivazione documentale esplicita.
+## 4. Development Workflow
 
-## 6. Documentation Workflow
+1. Classificare task, scope, rischi, dipendenze e documenti impattati.
+2. Verificare che la richiesta sia coerente con requirements, architecture, security e tasks.
+3. Applicare modifiche nello scope minimo.
+4. Preferire semplicita', leggibilita', manutenibilita' e testabilita'.
+5. Evitare overengineering, duplicazioni, dipendenze inutili e funzionalita' non richieste.
+6. Non cambiare API, modelli, comportamento o documenti di dominio senza requisito, task o decisione coerente.
+7. Non modificare codice applicativo durante task puramente documentali.
+8. Non duplicare contenuto di `docs/` dentro altri documenti; usare rimandi quando basta.
+9. Se emergono decisioni significative su prodotto, architettura, sicurezza o processo, registrarle in `docs/decisions.md`.
 
-- Gli agenti leggono sempre `docs/` prima di decidere.
-- Context Agent sintetizza solo il contesto minimo necessario.
-- Aggiornare `docs/tasks.md` solo se cambiano task, stato, priorita', dipendenze o roadmap.
-- Aggiornare `docs/decisions.md` per decisioni significative su prodotto, architettura, sicurezza, processo o nuovi agenti.
-- Aggiornare altri documenti solo secondo la loro responsabilita' specifica.
-- Se i documenti sono incoerenti, proporre correzione documentale minima prima dell'implementazione.
-- Non duplicare contenuto di `docs/` dentro `docs/workflow.md` o `agents/`.
+## 5. Documentation Update Workflow
 
-Documentazione del codice:
-- applicare la policy di `docs/architecture.md#12-convenzioni-di-sviluppo`;
-- quando una classe applicativa principale e' completata o stabilizzata, verificare se serve una breve Javadoc in inglese;
+- Aggiornare `docs/tasks.md` solo se cambiano roadmap, stato, priorita', dipendenze, task o criteri di verifica.
+- Aggiornare `docs/requirements.md` solo per cambiamenti del comportamento atteso di prodotto.
+- Aggiornare `docs/architecture.md` solo per scelte tecniche, struttura, componenti, convenzioni o flussi applicativi.
+- Aggiornare `docs/security.md` solo se cambia profilo di rischio, policy, guardrail o pratica vietata.
+- Aggiornare `docs/design.md` quando cambiano UI/UX, design system, componenti visivi o regole frontend.
+- Aggiornare `docs/decisions.md` per decisioni significative, includendo contesto, decisione, motivazione, alternative, impatti e stato.
+- Aggiornare `README.md` solo secondo le regole della sezione dedicata.
+- Non avanzare lo stato di task applicativi solo per modifiche documentali.
+
+## 6. Code Documentation Policy
+
+Applicare la policy di `docs/architecture.md#12-convenzioni-di-sviluppo`:
+
+- commenti e Javadoc nel codice sono in inglese;
+- usare Javadoc breve sulle classi applicative principali quando aiuta a chiarire ruolo, confini o uso;
+- quando una classe applicativa principale e' completata o stabilizzata, verificare se serve una breve Javadoc;
 - quando un flusso applicativo e' completato, rivedere entry point e componenti attraversati per aggiungere, aggiornare o rimuovere commenti dove utile;
 - commentare solo logica non immediata, vincoli di dominio, trade-off, assunzioni o comportamenti sorprendenti;
 - evitare commenti banali e contenuti gia' evidenti dai nomi.
 
-Logging:
+## 7. Logging Workflow
+
+Applicare `docs/architecture.md#8-error-handling-e-logging` e `docs/security.md#6-logging-ed-error-handling`:
+
 - quando un flusso applicativo e' completato, rivedere entry point, confini del sistema, integrazioni, decisioni operative ed errori gestibili;
 - aggiungere log solo se aiutano diagnosi, audit tecnico, troubleshooting o comprensione dello stato operativo;
 - rimuovere log temporanei, rumorosi, duplicati o banali, incluse semplici tracce di ingresso/uscita metodo;
-- verificare che i log rispettino `docs/security.md#6-logging-ed-error-handling`;
-- nel Dynamic Agent-Driven Workflow, il Review Agent rileva log mancanti o superflui rispetto alla policy di `docs/architecture.md#8-error-handling-e-logging`;
-- non introdurre nuovi agenti solo per logging.
+- non loggare segreti, prompt completi, input utente, output AI sensibili, payload completi o dati personali non necessari;
+- verificare livelli, correlation/session id e minimizzazione dei dati;
+- non creare task di logging artificiali e non rendere il logging obbligatorio per ogni task.
 
-README.md:
-- aggiornare `README.md` solo quando cambia l'esperienza di ingresso al progetto: setup, prerequisiti, comandi di avvio/test/build, configurazione richiesta, modalita' d'uso, funzionalita' principali, stato MVP o informazioni necessarie a un nuovo lettore;
-- mantenerlo sintetico, operativo e non duplicativo rispetto a `docs/`;
-- rimandare a `docs/` per requisiti, architettura, sicurezza, task, decisioni e workflow dettagliati.
+## 8. Testing Workflow
 
-## 7. Execution Workflow
+- Eseguire i test rilevanti per il cambiamento o indicare perche' non sono eseguibili.
+- Per codice applicativo, seguire `docs/architecture.md#11-testing-strategy` e le verifiche di `docs/tasks.md`.
+- I task `MUST` non sono completi senza verifica proporzionata.
+- Preferire test unitari per logica domain/application, integration test per web/SSE, contract test per adapter AI e controlli UI/manuali per frontend quando richiesto.
+- Per modifiche solo documentali, eseguire controlli statici mirati: coerenza dei riferimenti, assenza di residui obsoleti e nessuna modifica al codice.
 
-| Fase | Regola |
-| --- | --- |
-| Startup | Leggere documentazione rilevante. |
-| Context | Produrre sintesi minima e vincoli applicabili. |
-| Agent Selection | Usare agenti esistenti o coinvolgere Agent Factory. |
-| Execution | Applicare modifiche nello scope minimo. |
-| Security | Verificare rischi e controlli proporzionati. |
-| Testing | Eseguire test rilevanti o indicare perche' non sono eseguibili. |
-| Review | Verificare coerenza, regressioni, duplicazioni, overengineering, commenti/Javadoc, logging proporzionato e README quando rilevanti, e necessita' degli agenti creati. |
-| Closure | Riportare risultato, test, documenti aggiornati, agenti creati e rischi residui. |
+## 9. Security Workflow
 
-## 8. Anti-Proliferation Rules
+Assumere il ruolo Security quando il task tocca input, output, AI, prompt, segreti, log, errori, endpoint, dipendenze, filesystem, frontend rendering o superfici pubbliche.
 
-- Preferire agenti esistenti.
-- Preferire istruzioni nel workflow rispetto a nuovi agenti se il bisogno non e' ricorrente.
-- Eliminare o non creare agenti ridondanti.
-- Ogni agente dinamico deve avere responsabilita' distinta e riutilizzabile.
-- Motivare la creazione di un agente e registrarla in `docs/decisions.md` quando significativa.
-- Non creare agenti per accelerare un singolo task se il contesto basta.
+Regole:
+- leggere `docs/security.md` prima di modifiche con impatto di sicurezza;
+- bloccare o correggere modifiche insicure;
+- proporre controlli minimi e proporzionati;
+- non disabilitare controlli senza decisione registrata;
+- non introdurre segreti;
+- validare output AI e contenuti utente prima dell'uso;
+- mantenere errori utente non tecnici e log sicuri minimizzati;
+- aggiornare `docs/security.md` o `docs/decisions.md` solo se cambia il profilo di rischio o una policy.
 
-## 9. General Execution Rules
+## 10. Frontend Workflow
 
-- Limitare lo scope alla richiesta o al task corrente.
-- Preferire semplicita', leggibilita', manutenibilita' e testabilita'.
-- Evitare overengineering, duplicazioni, dipendenze inutili e funzionalita' non richieste.
-- Non cambiare API, modelli o comportamento senza requisito, task o decisione coerente.
-- Non duplicare contenuto di `docs/` dentro workflow o agenti.
-- Non generare codice applicativo, documenti o agenti fuori dallo scope richiesto.
+Applicabile quando il task tocca UI, asset, stili, interazioni, accessibilita' o rendering browser.
+
+- Leggere `docs/design.md` prima di implementare UI.
+- Mantenere l'esperienza single-screen, leggibile, accessibile e coerente con il design system.
+- Non introdurre framework visuali o librerie UI senza decisione motivata.
+- Non usare card annidate, palette monocromatica o testi in-app che spiegano il design.
+- Garantire stati hover, focus, disabled, loading e stati applicativi visibili quando applicabili.
+- Renderizzare contenuti generati come testo sicuro.
+- Verificare responsive, testi lunghi, assenza di overlap e accessibilita' quando il task modifica il frontend.
+
+## 11. README Update Rules
+
+Aggiornare `README.md` solo quando cambia l'esperienza di ingresso al progetto:
+
+- setup o prerequisiti;
+- comandi di avvio, test o build;
+- configurazione richiesta;
+- modalita' d'uso;
+- funzionalita' principali o stato MVP;
+- struttura progetto o entry point principali;
+- informazioni necessarie a un nuovo lettore.
+
+Mantenerlo sintetico, operativo e non duplicativo rispetto a `docs/`. Rimandare a `docs/` per requisiti, architettura, sicurezza, task, decisioni e workflow dettagliati.
+
+## 12. Review And Closure Workflow
+
+Prima della chiusura:
+
+1. Verificare coerenza con requirements, architecture, security, tasks, design e decisions rilevanti.
+2. Cercare bug, regressioni, duplicazioni, overengineering e modifiche fuori scope.
+3. Verificare che documentazione, commenti, logging, README e test siano aggiornati solo quando rilevante.
+4. Eseguire test o controlli statici proporzionati.
+5. Distinguere chiaramente tra ruoli AI orchestrati dell'applicazione e agenti di sviluppo persistenti, se il task riguarda il workflow.
+
+Il report finale deve includere, quando applicabile:
+- file modificati;
+- contenuto o decisioni migrate;
+- file/cartelle eliminati;
+- test o controlli eseguiti;
+- residui noti o riferimenti mantenuti intenzionalmente;
+- rischi residui.

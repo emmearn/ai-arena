@@ -25,7 +25,7 @@ class PlanningServiceTests {
 	void plansSoftwareQuestionWithDomainSpecificRoles() {
 		TeamPlan plan = planningService.plan(question("How should we improve this Spring software?"));
 
-		assertThat(plan.specialistCount()).isEqualTo(3);
+		assertThat(plan.expertCount()).isEqualTo(3);
 		assertThat(plan.roles()).containsExactly("Architect", "Risk Reviewer", "Synthesizer");
 		assertThat(plan.skills()).containsExactly("architecture", "risk analysis", "implementation synthesis");
 	}
@@ -47,30 +47,30 @@ class PlanningServiceTests {
 	}
 
 	@Test
-	void respectsConfiguredMaxSpecialists() {
-		arenaProperties.getLimits().setMaxSpecialists(2);
+	void respectsConfiguredMaxExperts() {
+		arenaProperties.getLimits().setMaxExperts(2);
 
 		TeamPlan plan = planningService.plan(question("Plan a travel itinerary with constraints"));
 
-		assertThat(plan.specialistCount()).isEqualTo(2);
+		assertThat(plan.expertCount()).isEqualTo(2);
 		assertThat(plan.roles()).containsExactly("Planner", "Risk Reviewer");
 		assertThat(plan.skills()).containsExactly("itinerary planning", "constraint analysis");
 	}
 
 	@Test
-	void rejectsAiPlanThatExceedsMaxSpecialists() {
+	void rejectsAiPlanThatExceedsMaxExperts() {
 		PlanningAiPort badPort = (question, limits) -> new TeamPlan(
 			List.of("one", "two"),
 			2,
 			List.of("One", "Two"),
 			"bad plan"
 		);
-		arenaProperties.getLimits().setMaxSpecialists(1);
+		arenaProperties.getLimits().setMaxExperts(1);
 		PlanningService service = new PlanningService(badPort, arenaProperties);
 
 		assertThatThrownBy(() -> service.plan(question("Any valid question")))
 			.isInstanceOf(IllegalStateException.class)
-			.hasMessageContaining("max specialists");
+			.hasMessageContaining("max experts");
 	}
 
 	private static Question question(String text) {

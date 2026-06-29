@@ -30,9 +30,9 @@ class SessionEventMapperTests {
 			SessionEventType.VALIDATION_STARTED,
 			SessionEventType.VALIDATION_ACCEPTED,
 			SessionEventType.TEAM_PLANNED,
-			SessionEventType.SPECIALIST_CREATED,
-			SessionEventType.SPECIALIST_CREATED,
-			SessionEventType.SPECIALIST_CREATED,
+			SessionEventType.EXPERT_CREATED,
+			SessionEventType.EXPERT_CREATED,
+			SessionEventType.EXPERT_CREATED,
 			SessionEventType.DEBATE_MESSAGE,
 			SessionEventType.DEBATE_MESSAGE,
 			SessionEventType.DEBATE_MESSAGE,
@@ -42,7 +42,7 @@ class SessionEventMapperTests {
 		assertThat(events.get(1).payload()).isInstanceOf(ValidationEvent.class);
 		assertThat(((ValidationEvent) events.get(1).payload()).classificationHint()).isNotNull();
 		assertThat(events.get(2).payload()).isInstanceOf(TeamEvent.class);
-		assertThat(events.get(3).payload()).isInstanceOf(SpecialistEvent.class);
+		assertThat(events.get(3).payload()).isInstanceOf(ExpertEvent.class);
 		assertThat(events.get(6).payload()).isInstanceOf(MessageEvent.class);
 		assertThat(events.get(9).payload()).isInstanceOf(DecisionEvent.class);
 		assertThat(events.get(10).payload()).isInstanceOf(FinalEvent.class);
@@ -78,13 +78,13 @@ class SessionEventMapperTests {
 		FakeAiAdapter fakeAiAdapter = new FakeAiAdapter();
 		ValidationService validationService = new ValidationService(fakeAiAdapter, properties, FIXED_CLOCK);
 		PlanningService planningService = new PlanningService(fakeAiAdapter, properties);
-		SpecialistFactory specialistFactory = new SpecialistFactory(fakeAiAdapter);
+		OrchestratedAiExpertFactory expertFactory = new OrchestratedAiExpertFactory(fakeAiAdapter);
 		DebateOrchestrator debateOrchestrator = new DebateOrchestrator(fakeAiAdapter, fakeAiAdapter, FIXED_CLOCK);
 		FinalAnswerService finalAnswerService = new FinalAnswerService(fakeAiAdapter);
 		return new RunArenaSessionUseCase(
 			validationService,
 			planningService,
-			specialistFactory,
+			expertFactory,
 			debateOrchestrator,
 			finalAnswerService,
 			properties,

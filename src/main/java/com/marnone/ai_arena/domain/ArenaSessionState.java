@@ -6,7 +6,7 @@ import java.util.Objects;
 public record ArenaSessionState(
 	String sessionId,
 	Question question,
-	List<Specialist> team,
+	List<OrchestratedAiExpert> team,
 	List<DebateMessage> messages,
 	SessionStatus status,
 	ArenaLimits limits

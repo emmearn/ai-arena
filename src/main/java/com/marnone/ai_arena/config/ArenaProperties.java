@@ -11,6 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ArenaProperties {
 
 	private Limits limits = new Limits();
+	private Http http = new Http();
 
 	public Limits getLimits() {
 		return limits;
@@ -23,20 +24,31 @@ public class ArenaProperties {
 		this.limits = limits;
 	}
 
+	public Http getHttp() {
+		return http;
+	}
+
+	public void setHttp(Http http) {
+		if (http == null) {
+			throw new IllegalArgumentException("arena.http must be configured");
+		}
+		this.http = http;
+	}
+
 	public static class Limits {
 
-		private int maxSpecialists = 4;
+		private int maxExperts = 4;
 		private int maxTurns = 6;
 		private int maxMessages = 24;
 		private Duration timeout = Duration.ofSeconds(90);
 		private int maxInputCharacters = 4000;
 
-		public int getMaxSpecialists() {
-			return maxSpecialists;
+		public int getMaxExperts() {
+			return maxExperts;
 		}
 
-		public void setMaxSpecialists(int maxSpecialists) {
-			this.maxSpecialists = requirePositive("arena.limits.max-specialists", maxSpecialists);
+		public void setMaxExperts(int maxExperts) {
+			this.maxExperts = requirePositive("arena.limits.max-experts", maxExperts);
 		}
 
 		public int getMaxTurns() {
@@ -72,6 +84,47 @@ public class ArenaProperties {
 
 		public void setMaxInputCharacters(int maxInputCharacters) {
 			this.maxInputCharacters = requirePositive("arena.limits.max-input-characters", maxInputCharacters);
+		}
+
+		private static int requirePositive(String name, int value) {
+			if (value < 1) {
+				throw new IllegalArgumentException(name + " must be positive");
+			}
+			return value;
+		}
+	}
+
+	public static class Http {
+
+		private int maxPayloadBytes = 8192;
+		private int rateLimitMaxRequests = 20;
+		private Duration rateLimitWindow = Duration.ofMinutes(1);
+
+		public int getMaxPayloadBytes() {
+			return maxPayloadBytes;
+		}
+
+		public void setMaxPayloadBytes(int maxPayloadBytes) {
+			this.maxPayloadBytes = requirePositive("arena.http.max-payload-bytes", maxPayloadBytes);
+		}
+
+		public int getRateLimitMaxRequests() {
+			return rateLimitMaxRequests;
+		}
+
+		public void setRateLimitMaxRequests(int rateLimitMaxRequests) {
+			this.rateLimitMaxRequests = requirePositive("arena.http.rate-limit-max-requests", rateLimitMaxRequests);
+		}
+
+		public Duration getRateLimitWindow() {
+			return rateLimitWindow;
+		}
+
+		public void setRateLimitWindow(Duration rateLimitWindow) {
+			if (rateLimitWindow == null || rateLimitWindow.isZero() || rateLimitWindow.isNegative()) {
+				throw new IllegalArgumentException("arena.http.rate-limit-window must be positive");
+			}
+			this.rateLimitWindow = rateLimitWindow;
 		}
 
 		private static int requirePositive(String name, int value) {

@@ -13,7 +13,7 @@ import com.marnone.ai_arena.domain.DebateMessage;
 import com.marnone.ai_arena.domain.FinalAnswer;
 import com.marnone.ai_arena.domain.MessageType;
 import com.marnone.ai_arena.domain.Question;
-import com.marnone.ai_arena.domain.Specialist;
+import com.marnone.ai_arena.domain.OrchestratedAiExpert;
 import com.marnone.ai_arena.domain.SupervisorDecision;
 import com.marnone.ai_arena.domain.TeamPlan;
 import com.marnone.ai_arena.domain.ValidationStatus;
@@ -48,13 +48,13 @@ class FakeAiAdapterTests {
 		Question question = new Question("How should we present AI Arena?", Instant.EPOCH);
 
 		TeamPlan plan = adapter.planTeam(question, limits);
-		List<Specialist> specialists = adapter.createSpecialists(plan);
-		DebateMessage message = adapter.createMessage(question, specialists.getFirst(), List.of(), 1);
+		List<OrchestratedAiExpert> experts = adapter.createExperts(plan);
+		DebateMessage message = adapter.createMessage(question, experts.getFirst(), List.of(), 1);
 		SupervisorDecision decision = adapter.decide(List.of(message, message, message), limits);
 		FinalAnswer answer = adapter.synthesize(question, List.of(message), decision.reason());
 
-		assertThat(plan.specialistCount()).isEqualTo(3);
-		assertThat(specialists).hasSize(3);
+		assertThat(plan.expertCount()).isEqualTo(3);
+		assertThat(experts).hasSize(3);
 		assertThat(message.type()).isEqualTo(MessageType.PROPOSAL);
 		assertThat(decision.reason()).contains("convergence");
 		assertThat(answer.content()).contains("AI Arena");

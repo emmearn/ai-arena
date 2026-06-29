@@ -12,7 +12,7 @@ import com.marnone.ai_arena.domain.FinalAnswer;
 import com.marnone.ai_arena.domain.MessageType;
 import com.marnone.ai_arena.domain.Question;
 import com.marnone.ai_arena.domain.RequestClassification;
-import com.marnone.ai_arena.domain.Specialist;
+import com.marnone.ai_arena.domain.OrchestratedAiExpert;
 import com.marnone.ai_arena.domain.SupervisorDecision;
 import com.marnone.ai_arena.domain.TeamPlan;
 import com.marnone.ai_arena.domain.ValidationResult;
@@ -36,23 +36,23 @@ public class FakeAiAdapter implements AiClientPort {
 		String text = Objects.requireNonNull(question, "question must not be null").text().toLowerCase(Locale.ROOT);
 		Objects.requireNonNull(limits, "limits must not be null");
 		PlanningProfile profile = PlanningProfile.forDomain(classifyDomain(text));
-		int specialistCount = Math.min(limits.maxSpecialists(), profile.roles().size());
+		int expertCount = Math.min(limits.maxExperts(), profile.roles().size());
 		return new TeamPlan(
-			profile.skills().subList(0, specialistCount),
-			specialistCount,
-			profile.roles().subList(0, specialistCount),
+			profile.skills().subList(0, expertCount),
+			expertCount,
+			profile.roles().subList(0, expertCount),
 			profile.strategy()
 		);
 	}
 
 	@Override
-	public List<Specialist> createSpecialists(TeamPlan plan) {
+	public List<OrchestratedAiExpert> createExperts(TeamPlan plan) {
 		Objects.requireNonNull(plan, "plan must not be null");
-		List<Specialist> specialists = new ArrayList<>();
+		List<OrchestratedAiExpert> experts = new ArrayList<>();
 		for (int index = 0; index < plan.roles().size(); index++) {
 			String role = plan.roles().get(index);
-			specialists.add(new Specialist(
-				"agent-" + (index + 1),
+			experts.add(new OrchestratedAiExpert(
+				"expert-" + (index + 1),
 				nameFor(role),
 				role,
 				personalityFor(role),
@@ -60,22 +60,22 @@ public class FakeAiAdapter implements AiClientPort {
 				uiAccentFor(role, index)
 			));
 		}
-		return List.copyOf(specialists);
+		return List.copyOf(experts);
 	}
 
 	@Override
 	public DebateMessage createMessage(
 		Question question,
-		Specialist specialist,
+		OrchestratedAiExpert expert,
 		List<DebateMessage> previousMessages,
 		int turn
 	) {
 		Objects.requireNonNull(question, "question must not be null");
-		Objects.requireNonNull(specialist, "specialist must not be null");
+		Objects.requireNonNull(expert, "expert must not be null");
 		Objects.requireNonNull(previousMessages, "previousMessages must not be null");
 		MessageType type = messageTypeFor(turn);
-		String content = specialist.role() + " turn " + turn + ": " + deterministicContent(type, question.text());
-		return new DebateMessage("message-" + turn, specialist.id(), turn, type, content, Instant.EPOCH.plusSeconds(turn));
+		String content = expert.role() + " turn " + turn + ": " + deterministicContent(type, question.text());
+		return new DebateMessage("message-" + turn, expert.id(), turn, type, content, Instant.EPOCH.plusSeconds(turn));
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public class FakeAiAdapter implements AiClientPort {
 		if (messages.size() >= Math.min(3, limits.maxMessages())) {
 			return SupervisorDecision.stop("Fake supervisor reached deterministic convergence.");
 		}
-		return SupervisorDecision.continueWith("agent-" + (messages.size() + 1), "Fake supervisor requests another view.");
+		return SupervisorDecision.continueWith("expert-" + (messages.size() + 1), "Fake supervisor requests another view.");
 	}
 
 	@Override
@@ -135,7 +135,7 @@ public class FakeAiAdapter implements AiClientPort {
 			case "Planner" -> "Compass";
 			case "Budget Analyst" -> "Ledger";
 			case "Learning Strategist" -> "Method";
-			default -> role + " Agent";
+			default -> role + " Expert";
 		};
 	}
 

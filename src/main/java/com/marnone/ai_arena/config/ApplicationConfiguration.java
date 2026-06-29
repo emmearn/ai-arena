@@ -10,7 +10,7 @@ import com.marnone.ai_arena.application.FinalAnswerService;
 import com.marnone.ai_arena.application.PlanningService;
 import com.marnone.ai_arena.application.RunArenaSessionUseCase;
 import com.marnone.ai_arena.application.SessionEventMapper;
-import com.marnone.ai_arena.application.SpecialistFactory;
+import com.marnone.ai_arena.application.OrchestratedAiExpertFactory;
 import com.marnone.ai_arena.application.ValidationService;
 
 /**
@@ -35,8 +35,8 @@ public class ApplicationConfiguration {
 	}
 
 	@Bean
-	SpecialistFactory specialistFactory(AiClientPort aiClientPort) {
-		return new SpecialistFactory(aiClientPort);
+	OrchestratedAiExpertFactory expertFactory(AiClientPort aiClientPort) {
+		return new OrchestratedAiExpertFactory(aiClientPort);
 	}
 
 	@Bean
@@ -53,7 +53,7 @@ public class ApplicationConfiguration {
 	RunArenaSessionUseCase runArenaSessionUseCase(
 		ValidationService validationService,
 		PlanningService planningService,
-		SpecialistFactory specialistFactory,
+		OrchestratedAiExpertFactory expertFactory,
 		DebateOrchestrator debateOrchestrator,
 		FinalAnswerService finalAnswerService,
 		ArenaProperties arenaProperties
@@ -61,7 +61,7 @@ public class ApplicationConfiguration {
 		return new RunArenaSessionUseCase(
 			validationService,
 			planningService,
-			specialistFactory,
+			expertFactory,
 			debateOrchestrator,
 			finalAnswerService,
 			arenaProperties

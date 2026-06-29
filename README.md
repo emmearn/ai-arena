@@ -1,6 +1,6 @@
 # AI Arena
 
-AI Arena is a Spring Boot web application that turns one user question into a visible multi-specialist debate: the backend validates the request, plans a temporary team, creates runtime specialists, streams debate events, and produces a final answer.
+AI Arena is a Spring Boot web application that turns one user question into a visible debate among orchestrated AI experts: the backend validates the request, plans a temporary team, creates request-specific AI roles, streams debate events, and produces a final answer.
 
 ## Stack
 
@@ -31,11 +31,14 @@ The app starts on the default Spring Boot port unless overridden with standard S
 Operational limits are configured in `src/main/resources/application.properties`:
 
 ```properties
-arena.limits.max-specialists=4
+arena.limits.max-experts=4
 arena.limits.max-turns=6
 arena.limits.max-messages=24
 arena.limits.timeout=90s
 arena.limits.max-input-characters=4000
+arena.http.max-payload-bytes=8192
+arena.http.rate-limit-max-requests=20
+arena.http.rate-limit-window=1m
 ```
 
 Keep secrets out of files and pass future provider credentials through environment variables or a secret manager.
@@ -43,7 +46,7 @@ Keep secrets out of files and pass future provider credentials through environme
 ## Project Structure
 
 - `src/main/java/com/marnone/ai_arena/web`: HTTP/SSE entry points and web DTOs.
-- `src/main/java/com/marnone/ai_arena/application`: validation, planning, specialist creation, debate orchestration, events, and final answer flow.
+- `src/main/java/com/marnone/ai_arena/application`: validation, planning, orchestrated AI expert creation, debate orchestration, events, and final answer flow.
 - `src/main/java/com/marnone/ai_arena/domain`: immutable domain records and execution limits.
 - `src/main/java/com/marnone/ai_arena/ai`: AI ports and the fake adapter.
 - `src/main/java/com/marnone/ai_arena/config`: Spring configuration and typed properties.
@@ -57,7 +60,7 @@ Clients start a session with `POST /api/arena/sessions` using JSON:
 { "question": "How should AI Arena present a software architecture decision?" }
 ```
 
-Use `Accept: text/event-stream` to receive validation, team, specialist, debate, supervisor, final answer, or error events as they are produced.
+Use `Accept: text/event-stream` to receive validation, team, expert, debate, supervisor, final answer, or error events as they are produced.
 
 ## Documentation
 

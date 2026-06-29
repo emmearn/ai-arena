@@ -25,8 +25,8 @@ public record SessionEvent(SessionEventType type, Object payload) {
 		return new SessionEvent(SessionEventType.TEAM_PLANNED, payload);
 	}
 
-	public static SessionEvent specialistCreated(SpecialistEvent payload) {
-		return new SessionEvent(SessionEventType.SPECIALIST_CREATED, payload);
+	public static SessionEvent expertCreated(ExpertEvent payload) {
+		return new SessionEvent(SessionEventType.EXPERT_CREATED, payload);
 	}
 
 	public static SessionEvent debateMessage(MessageEvent payload) {

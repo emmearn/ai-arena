@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import com.marnone.ai_arena.domain.SupervisorAction;
 
-public record DecisionEvent(SupervisorAction action, String reason, String nextSpecialistId) {
+public record DecisionEvent(SupervisorAction action, String reason, String nextExpertId) {
 
 	public DecisionEvent {
 		Objects.requireNonNull(action, "action must not be null");

@@ -12,7 +12,7 @@ import com.marnone.ai_arena.domain.Question;
 import com.marnone.ai_arena.domain.TeamPlan;
 
 /**
- * Builds and validates the domain-agnostic specialist plan for an accepted question.
+ * Builds and validates the domain-agnostic expert plan for an accepted question.
  */
 public class PlanningService {
 
@@ -36,7 +36,7 @@ public class PlanningService {
 
 	private static ArenaLimits toArenaLimits(ArenaProperties.Limits limits) {
 		return new ArenaLimits(
-			limits.getMaxSpecialists(),
+			limits.getMaxExperts(),
 			limits.getMaxTurns(),
 			limits.getMaxMessages(),
 			limits.getTimeout(),
@@ -46,29 +46,29 @@ public class PlanningService {
 
 	private static void ensureWithinLimits(TeamPlan plan, ArenaLimits limits) {
 		Objects.requireNonNull(plan, "plan must not be null");
-		if (plan.specialistCount() > limits.maxSpecialists()) {
+		if (plan.expertCount() > limits.maxExperts()) {
 			log.warn(
-				"AI team plan rejected because specialist count exceeds limit specialistCount={} maxSpecialists={}",
-				plan.specialistCount(),
-				limits.maxSpecialists()
+				"AI team plan rejected because expert count exceeds limit expertCount={} maxExperts={}",
+				plan.expertCount(),
+				limits.maxExperts()
 			);
-			throw new IllegalStateException("team plan exceeds max specialists");
+			throw new IllegalStateException("team plan exceeds max experts");
 		}
-		if (plan.roles().size() != plan.specialistCount()) {
+		if (plan.roles().size() != plan.expertCount()) {
 			log.warn(
-				"AI team plan rejected because roles do not match specialist count roleCount={} specialistCount={}",
+				"AI team plan rejected because roles do not match expert count roleCount={} expertCount={}",
 				plan.roles().size(),
-				plan.specialistCount()
+				plan.expertCount()
 			);
-			throw new IllegalStateException("team plan roles must match specialist count");
+			throw new IllegalStateException("team plan roles must match expert count");
 		}
-		if (plan.skills().size() < plan.specialistCount()) {
+		if (plan.skills().size() < plan.expertCount()) {
 			log.warn(
-				"AI team plan rejected because skills are missing skillCount={} specialistCount={}",
+				"AI team plan rejected because skills are missing skillCount={} expertCount={}",
 				plan.skills().size(),
-				plan.specialistCount()
+				plan.expertCount()
 			);
-			throw new IllegalStateException("team plan must provide skills for each specialist");
+			throw new IllegalStateException("team plan must provide skills for each expert");
 		}
 	}
 }

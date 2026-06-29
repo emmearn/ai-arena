@@ -87,13 +87,13 @@ class RunArenaSessionUseCaseTests {
 	private static RunArenaSessionUseCase useCaseWith(ArenaProperties properties, AiClientPort aiClientPort) {
 		ValidationService validationService = new ValidationService(aiClientPort, properties, FIXED_CLOCK);
 		PlanningService planningService = new PlanningService(aiClientPort, properties);
-		SpecialistFactory specialistFactory = new SpecialistFactory(aiClientPort);
+		OrchestratedAiExpertFactory expertFactory = new OrchestratedAiExpertFactory(aiClientPort);
 		DebateOrchestrator debateOrchestrator = new DebateOrchestrator(aiClientPort, aiClientPort, FIXED_CLOCK);
 		FinalAnswerService finalAnswerService = new FinalAnswerService(aiClientPort);
 		return new RunArenaSessionUseCase(
 			validationService,
 			planningService,
-			specialistFactory,
+			expertFactory,
 			debateOrchestrator,
 			finalAnswerService,
 			properties,

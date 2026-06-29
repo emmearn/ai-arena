@@ -31,7 +31,7 @@ class ArenaControllerTests {
 		assertThat(body).contains("event:VALIDATION_STARTED");
 		assertThat(body).contains("event:VALIDATION_ACCEPTED");
 		assertThat(body).contains("event:TEAM_PLANNED");
-		assertThat(body).contains("event:SPECIALIST_CREATED");
+		assertThat(body).contains("event:EXPERT_CREATED");
 		assertThat(body).contains("event:DEBATE_MESSAGE");
 		assertThat(body).contains("event:SUPERVISOR_DECISION");
 		assertThat(body).contains("event:FINAL_ANSWER");

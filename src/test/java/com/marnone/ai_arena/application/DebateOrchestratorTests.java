@@ -18,7 +18,7 @@ import com.marnone.ai_arena.domain.DebateMessage;
 import com.marnone.ai_arena.domain.FinalAnswer;
 import com.marnone.ai_arena.domain.MessageType;
 import com.marnone.ai_arena.domain.Question;
-import com.marnone.ai_arena.domain.Specialist;
+import com.marnone.ai_arena.domain.OrchestratedAiExpert;
 import com.marnone.ai_arena.domain.SupervisorDecision;
 
 class DebateOrchestratorTests {
@@ -33,7 +33,7 @@ class DebateOrchestratorTests {
 
 		assertThat(result.messages()).hasSize(3);
 		assertThat(result.messages()).extracting(DebateMessage::turn).containsExactly(1, 2, 3);
-		assertThat(result.messages()).extracting(DebateMessage::specialistId).containsExactly("agent-1", "agent-2", "agent-3");
+		assertThat(result.messages()).extracting(DebateMessage::expertId).containsExactly("expert-1", "expert-2", "expert-3");
 		assertThat(result.stopReason()).contains("convergence");
 	}
 
@@ -60,9 +60,9 @@ class DebateOrchestratorTests {
 	@Test
 	void stopsWhenTimeoutIsReached() {
 		MutableClock clock = new MutableClock(Instant.EPOCH);
-		DebateAiPort slowDebatePort = (question, specialist, previousMessages, turn) -> {
+		DebateAiPort slowDebatePort = (question, expert, previousMessages, turn) -> {
 			clock.advance(Duration.ofSeconds(2));
-			return new DebateMessage("message-" + turn, specialist.id(), turn, MessageType.PROPOSAL, "slow", clock.instant());
+			return new DebateMessage("message-" + turn, expert.id(), turn, MessageType.PROPOSAL, "slow", clock.instant());
 		};
 		DebateOrchestrator orchestrator = new DebateOrchestrator(slowDebatePort, new AlwaysContinueSupervisor(), clock);
 
@@ -73,14 +73,14 @@ class DebateOrchestratorTests {
 	}
 
 	@Test
-	void stopsWhenSupervisorSelectsUnknownSpecialist() {
-		SupervisorAiPort badSupervisor = new AlwaysContinueSupervisor("agent-999");
+	void stopsWhenSupervisorSelectsUnknownExpert() {
+		SupervisorAiPort badSupervisor = new AlwaysContinueSupervisor("expert-999");
 		DebateOrchestrator orchestrator = new DebateOrchestrator(fakeAiAdapter, badSupervisor);
 
 		DebateResult result = orchestrator.run(question(), team(), limits(6, 24, Duration.ofSeconds(90)));
 
 		assertThat(result.messages()).hasSize(1);
-		assertThat(result.stopReason()).contains("unknown specialist");
+		assertThat(result.stopReason()).contains("unknown expert");
 	}
 
 	@Test
@@ -94,10 +94,10 @@ class DebateOrchestratorTests {
 	}
 
 	@Test
-	void stopsWhenDebateMessageDoesNotMatchExpectedTurnOrSpecialist() {
-		DebateAiPort badDebatePort = (question, specialist, previousMessages, turn) ->
-			new DebateMessage("message-" + turn, "other-agent", turn, MessageType.PROPOSAL, "bad", Instant.EPOCH);
-		DebateOrchestrator orchestrator = new DebateOrchestrator(badDebatePort, new AlwaysContinueSupervisor("agent-1"));
+	void stopsWhenDebateMessageDoesNotMatchExpectedTurnOrExpert() {
+		DebateAiPort badDebatePort = (question, expert, previousMessages, turn) ->
+			new DebateMessage("message-" + turn, "other-expert", turn, MessageType.PROPOSAL, "bad", Instant.EPOCH);
+		DebateOrchestrator orchestrator = new DebateOrchestrator(badDebatePort, new AlwaysContinueSupervisor("expert-1"));
 
 		DebateResult result = orchestrator.run(question(), team(), limits(6, 24, Duration.ofSeconds(90)));
 
@@ -109,11 +109,11 @@ class DebateOrchestratorTests {
 		return new Question("How should AI Arena structure the debate?", Instant.EPOCH);
 	}
 
-	private static List<Specialist> team() {
+	private static List<OrchestratedAiExpert> team() {
 		return List.of(
-			new Specialist("agent-1", "Prism", "Analyst", "precise", "Map the arena debate.", "#2FB7C8"),
-			new Specialist("agent-2", "Sentinel", "Critic", "careful", "Challenge the arena debate.", "#C84A5D"),
-			new Specialist("agent-3", "Keystone", "Synthesizer", "balanced", "Synthesize the arena debate.", "#D7A84F")
+			new OrchestratedAiExpert("expert-1", "Prism", "Analyst", "precise", "Map the arena debate.", "#2FB7C8"),
+			new OrchestratedAiExpert("expert-2", "Sentinel", "Critic", "careful", "Challenge the arena debate.", "#C84A5D"),
+			new OrchestratedAiExpert("expert-3", "Keystone", "Synthesizer", "balanced", "Synthesize the arena debate.", "#D7A84F")
 		);
 	}
 
@@ -123,19 +123,19 @@ class DebateOrchestratorTests {
 
 	private static class AlwaysContinueSupervisor implements SupervisorAiPort {
 
-		private final String nextSpecialistId;
+		private final String nextExpertId;
 
 		private AlwaysContinueSupervisor() {
-			this("agent-1");
+			this("expert-1");
 		}
 
-		private AlwaysContinueSupervisor(String nextSpecialistId) {
-			this.nextSpecialistId = nextSpecialistId;
+		private AlwaysContinueSupervisor(String nextExpertId) {
+			this.nextExpertId = nextExpertId;
 		}
 
 		@Override
 		public SupervisorDecision decide(List<DebateMessage> messages, ArenaLimits limits) {
-			return SupervisorDecision.continueWith(nextSpecialistId, "continue");
+			return SupervisorDecision.continueWith(nextExpertId, "continue");
 		}
 
 		@Override

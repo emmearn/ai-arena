@@ -56,7 +56,8 @@ Stati: `TODO`, `IMPLEMENTED`, `VERIFIED_STATIC`, `BLOCKED_RUNTIME`, `DONE`.
 | `TASK-010` | `DONE` | `RunArenaSessionUseCase`, `FinalAnswerService` e sintesi fake derivata dal dibattito; test end-to-end applicativi eseguiti da Maven. | Verificato con Java 21.0.11. |
 | `TASK-011` | `DONE` | Eventi applicativi `SessionEvent*` e mapping ordinato da risultato sessione; test eseguiti da Maven. | Verificato con Java 21.0.11. |
 | `TASK-012` | `DONE` | Endpoint `POST /api/arena/sessions` con stream SSE da eventi applicativi; integration test web eseguiti da Maven. | Verificato con Java 21.0.11. |
-| `TASK-013` | `TODO` | Non iniziato. | Prossimo task operativo. |
+| `TASK-013` | `DONE` | Error handler web con `ArenaErrorResponse`; test web su JSON invalido, failure provider simulato e assenza di stacktrace; `mvnw -Dtest=ArenaControllerErrorTests,ArenaControllerTests test` passa. | Verificato con Java 21.0.11. |
+| `TASK-014` | `DONE` | `ArenaRequestLimitFilter`, properties `arena.http.*`, decisione `DEC-003`; test su payload troppo grande e rate limit. | Verificato con Java 21.0.11. |
 | `TASK-031` | `DONE` | Nomi tecnici migrati a `OrchestratedAiExpert`/`expert`; evento SSE `EXPERT_CREATED`; property `arena.limits.max-experts`; `mvnw test` passa. | Verificato con Java 21.0.11. |
 | `TASK-032` | `TODO` | Non iniziato. | Evoluzione non MVP: modello dominio Judge. |
 | `TASK-033` | `TODO` | Non iniziato. | Evoluzione non MVP: porta AI dedicata al Judge. |

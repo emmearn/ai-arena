@@ -1,10 +1,10 @@
-package com.marnone.ai_arena.application;
+package com.marnone.ai_arena.domain;
 
 import java.util.Objects;
 
-public record SpecialistEvent(String id, String name, String role, String personality, String mission, String uiAccent) {
+public record OrchestratedAiExpert(String id, String name, String role, String personality, String mission, String uiAccent) {
 
-	public SpecialistEvent {
+	public OrchestratedAiExpert {
 		id = requireText("id", id);
 		name = requireText("name", name);
 		role = requireText("role", role);

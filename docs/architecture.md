@@ -260,6 +260,10 @@ Properties applicative:
 | `arena.limits.max-turns` | Limite massimo turni. |
 | `arena.limits.max-messages` | Limite massimo messaggi. |
 | `arena.limits.timeout` | Durata massima sessione. |
+| `arena.limits.max-input-characters` | Lunghezza massima della domanda utente dopo parsing JSON. |
+| `arena.http.max-payload-bytes` | Dimensione massima del payload HTTP per apertura sessione. |
+| `arena.http.rate-limit-max-requests` | Numero massimo di richieste per finestra e indirizzo remoto. |
+| `arena.http.rate-limit-window` | Durata della finestra rate limit in-process. |
 | `arena.ai.provider` | Provider LLM selezionato. |
 | `arena.ai.model` | Modello LLM selezionato. |
 | `arena.ai.temperature.*` | Parametri per validazione, planning, dibattito, sintesi se necessari. |

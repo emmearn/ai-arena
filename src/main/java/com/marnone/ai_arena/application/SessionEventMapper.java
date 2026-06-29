@@ -6,7 +6,7 @@ import java.util.Objects;
 
 import com.marnone.ai_arena.domain.DebateMessage;
 import com.marnone.ai_arena.domain.FinalAnswer;
-import com.marnone.ai_arena.domain.Specialist;
+import com.marnone.ai_arena.domain.OrchestratedAiExpert;
 import com.marnone.ai_arena.domain.SupervisorAction;
 import com.marnone.ai_arena.domain.TeamPlan;
 import com.marnone.ai_arena.domain.ValidationResult;
@@ -31,8 +31,8 @@ public class SessionEventMapper {
 		events.add(SessionEvent.validationAccepted(toValidationEvent(result.validation())));
 		events.add(SessionEvent.teamPlanned(toTeamEvent(result.plan())));
 		result.team().stream()
-			.map(SessionEventMapper::toSpecialistEvent)
-			.map(SessionEvent::specialistCreated)
+			.map(SessionEventMapper::toExpertEvent)
+			.map(SessionEvent::expertCreated)
 			.forEach(events::add);
 		result.debate().messages().stream()
 			.map(SessionEventMapper::toMessageEvent)
@@ -49,22 +49,22 @@ public class SessionEventMapper {
 
 	private static TeamEvent toTeamEvent(TeamPlan plan) {
 		Objects.requireNonNull(plan, "plan must not be null");
-		return new TeamEvent(plan.specialistCount(), plan.roles(), plan.initialStrategy());
+		return new TeamEvent(plan.expertCount(), plan.roles(), plan.initialStrategy());
 	}
 
-	private static SpecialistEvent toSpecialistEvent(Specialist specialist) {
-		return new SpecialistEvent(
-			specialist.id(),
-			specialist.name(),
-			specialist.role(),
-			specialist.personality(),
-			specialist.mission(),
-			specialist.uiAccent()
+	private static ExpertEvent toExpertEvent(OrchestratedAiExpert expert) {
+		return new ExpertEvent(
+			expert.id(),
+			expert.name(),
+			expert.role(),
+			expert.personality(),
+			expert.mission(),
+			expert.uiAccent()
 		);
 	}
 
 	private static MessageEvent toMessageEvent(DebateMessage message) {
-		return new MessageEvent(message.id(), message.specialistId(), message.turn(), message.type(), message.content());
+		return new MessageEvent(message.id(), message.expertId(), message.turn(), message.type(), message.content());
 	}
 
 	private static FinalEvent toFinalEvent(FinalAnswer finalAnswer) {

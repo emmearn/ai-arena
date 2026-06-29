@@ -13,7 +13,7 @@ class ArenaLimitsTests {
 	void acceptsPositiveLimits() {
 		ArenaLimits limits = new ArenaLimits(4, 6, 24, Duration.ofSeconds(90), 4000);
 
-		assertThat(limits.maxSpecialists()).isEqualTo(4);
+		assertThat(limits.maxExperts()).isEqualTo(4);
 		assertThat(limits.maxTurns()).isEqualTo(6);
 		assertThat(limits.maxMessages()).isEqualTo(24);
 		assertThat(limits.timeout()).isEqualTo(Duration.ofSeconds(90));

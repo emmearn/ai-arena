@@ -7,17 +7,17 @@
 
 AI Arena è una web application dimostrativa sviluppata con Spring Boot e Spring AI.
 
-L'obiettivo è mostrare in modo intuitivo come un sistema multi-agent possa produrre risposte più robuste attraverso confronto, revisione e sintesi, anziché tramite una singola chiamata ad un LLM.
+L'obiettivo è mostrare in modo intuitivo come un sistema di ruoli AI orchestrati possa produrre risposte più robuste attraverso confronto, revisione e sintesi, anziché tramite una singola chiamata ad un LLM.
 
 L'utente non conversa con un chatbot.
-L'utente assiste ad una discussione tra specialisti virtuali.
+L'utente assiste ad una discussione tra esperti AI orchestrati.
 
 # 2. Obiettivi
 
 - Dimostrare Spring AI.
-- Mostrare orchestrazione multi-agent.
+- Mostrare orchestrazione di ruoli AI.
 - Evidenziare streaming della conversazione.
-- Dimostrare creazione dinamica degli agenti.
+- Dimostrare creazione dinamica di ruoli AI orchestrati.
 - Offrire un'interfaccia piacevole e coinvolgente.
 
 # 3. Esperienza utente
@@ -26,7 +26,7 @@ L'utente inserisce una domanda.
 Il sistema:
 1. valida la richiesta;
 2. pianifica il team;
-3. crea gli agenti;
+3. crea gli esperti AI orchestrati;
 4. mostra il dibattito in tempo reale;
 5. interrompe la discussione quando raggiunge un criterio di arresto;
 6. produce una risposta finale motivata.
@@ -35,20 +35,20 @@ Il sistema:
 
 Il sistema è domain-agnostic.
 
-Non esistono agenti di dominio permanenti.
-Le competenze vengono selezionate e trasformate in agenti runtime per ogni richiesta.
+Non esistono esperti AI permanenti di dominio.
+Le competenze vengono selezionate e trasformate in ruoli AI orchestrati per ogni richiesta.
 
 # 5. Workflow
 
 Utente
-→ Validation Agent
-→ Planner Agent
-→ Runtime Agent Builder
+→ Ruolo di validazione
+→ Ruolo planner
+→ Costruttore ruoli runtime
 → Debate Orchestrator
 → Supervisor
 → Risposta finale
 
-# 6. Validation Agent
+# 6. Ruolo di validazione
 
 Responsabilità:
 - validazione input;
@@ -59,21 +59,21 @@ Responsabilità:
 
 Il dibattito non parte se la richiesta non supera questa fase.
 
-# 7. Planner Agent
+# 7. Ruolo planner
 
 Non risponde alla domanda.
 
 Produce un piano contenente:
 - competenze richieste;
-- numero di agenti;
+- numero di esperti AI orchestrati;
 - ruoli;
 - strategia iniziale.
 
-# 8. Runtime Agent Builder
+# 8. Costruttore ruoli runtime
 
-Genera dinamicamente gli agenti.
+Genera dinamicamente gli esperti AI orchestrati.
 
-Ogni agente possiede:
+Ogni esperto AI orchestrato possiede:
 - nome;
 - ruolo;
 - personalità;
@@ -83,9 +83,9 @@ Ogni agente possiede:
 
 # 9. Personalità
 
-Gli agenti non devono sembrare copie dello stesso modello.
+Gli esperti AI orchestrati non devono sembrare copie dello stesso modello.
 
-Ogni agente ha un carattere professionale coerente.
+Ogni esperto AI orchestrato ha un carattere professionale coerente.
 
 Esempi:
 - Software Architect: pragmatico, orientato al design.
@@ -96,7 +96,7 @@ Esempi:
 
 # 10. Dibattito
 
-Gli agenti:
+Gli esperti AI orchestrati:
 - propongono;
 - criticano;
 - correggono;
@@ -115,7 +115,7 @@ Responsabilità:
 # 12. Regole
 
 Configurabili:
-- massimo agenti;
+- massimo esperti AI orchestrati;
 - massimo turni;
 - massimo messaggi;
 - timeout.
@@ -157,7 +157,7 @@ Domande:
 - MCP
 - RAG
 - memoria persistente
-- agenti paralleli
+- ruoli AI paralleli
 - votazione
 - modelli differenti
 - cronologia conversazioni
@@ -173,8 +173,8 @@ La PoC è riuscita se:
 
 # 18. Domande aperte
 
-- Come scegliere automaticamente il numero ottimale di agenti?
-- Il supervisor può richiedere un nuovo agente durante il dibattito?
+- Come scegliere automaticamente il numero ottimale di esperti AI orchestrati?
+- Il supervisor puo' richiedere un nuovo esperto AI orchestrato durante il dibattito?
 - Quando interrompere una discussione per consenso o saturazione?
 - Come valutare automaticamente la qualità della risposta finale?
 
@@ -184,6 +184,6 @@ AI Arena è una sala riunioni virtuale.
 
 L'utente porta un problema.
 
-Il sistema costruisce automaticamente un team di specialisti, coordina il confronto e restituisce una risposta nata dal dibattito.
+Il sistema costruisce automaticamente un team di esperti AI orchestrati, coordina il confronto e restituisce una risposta nata dal dibattito.
 
-L'esperienza deve essere tanto educativa quanto funzionale, mostrando in modo trasparente il valore dell'orchestrazione multi-agent.
+L'esperienza deve essere tanto educativa quanto funzionale, mostrando in modo trasparente il valore dell'orchestrazione di ruoli AI.

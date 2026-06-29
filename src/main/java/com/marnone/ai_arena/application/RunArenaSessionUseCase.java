@@ -17,7 +17,7 @@ import com.marnone.ai_arena.domain.ArenaLimits;
 import com.marnone.ai_arena.domain.DebateMessage;
 import com.marnone.ai_arena.domain.FinalAnswer;
 import com.marnone.ai_arena.domain.Question;
-import com.marnone.ai_arena.domain.Specialist;
+import com.marnone.ai_arena.domain.OrchestratedAiExpert;
 import com.marnone.ai_arena.domain.SupervisorAction;
 import com.marnone.ai_arena.domain.TeamPlan;
 import com.marnone.ai_arena.domain.ValidationResult;
@@ -32,7 +32,7 @@ public class RunArenaSessionUseCase {
 
 	private final ValidationService validationService;
 	private final PlanningService planningService;
-	private final SpecialistFactory specialistFactory;
+	private final OrchestratedAiExpertFactory expertFactory;
 	private final DebateOrchestrator debateOrchestrator;
 	private final FinalAnswerService finalAnswerService;
 	private final ArenaProperties arenaProperties;
@@ -41,18 +41,18 @@ public class RunArenaSessionUseCase {
 	public RunArenaSessionUseCase(
 		ValidationService validationService,
 		PlanningService planningService,
-		SpecialistFactory specialistFactory,
+		OrchestratedAiExpertFactory expertFactory,
 		DebateOrchestrator debateOrchestrator,
 		FinalAnswerService finalAnswerService,
 		ArenaProperties arenaProperties
 	) {
-		this(validationService, planningService, specialistFactory, debateOrchestrator, finalAnswerService, arenaProperties, Clock.systemUTC());
+		this(validationService, planningService, expertFactory, debateOrchestrator, finalAnswerService, arenaProperties, Clock.systemUTC());
 	}
 
 	RunArenaSessionUseCase(
 		ValidationService validationService,
 		PlanningService planningService,
-		SpecialistFactory specialistFactory,
+		OrchestratedAiExpertFactory expertFactory,
 		DebateOrchestrator debateOrchestrator,
 		FinalAnswerService finalAnswerService,
 		ArenaProperties arenaProperties,
@@ -60,7 +60,7 @@ public class RunArenaSessionUseCase {
 	) {
 		this.validationService = Objects.requireNonNull(validationService, "validationService must not be null");
 		this.planningService = Objects.requireNonNull(planningService, "planningService must not be null");
-		this.specialistFactory = Objects.requireNonNull(specialistFactory, "specialistFactory must not be null");
+		this.expertFactory = Objects.requireNonNull(expertFactory, "expertFactory must not be null");
 		this.debateOrchestrator = Objects.requireNonNull(debateOrchestrator, "debateOrchestrator must not be null");
 		this.finalAnswerService = Objects.requireNonNull(finalAnswerService, "finalAnswerService must not be null");
 		this.arenaProperties = Objects.requireNonNull(arenaProperties, "arenaProperties must not be null");
@@ -103,22 +103,22 @@ public class RunArenaSessionUseCase {
 			stage = "planning";
 			Question question = new Question(input, Instant.now(clock));
 			TeamPlan plan = planningService.plan(question);
-			eventConsumer.accept(SessionEvent.teamPlanned(new TeamEvent(plan.specialistCount(), plan.roles(), plan.initialStrategy())));
+			eventConsumer.accept(SessionEvent.teamPlanned(new TeamEvent(plan.expertCount(), plan.roles(), plan.initialStrategy())));
 			log.info(
-				"Arena team planned correlationId={} specialistCount={} skillCount={} roleCount={}",
+				"Arena team planned correlationId={} expertCount={} skillCount={} roleCount={}",
 				correlationId,
-				plan.specialistCount(),
+				plan.expertCount(),
 				plan.skills().size(),
 				plan.roles().size()
 			);
 
-			stage = "specialist_factory";
-			List<Specialist> team = specialistFactory.createTeam(plan);
+			stage = "expert_factory";
+			List<OrchestratedAiExpert> team = expertFactory.createTeam(plan);
 			team.stream()
-				.map(RunArenaSessionUseCase::toSpecialistEvent)
-				.map(SessionEvent::specialistCreated)
+				.map(RunArenaSessionUseCase::toExpertEvent)
+				.map(SessionEvent::expertCreated)
 				.forEach(eventConsumer);
-			log.info("Arena specialists created correlationId={} specialistCount={}", correlationId, team.size());
+			log.info("Arena experts created correlationId={} expertCount={}", correlationId, team.size());
 
 			stage = "debate";
 			DebateResult debate = debateOrchestrator.run(
@@ -145,7 +145,7 @@ public class RunArenaSessionUseCase {
 				safeLength(finalAnswer.rationale())
 			);
 			log.info(
-				"Arena session completed correlationId={} durationMs={} specialistCount={} messageCount={} stopReasonCategory={}",
+				"Arena session completed correlationId={} durationMs={} expertCount={} messageCount={} stopReasonCategory={}",
 				correlationId,
 				elapsedMillis(startedAt),
 				team.size(),
@@ -168,7 +168,7 @@ public class RunArenaSessionUseCase {
 
 	private static ArenaLimits toArenaLimits(ArenaProperties.Limits limits) {
 		return new ArenaLimits(
-			limits.getMaxSpecialists(),
+			limits.getMaxExperts(),
 			limits.getMaxTurns(),
 			limits.getMaxMessages(),
 			limits.getTimeout(),
@@ -180,19 +180,19 @@ public class RunArenaSessionUseCase {
 		return new ValidationEvent(validation.status(), validation.reason(), validation.classificationHint());
 	}
 
-	private static SpecialistEvent toSpecialistEvent(Specialist specialist) {
-		return new SpecialistEvent(
-			specialist.id(),
-			specialist.name(),
-			specialist.role(),
-			specialist.personality(),
-			specialist.mission(),
-			specialist.uiAccent()
+	private static ExpertEvent toExpertEvent(OrchestratedAiExpert expert) {
+		return new ExpertEvent(
+			expert.id(),
+			expert.name(),
+			expert.role(),
+			expert.personality(),
+			expert.mission(),
+			expert.uiAccent()
 		);
 	}
 
 	private static MessageEvent toMessageEvent(DebateMessage message) {
-		return new MessageEvent(message.id(), message.specialistId(), message.turn(), message.type(), message.content());
+		return new MessageEvent(message.id(), message.expertId(), message.turn(), message.type(), message.content());
 	}
 
 	private static String reasonOrDefault(ValidationResult validation, String defaultReason) {
@@ -249,7 +249,7 @@ public class RunArenaSessionUseCase {
 		if (stopReason.contains("empty")) {
 			return "EMPTY_TEAM";
 		}
-		if (stopReason.contains("unknown specialist")) {
+		if (stopReason.contains("unknown expert")) {
 			return "INVALID_SUPERVISOR";
 		}
 		if (stopReason.contains("inconsistent")) {

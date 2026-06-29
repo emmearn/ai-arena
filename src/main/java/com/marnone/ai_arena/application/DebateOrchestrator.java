@@ -13,12 +13,12 @@ import com.marnone.ai_arena.ai.SupervisorAiPort;
 import com.marnone.ai_arena.domain.ArenaLimits;
 import com.marnone.ai_arena.domain.DebateMessage;
 import com.marnone.ai_arena.domain.Question;
-import com.marnone.ai_arena.domain.Specialist;
+import com.marnone.ai_arena.domain.OrchestratedAiExpert;
 import com.marnone.ai_arena.domain.SupervisorAction;
 import com.marnone.ai_arena.domain.SupervisorDecision;
 
 /**
- * Runs the sequential specialist debate and enforces turn, message, timeout, and supervisor limits.
+ * Runs the sequential expert debate and enforces turn, message, timeout, and supervisor limits.
  */
 public class DebateOrchestrator {
 
@@ -26,7 +26,7 @@ public class DebateOrchestrator {
 	private static final String MAX_TURNS_STOP = "Stopped because the maximum turn limit was reached.";
 	private static final String TIMEOUT_STOP = "Stopped because the debate timeout was reached.";
 	private static final String EMPTY_TEAM_STOP = "Stopped because the debate team is empty.";
-	private static final String INVALID_SUPERVISOR_STOP = "Stopped because the supervisor selected an unknown specialist.";
+	private static final String INVALID_SUPERVISOR_STOP = "Stopped because the supervisor selected an unknown expert.";
 	private static final String INVALID_MESSAGE_STOP = "Stopped because the debate message was inconsistent.";
 	private static final String SUPERVISOR_STOP = "Stopped by supervisor decision.";
 
@@ -44,23 +44,23 @@ public class DebateOrchestrator {
 		this.clock = Objects.requireNonNull(clock, "clock must not be null");
 	}
 
-	public DebateResult run(Question question, List<Specialist> team, ArenaLimits limits) {
+	public DebateResult run(Question question, List<OrchestratedAiExpert> team, ArenaLimits limits) {
 		return run(question, team, limits, message -> {
 		});
 	}
 
-	public DebateResult run(Question question, List<Specialist> team, ArenaLimits limits, Consumer<DebateMessage> messageConsumer) {
+	public DebateResult run(Question question, List<OrchestratedAiExpert> team, ArenaLimits limits, Consumer<DebateMessage> messageConsumer) {
 		Objects.requireNonNull(question, "question must not be null");
 		Objects.requireNonNull(limits, "limits must not be null");
 		Objects.requireNonNull(messageConsumer, "messageConsumer must not be null");
-		List<Specialist> specialists = List.copyOf(Objects.requireNonNull(team, "team must not be null"));
-		if (specialists.isEmpty()) {
+		List<OrchestratedAiExpert> experts = List.copyOf(Objects.requireNonNull(team, "team must not be null"));
+		if (experts.isEmpty()) {
 			return new DebateResult(List.of(), EMPTY_TEAM_STOP);
 		}
 
 		Instant startedAt = clock.instant();
 		List<DebateMessage> messages = new ArrayList<>();
-		Specialist nextSpecialist = specialists.getFirst();
+		OrchestratedAiExpert nextExpert = experts.getFirst();
 
 		for (int turn = 1; ; turn++) {
 			if (isTimedOut(startedAt, limits.timeout())) {
@@ -73,8 +73,8 @@ public class DebateOrchestrator {
 				return new DebateResult(messages, MAX_MESSAGES_STOP);
 			}
 
-			DebateMessage message = debateAiPort.createMessage(question, nextSpecialist, List.copyOf(messages), turn);
-			if (!isConsistentMessage(message, nextSpecialist, turn)) {
+			DebateMessage message = debateAiPort.createMessage(question, nextExpert, List.copyOf(messages), turn);
+			if (!isConsistentMessage(message, nextExpert, turn)) {
 				return new DebateResult(messages, INVALID_MESSAGE_STOP);
 			}
 			messages.add(message);
@@ -94,11 +94,11 @@ public class DebateOrchestrator {
 			if (decision.action() == SupervisorAction.STOP) {
 				return new DebateResult(messages, explicitReason(decision.reason()));
 			}
-			Specialist selectedSpecialist = specialistById(specialists, decision.nextSpecialistId());
-			if (selectedSpecialist == null) {
+			OrchestratedAiExpert selectedExpert = expertById(experts, decision.nextExpertId());
+			if (selectedExpert == null) {
 				return new DebateResult(messages, INVALID_SUPERVISOR_STOP);
 			}
-			nextSpecialist = selectedSpecialist;
+			nextExpert = selectedExpert;
 		}
 	}
 
@@ -106,14 +106,14 @@ public class DebateOrchestrator {
 		return !Duration.between(startedAt, clock.instant()).minus(timeout).isNegative();
 	}
 
-	private static boolean isConsistentMessage(DebateMessage message, Specialist specialist, int turn) {
+	private static boolean isConsistentMessage(DebateMessage message, OrchestratedAiExpert expert, int turn) {
 		Objects.requireNonNull(message, "message must not be null");
-		return message.turn() == turn && message.specialistId().equals(specialist.id());
+		return message.turn() == turn && message.expertId().equals(expert.id());
 	}
 
-	private static Specialist specialistById(List<Specialist> specialists, String id) {
-		return specialists.stream()
-			.filter(specialist -> specialist.id().equals(id))
+	private static OrchestratedAiExpert expertById(List<OrchestratedAiExpert> experts, String id) {
+		return experts.stream()
+			.filter(expert -> expert.id().equals(id))
 			.findFirst()
 			.orElse(null);
 	}

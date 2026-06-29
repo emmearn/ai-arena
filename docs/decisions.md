@@ -27,3 +27,16 @@ Fonte di verita' per decisioni significative di prodotto, architettura, sicurezz
 | Alternative | Lasciare valutazione, sintesi e orchestrazione dentro `SupervisorAiPort`; introdurre subito refactor completo; usare solo euristiche deterministiche senza Judge LLM. |
 | Impatti | Futuri task architetturali e test per `JudgeAiPort`, `JudgeService`, `JudgeRequest`, `Judgement`, `JudgeVerdict` e `JudgeRubric`; nessuna rimozione degli agenti runtime dell'applicazione; nessuna implementazione immediata richiesta. |
 | Riferimenti | `docs/architecture.md`, `docs/tasks.md`, `docs/security.md`, `docs/design.md` |
+
+## DEC-003 - Limiti HTTP MVP in-process
+
+| Campo | Contenuto |
+| --- | --- |
+| Stato | Accepted |
+| Data | 2026-06-27 |
+| Contesto | L'MVP espone un endpoint pubblico per aprire sessioni SSE senza autenticazione o database. `TASK-014` richiede rifiuto controllato di payload troppo grandi e richieste eccessive. |
+| Decisione | Applicare un filtro HTTP in-process su `POST /api/arena/sessions` con limite payload configurabile e rate limit per indirizzo remoto. I default sono `arena.http.max-payload-bytes=8192`, `arena.http.rate-limit-max-requests=20`, `arena.http.rate-limit-window=1m`. |
+| Motivazione | I limiti proteggono risorse prima della validazione e prima di eventuali chiamate AI costose, restando semplici e senza nuove dipendenze per il monolite MVP. |
+| Alternative | Nessun rate limit; rate limit via proxy esterno soltanto; introdurre una libreria dedicata o uno store distribuito. |
+| Impatti | Sufficiente per demo e uso locale; non e' adatto da solo a deploy multi-istanza o traffico pubblico elevato. I valori vanno rivalutati quando saranno definiti provider LLM, costi e target di concorrenza. |
+| Riferimenti | `docs/security.md#9-api-e-integrazioni`, `docs/tasks.md#task-014` |
