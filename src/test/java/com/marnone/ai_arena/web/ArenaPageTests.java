@@ -34,5 +34,7 @@ class ArenaPageTests {
 		assertThat(body).contains("Progressive exchange");
 		assertThat(body).contains("Final answer");
 		assertThat(body).contains("/assets/logo.png");
+		assertThat(body).doesNotContain("Live reasoning arena");
+		assertThat(body).doesNotContain("<h1>AI Arena</h1>");
 	}
 }

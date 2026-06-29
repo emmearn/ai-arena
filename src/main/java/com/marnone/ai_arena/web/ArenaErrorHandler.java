@@ -10,6 +10,7 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * Maps web-layer failures to stable public error responses without exposing internals.
@@ -35,6 +36,12 @@ public class ArenaErrorHandler {
 	ResponseEntity<ArenaErrorResponse> methodNotAllowed(HttpRequestMethodNotSupportedException ex) {
 		log.warn("Arena request rejected because method is unsupported exceptionType={}", ex.getClass().getName());
 		return error(HttpStatus.METHOD_NOT_ALLOWED, "METHOD_NOT_ALLOWED", "Request method is not supported.");
+	}
+
+	@ExceptionHandler(NoResourceFoundException.class)
+	ResponseEntity<ArenaErrorResponse> resourceNotFound(NoResourceFoundException ex) {
+		log.debug("Arena static resource not found resourcePath={}", ex.getResourcePath());
+		return error(HttpStatus.NOT_FOUND, "NOT_FOUND", "Resource not found.");
 	}
 
 	@ExceptionHandler(Exception.class)

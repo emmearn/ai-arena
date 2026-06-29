@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
@@ -77,6 +78,20 @@ class ArenaControllerErrorTests {
 
 		assertThat(body).contains("event:ERROR");
 		assertThat(body).contains("Unable to run arena session.");
+		assertSafePublicError(body);
+	}
+
+	@Test
+	void mapsMissingStaticResourceToNotFound() throws Exception {
+		MvcResult result = mockMvc.perform(get("/missing-static-resource.png"))
+			.andExpect(status().isNotFound())
+			.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+			.andReturn();
+
+		String body = result.getResponse().getContentAsString();
+
+		assertThat(body).contains("\"code\":\"NOT_FOUND\"");
+		assertThat(body).contains("\"message\":\"Resource not found.\"");
 		assertSafePublicError(body);
 	}
 
