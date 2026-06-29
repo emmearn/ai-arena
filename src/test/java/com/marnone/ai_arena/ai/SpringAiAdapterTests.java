@@ -16,6 +16,9 @@ import org.junit.jupiter.api.Test;
 import com.marnone.ai_arena.domain.ArenaLimits;
 import com.marnone.ai_arena.domain.DebateMessage;
 import com.marnone.ai_arena.domain.FinalAnswer;
+import com.marnone.ai_arena.domain.JudgeRequest;
+import com.marnone.ai_arena.domain.JudgeVerdict;
+import com.marnone.ai_arena.domain.Judgement;
 import com.marnone.ai_arena.domain.MessageType;
 import com.marnone.ai_arena.domain.OrchestratedAiExpert;
 import com.marnone.ai_arena.domain.Question;
@@ -151,12 +154,74 @@ class SpringAiAdapterTests {
 			.hasMessageContaining("AI provider request failed");
 	}
 
+	@Test
+	void mapsValidJudgeOutput() {
+		SpringAiAdapter adapter = adapterWith(
+			"""
+			{"verdict":"REVISE","rubric":{"relevance":5,"correctness":4,"completeness":3,"clarity":4,"safety":5,"overall":4},"reason":"Needs a sharper caveat.","revisionHints":["Clarify the operational caveat."]}
+			"""
+		);
+
+		Judgement judgement = adapter.judge(judgeRequest());
+
+		assertThat(judgement.verdict()).isEqualTo(JudgeVerdict.REVISE);
+		assertThat(judgement.rubric().overall()).isEqualTo(4);
+		assertThat(judgement.reason()).contains("caveat");
+		assertThat(judgement.revisionHints()).containsExactly("Clarify the operational caveat.");
+	}
+
+	@Test
+	void rejectsJudgeOutputWithMissingFields() {
+		SpringAiAdapter adapter = adapterWith(
+			"""
+			{"verdict":"ACCEPT","reason":"Looks fine.","revisionHints":[]}
+			"""
+		);
+
+		assertThatThrownBy(() -> adapter.judge(judgeRequest()))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessageContaining("malformed");
+	}
+
+	@Test
+	void rejectsJudgeOutputWithInvalidVerdict() {
+		SpringAiAdapter adapter = adapterWith(
+			"""
+			{"verdict":"MAYBE","rubric":{"relevance":5,"correctness":4,"completeness":3,"clarity":4,"safety":5,"overall":4},"reason":"Unclear.","revisionHints":["Decide."]}
+			"""
+		);
+
+		assertThatThrownBy(() -> adapter.judge(judgeRequest()))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessageContaining("malformed");
+	}
+
+	@Test
+	void wrapsJudgeProviderFailureInControlledException() {
+		SpringAiAdapter adapter = new SpringAiAdapter(prompt -> {
+			throw new IllegalStateException("judge provider unavailable");
+		}, Duration.ofSeconds(3), FIXED_CLOCK);
+
+		assertThatThrownBy(() -> adapter.judge(judgeRequest()))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessageContaining("AI provider request failed");
+	}
+
 	private static DebateMessage message() {
 		return new DebateMessage("message-1", "expert-1", 1, MessageType.PROPOSAL, "Initial point.", Instant.EPOCH);
 	}
 
 	private static OrchestratedAiExpert expert() {
 		return new OrchestratedAiExpert("expert-1", "Blueprint", "Architect", "structural", "Frame the design.", "#42BFD0");
+	}
+
+	private static JudgeRequest judgeRequest() {
+		return new JudgeRequest(
+			QUESTION,
+			List.of(message()),
+			new FinalAnswer("Use a guarded Spring AI adapter.", "The debate converged on structured outputs.", "Converged."),
+			"final-answer"
+		);
 	}
 
 	private static SpringAiAdapter adapterWith(String... responses) {

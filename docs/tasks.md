@@ -75,8 +75,8 @@ Stati: `TODO`, `IMPLEMENTED`, `VERIFIED_STATIC`, `BLOCKED_RUNTIME`, `DONE`.
 | `TASK-029` | `DONE` | Review `pom.xml` e dependency tree: dipendenze minime Spring Boot/Spring AI/test, nessun DB/auth/actuator o libreria non motivata. | `dependency:tree` e build completa passano il 2026-06-29. |
 | `TASK-030` | `DONE` | Aggiunto smoke test MVP con fake adapter: shell UI, scenario valido completo via SSE e scenario ostile rifiutato prima di team/finale. | Verificato con `ArenaMvpSmokeTests` e suite Maven completa il 2026-06-29. |
 | `TASK-031` | `DONE` | Nomi tecnici migrati a `OrchestratedAiExpert`/`expert`; evento SSE `EXPERT_CREATED`; property `arena.limits.max-experts`; `mvnw test` passa. | Verificato con Java 21.0.11. |
-| `TASK-032` | `TODO` | Non iniziato. | Evoluzione non MVP: modello dominio Judge. |
-| `TASK-033` | `TODO` | Non iniziato. | Evoluzione non MVP: porta AI dedicata al Judge. |
+| `TASK-032` | `DONE` | Aggiunti `JudgeRequest`, `Judgement`, `JudgeVerdict`, `JudgeRubric` con invarianti e test dominio su scoring, verdict e campi obbligatori. | Verificato con `JudgeModelTests` e suite Maven il 2026-06-29. |
+| `TASK-033` | `DONE` | Aggiunta `JudgeAiPort` separata dal Supervisor; `SpringAiAdapter` implementa il contratto Judge con output JSON validato e test valido/malformed/verdict/provider error. | Verificato con `JudgeAiPortTests`, `SpringAiAdapterTests` e suite Maven il 2026-06-29. |
 | `TASK-034` | `TODO` | Non iniziato. | Evoluzione non MVP: quality gate post-sintesi. |
 | `TASK-035` | `TODO` | Non iniziato. | Evoluzione non MVP: uso consultivo nel Supervisor dopo test. |
 | `TASK-036` | `TODO` | Non iniziato. | Evoluzione non MVP: test fallback e output malformati. |
@@ -169,7 +169,7 @@ Task con sicurezza obbligatoria:
 | `DEBT-002` | Nessun database e nessuna cronologia. | Esclusi dall'MVP. | Requisito approvato per memoria o storico. |
 | `DEBT-003` | Rate limit semplice in-process. | Sufficiente per MVP/demo. | Deploy pubblico con traffico reale o piu' istanze. |
 | `DEBT-004` | Scoring qualita' risposta assente. | Escluso dai requisiti MVP. | Requisito approvato di valutazione automatica. |
-| `DEBT-005` | `SupervisorAiPort` copre oggi sia decisione di flusso sia sintesi. | Accettabile nell'MVP fake e nel flusso core gia' implementato. | Avvio dei task `TASK-032`-`TASK-034` per separare il Judge. |
+| `DEBT-005` | `SupervisorAiPort` copre oggi sia decisione di flusso sia sintesi runtime. | Accettabile nell'MVP fake e nel flusso core gia' implementato; modello e porta Judge sono gia' separati. | `TASK-034` per integrare `JudgeService` dopo la sintesi finale. |
 
 ## 9. Funzionalita' future
 

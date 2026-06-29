@@ -14,7 +14,7 @@ AI Arena e' una web application monolitica, stateless rispetto alla persistenza 
 | `REQ-005`, `REQ-006` | Factory runtime di ruoli AI orchestrati senza registry persistente di dominio. |
 | `REQ-007`, `NFR-001` | Streaming/eventi progressivi dal backend alla UI. |
 | `REQ-008`, `REQ-009`, `REQ-010`, `NFR-002` | Orchestrator con stato di sessione richiesta, limiti, arresto e sintesi finale. |
-| Evoluzione Judge | Separazione futura tra orchestrazione del dibattito e valutazione qualitativa strutturata. |
+| Evoluzione Judge | Separazione tra orchestrazione del dibattito e valutazione qualitativa strutturata; modello e porta Judge sono presenti, integrazione runtime futura. |
 | `NFR-004`, `NFR-006` | Error model uniforme, logging tecnico e test tracciabili. |
 
 ## 2. Stack tecnologico
@@ -42,7 +42,7 @@ Layer:
 | --- | --- | --- |
 | `web` | Controller, pagina singola, DTO di input/output, stream eventi, mapping errori utente. | Dipende da `application`; non contiene logica di dominio. |
 | `application` | Use case `RunArenaSession`, coordinamento validazione -> planning -> team -> dibattito -> sintesi. | Dipende da `domain` e porte in `ai`; non dipende da dettagli web. |
-| `domain` | Modello e regole: domanda, esito validazione, piano, esperto AI orchestrato, messaggio, sessione, limiti, decisione supervisore. | Nessuna dipendenza da Spring, web o provider esterni. |
+| `domain` | Modello e regole: domanda, esito validazione, piano, esperto AI orchestrato, messaggio, sessione, limiti, decisione supervisore e giudizio Judge. | Nessuna dipendenza da Spring, web o provider esterni. |
 | `ai` | Porte e adapter Spring AI per chiamate LLM strutturate. | Implementa interfacce usate da `application`; non conosce controller. |
 | `config` | Properties tipizzate, limiti, bean applicativi. | Puo' cablare layer; non contiene logica di business. |
 
@@ -58,9 +58,10 @@ Stato attuale:
 - `SupervisorAiPort` espone oggi sia `decide(...)` per prossimo turno/arresto sia `synthesize(...)` per produrre la risposta finale;
 - `DebateOrchestrator` usa il Supervisor per il controllo sequenziale del dibattito;
 - `FinalAnswerService` delega la sintesi finale al `SupervisorAiPort`;
+- `JudgeRequest`, `Judgement`, `JudgeVerdict`, `JudgeRubric` e `JudgeAiPort` esistono come contratto separato per valutazioni qualitative strutturate;
 - `SpringAiAdapter` implementa le porte AI via Spring AI `ChatModel` con output JSON strutturati e validati;
 - `arena.ai.adapter=fake` mantiene il comportamento locale/test, mentre `arena.ai.adapter=openai` abilita l'adapter reale insieme a `spring.ai.model.chat=openai` e API key server-side;
-- non esiste ancora un componente Judge separato nel codice.
+- non esiste ancora un `JudgeService` integrato nel flusso runtime.
 
 Direzione evolutiva:
 - mantenere il Supervisor responsabile di orchestrazione, limiti, loop, timeout e scelta del prossimo esperto AI orchestrato;
@@ -98,7 +99,7 @@ src/main/java/com/marnone/ai_arena/
     DebateMessage
     SupervisorDecision
     FinalAnswer
-    JudgeRequest / Judgement / JudgeVerdict / JudgeRubric (future)
+    JudgeRequest / Judgement / JudgeVerdict / JudgeRubric
     ArenaLimits
     ArenaSessionState
   ai/
@@ -108,7 +109,7 @@ src/main/java/com/marnone/ai_arena/
     OrchestratedAiExpertAiPort
     DebateAiPort
     SupervisorAiPort
-    JudgeAiPort (future)
+    JudgeAiPort
     SpringAiAdapter
   config/
     ArenaProperties
@@ -147,6 +148,7 @@ Convenzioni:
 | `DebateOrchestrator` | Gestire turni, messaggi progressivi e stato dibattito. | `REQ-007`, `REQ-008`, `REQ-009` |
 | `SupervisorService` | Decidere prossimo turno, arresto e ragione. | `REQ-008`, `NFR-002` |
 | `FinalAnswerService` | Produrre sintesi motivata dal dibattito. | `REQ-010` |
+| `JudgeAiPort` | Esporre una valutazione qualitativa strutturata separata dal Supervisor. | Evoluzione Judge |
 | `JudgeService` (future) | Valutare contributi, dibattito o risposta finale tramite rubrica esplicita e output strutturato validato. | Evoluzione Judge |
 | `ArenaProperties` | Esporre limiti configurabili. | `REQ-009` |
 | `SpringAiAdapter` | Incapsulare Spring AI e provider LLM. | `REQ-002`-`REQ-010` |
@@ -165,10 +167,10 @@ Nessuna persistenza richiesta nell'MVP. Il modello e' in memoria per durata dell
 | `DebateMessage` | `id`, `expertId`, `turn`, `type`, `content`, `createdAt` | Appartiene alla sessione. |
 | `SupervisorDecision` | `action`, `reason`, `nextExpertId` | Controlla turni/arresto. |
 | `FinalAnswer` | `content`, `rationale`, `stopReason` | Output finale. |
-| `JudgeRequest` (future) | `question`, `messages`, `finalAnswer`, `evaluationTarget` | Input strutturato per una valutazione qualitativa. |
-| `Judgement` (future) | `verdict`, `rubric`, `reason`, `revisionHints` | Output validato del Judge. |
-| `JudgeVerdict` (future) | `ACCEPT`, `REVISE`, `REJECT` | Esito sintetico del giudizio. |
-| `JudgeRubric` (future) | `relevance`, `correctness`, `completeness`, `clarity`, `safety`, `overall` | Rubrica esplicita della valutazione. |
+| `JudgeRequest` | `question`, `messages`, `finalAnswer`, `evaluationTarget` | Input strutturato per una valutazione qualitativa. |
+| `Judgement` | `verdict`, `rubric`, `reason`, `revisionHints` | Output validato del Judge. |
+| `JudgeVerdict` | `ACCEPT`, `REVISE`, `REJECT` | Esito sintetico del giudizio. |
+| `JudgeRubric` | `relevance`, `correctness`, `completeness`, `clarity`, `safety`, `overall` | Rubrica esplicita della valutazione con score 1-5. |
 | `ArenaLimits` | `maxExperts`, `maxTurns`, `maxMessages`, `timeout` | Vincola piano e dibattito. |
 | `ArenaSessionState` | `sessionId`, `question`, `team`, `messages`, `status`, `limits` | Aggregato runtime non persistente. |
 

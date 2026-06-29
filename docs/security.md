@@ -58,7 +58,7 @@ Output AI:
 - sanitizzare contenuti mostrati in UI;
 - non mostrare stacktrace, prompt interni, configurazioni, API key, path locali o dettagli provider.
 
-Output Judge futuro:
+Output Judge:
 - trattare il giudizio LLM-as-a-Judge come output AI non fidato finche' non e' validato;
 - accettare solo verdict previsti (`ACCEPT`, `REVISE`, `REJECT`) e rubrica strutturata con campi obbligatori;
 - non usare il Judge come unico controllo di sicurezza, policy, compliance o blocco contenuti;

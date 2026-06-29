@@ -18,6 +18,10 @@ import org.springframework.ai.chat.model.ChatModel;
 import com.marnone.ai_arena.domain.ArenaLimits;
 import com.marnone.ai_arena.domain.DebateMessage;
 import com.marnone.ai_arena.domain.FinalAnswer;
+import com.marnone.ai_arena.domain.JudgeRequest;
+import com.marnone.ai_arena.domain.JudgeRubric;
+import com.marnone.ai_arena.domain.JudgeVerdict;
+import com.marnone.ai_arena.domain.Judgement;
 import com.marnone.ai_arena.domain.MessageType;
 import com.marnone.ai_arena.domain.OrchestratedAiExpert;
 import com.marnone.ai_arena.domain.Question;
@@ -30,7 +34,7 @@ import com.marnone.ai_arena.domain.ValidationResult;
 /**
  * Spring AI adapter that requests strict JSON outputs and maps them into validated domain types.
  */
-public class SpringAiAdapter implements AiClientPort {
+public class SpringAiAdapter implements AiClientPort, JudgeAiPort {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	private static final List<String> FALLBACK_ACCENTS = List.of("#42BFD0", "#D85B55", "#FFC21A", "#58C3A6", "#8F7AF5");
@@ -202,6 +206,45 @@ public class SpringAiAdapter implements AiClientPort {
 		);
 	}
 
+	@Override
+	public Judgement judge(JudgeRequest request) {
+		Objects.requireNonNull(request, "request must not be null");
+		JudgementResponse response = ask(
+			"""
+			Evaluate an AI Arena output as a separate LLM-as-a-Judge signal.
+			Return only JSON with this schema:
+			{"verdict":"ACCEPT|REVISE|REJECT","rubric":{"relevance":1,"correctness":1,"completeness":1,"clarity":1,"safety":1,"overall":1},"reason":"brief reason","revisionHints":["string"]}
+			Rules: scores are integers from 1 to 5. ACCEPT must use an empty revisionHints array. REVISE or REJECT must include at least one actionable revision hint.
+			Evaluation target: %s
+			Question: %s
+			Final answer: %s
+			Rationale: %s
+			Debate messages: %s
+			""".formatted(
+				request.evaluationTarget(),
+				request.question().text(),
+				request.finalAnswer().content(),
+				request.finalAnswer().rationale(),
+				summarizeMessages(request.messages())
+			),
+			JudgementResponse.class
+		);
+		try {
+			return new Judgement(
+				parseJudgeVerdict(response.verdict()),
+				toJudgeRubric(Objects.requireNonNull(response.rubric(), "rubric must not be null")),
+				requireText("reason", response.reason()),
+				List.copyOf(Objects.requireNonNull(response.revisionHints(), "revisionHints must not be null"))
+			);
+		}
+		catch (RuntimeException ex) {
+			if (MALFORMED_OUTPUT.equals(ex.getMessage())) {
+				throw ex;
+			}
+			throw malformed();
+		}
+	}
+
 	private <T> T ask(String prompt, Class<T> responseType) {
 		try {
 			String raw = CompletableFuture
@@ -276,6 +319,31 @@ public class SpringAiAdapter implements AiClientPort {
 		}
 	}
 
+	private static JudgeVerdict parseJudgeVerdict(String value) {
+		try {
+			return JudgeVerdict.valueOf(requireText("verdict", value).toUpperCase(Locale.ROOT));
+		}
+		catch (IllegalArgumentException ex) {
+			throw malformed();
+		}
+	}
+
+	private static JudgeRubric toJudgeRubric(JudgeRubricResponse response) {
+		try {
+			return new JudgeRubric(
+				response.relevance(),
+				response.correctness(),
+				response.completeness(),
+				response.clarity(),
+				response.safety(),
+				response.overall()
+			);
+		}
+		catch (RuntimeException ex) {
+			throw malformed();
+		}
+	}
+
 	private static String safeAccent(String value, int index) {
 		if (value != null && value.matches("^#[0-9a-fA-F]{6}$")) {
 			return value;
@@ -330,6 +398,12 @@ public class SpringAiAdapter implements AiClientPort {
 	}
 
 	private record FinalAnswerResponse(String content, String rationale, String stopReason) {
+	}
+
+	private record JudgementResponse(String verdict, JudgeRubricResponse rubric, String reason, List<String> revisionHints) {
+	}
+
+	private record JudgeRubricResponse(int relevance, int correctness, int completeness, int clarity, int safety, int overall) {
 	}
 }
 
