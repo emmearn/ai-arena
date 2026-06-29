@@ -12,6 +12,7 @@ public class ArenaProperties {
 
 	private Limits limits = new Limits();
 	private Http http = new Http();
+	private Ai ai = new Ai();
 
 	public Limits getLimits() {
 		return limits;
@@ -33,6 +34,17 @@ public class ArenaProperties {
 			throw new IllegalArgumentException("arena.http must be configured");
 		}
 		this.http = http;
+	}
+
+	public Ai getAi() {
+		return ai;
+	}
+
+	public void setAi(Ai ai) {
+		if (ai == null) {
+			throw new IllegalArgumentException("arena.ai must be configured");
+		}
+		this.ai = ai;
 	}
 
 	public static class Limits {
@@ -132,6 +144,47 @@ public class ArenaProperties {
 				throw new IllegalArgumentException(name + " must be positive");
 			}
 			return value;
+		}
+	}
+
+	public static class Ai {
+
+		private String provider = "openai";
+		private String model = "gpt-5-mini";
+		private Duration requestTimeout = Duration.ofSeconds(30);
+
+		public String getProvider() {
+			return provider;
+		}
+
+		public void setProvider(String provider) {
+			this.provider = requireText("arena.ai.provider", provider);
+		}
+
+		public String getModel() {
+			return model;
+		}
+
+		public void setModel(String model) {
+			this.model = requireText("arena.ai.model", model);
+		}
+
+		public Duration getRequestTimeout() {
+			return requestTimeout;
+		}
+
+		public void setRequestTimeout(Duration requestTimeout) {
+			if (requestTimeout == null || requestTimeout.isZero() || requestTimeout.isNegative()) {
+				throw new IllegalArgumentException("arena.ai.request-timeout must be positive");
+			}
+			this.requestTimeout = requestTimeout;
+		}
+
+		private static String requireText(String name, String value) {
+			if (value == null || value.isBlank()) {
+				throw new IllegalArgumentException(name + " must not be blank");
+			}
+			return value.trim();
 		}
 	}
 }

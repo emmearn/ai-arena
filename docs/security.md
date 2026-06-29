@@ -16,6 +16,7 @@ Fonte di verita' per guardrail, policy, rischi e vincoli di sicurezza di AI Aren
 
 - Vietato inserire API key, token, password o credenziali in codice, Git, asset, test fixture reali o documentazione.
 - Segreti solo tramite variabili d'ambiente o secret manager dell'ambiente di deploy.
+- Per OpenAI usare solo API key server-side; non usare password ChatGPT, sessioni browser o credenziali utente.
 - Configurazioni non segrete possono stare in file applicativi; valori sensibili devono restare esterni.
 - Log, errori e UI non devono mostrare segreti, header sensibili, prompt completi o payload contenenti dati non necessari.
 - Rotazione e naming dei segreti dipendono dal provider scelto e vanno registrati in `docs/decisions.md`.
@@ -122,7 +123,7 @@ Endpoint applicativi:
 - content type attesi e validati;
 - SSE chiuso su completamento, errore, timeout o disconnessione client.
 
-Decisioni da registrare in `docs/decisions.md`: provider LLM, modello, valori rate limit, timeout, retry e domini CORS.
+Decisioni registrate in `docs/decisions.md`: provider LLM/modello in `DEC-004`, limiti HTTP in `DEC-003`. Valori CORS e ulteriori tuning retry/timeout vanno registrati quando definiti per deploy reale.
 
 ## 10. Frontend e UX di sicurezza
 

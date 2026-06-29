@@ -7,6 +7,7 @@ AI Arena is a Spring Boot web application that turns one user question into a vi
 - Java 21
 - Maven wrapper
 - Spring Boot Web MVC
+- Spring AI OpenAI starter, disabled by default until real adapters are enabled
 - Server-Sent Events for progressive session updates
 - Deterministic fake AI adapter for local development and tests
 
@@ -15,6 +16,7 @@ AI Arena is a Spring Boot web application that turns one user question into a vi
 - JDK 21 available on `PATH`
 - No database is required for the MVP
 - No API key is required while the fake AI adapter is active
+- OpenAI integration will use a server-side API key when real adapters are enabled; no ChatGPT password is used
 
 ## Commands
 
@@ -40,9 +42,20 @@ arena.limits.max-input-characters=4000
 arena.http.max-payload-bytes=8192
 arena.http.rate-limit-max-requests=20
 arena.http.rate-limit-window=1m
+arena.ai.provider=openai
+arena.ai.model=gpt-5-mini
+arena.ai.request-timeout=30s
+spring.ai.model.chat=none
+spring.ai.model.embedding=none
+spring.ai.model.image=none
+spring.ai.model.audio.speech=none
+spring.ai.model.audio.transcription=none
+spring.ai.model.moderation=none
+spring.ai.openai.chat.model=gpt-5-mini
+spring.ai.retry.max-attempts=2
 ```
 
-Keep secrets out of files and pass future provider credentials through environment variables or a secret manager.
+Keep secrets out of files and pass future provider credentials through environment variables or a secret manager. The OpenAI starter is on the classpath, but all Spring AI model auto-configurations are set to `none` by default so the app stays runnable without an API key until the real Spring AI adapters are implemented.
 
 ## Project Structure
 

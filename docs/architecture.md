@@ -30,9 +30,9 @@ AI Arena e' una web application monolitica, stateless rispetto alla persistenza 
 | HTML/CSS/JavaScript vanilla serviti dall'app | Sufficiente per schermata unica; evita framework frontend non richiesti. |
 | Nessun database nell'MVP | Cronologia e memoria persistente sono escluse; lo stato vive solo durante la richiesta. |
 | JUnit + Spring Boot Test | Gia' presenti; coprono unit e integration test della logica principale. |
-| Provider LLM esterno via Spring AI | Necessario per generazione AI; provider/modello specifico e' punto aperto da registrare in `docs/decisions.md`. |
+| Provider LLM esterno via Spring AI | OpenAI selezionato come primo provider tramite `DEC-004`; il fake resta default operativo finche' gli adapter reali non sono implementati. |
 
-Dipendenze applicative previste: starter web, Spring AI starter del provider scelto, starter test. Non introdurre database, code, broker, RAG, tool calling o autenticazione finche' non richiesti.
+Dipendenze applicative previste: starter web, Spring AI OpenAI starter, starter test. Non introdurre database, code, broker, RAG, tool calling o autenticazione finche' non richiesti.
 
 ## 3. Architettura applicativa
 
@@ -266,11 +266,16 @@ Properties applicative:
 | `arena.http.rate-limit-window` | Durata della finestra rate limit in-process. |
 | `arena.ai.provider` | Provider LLM selezionato. |
 | `arena.ai.model` | Modello LLM selezionato. |
+| `arena.ai.request-timeout` | Timeout applicativo massimo previsto per chiamata provider. |
 | `arena.ai.temperature.*` | Parametri per validazione, planning, dibattito, sintesi se necessari. |
+| `spring.ai.model.*` | Modalita' model Spring AI; default `none` per chat, embedding, image, audio e moderation finche' gli adapter reali non vengono abilitati. |
+| `spring.ai.openai.chat.model` | Modello OpenAI usato quando la chat Spring AI verra' abilitata. |
+| `spring.ai.retry.*` | Retry limitati per errori transitori del provider. |
 
 Segreti:
 - API key e credenziali solo via variabili d'ambiente o secret manager dell'ambiente di deploy;
 - non salvare segreti in repository;
+- per OpenAI usare API key server-side; non sono richieste password ChatGPT o credenziali browser;
 - dettagli di rotazione, storage e policy in `docs/security.md`.
 
 ## 10. Performance e scalabilita'
@@ -342,10 +347,9 @@ README.md:
 | Separazione Supervisor/Judge | Evitare mescolare orchestrazione, sintesi e valutazione qualitativa. | Lasciare tutto in `SupervisorAiPort`. | Maggiore testabilita' e roadmap per quality gate strutturato. | Si. |
 | Dibattito sequenziale | Chiarezza, controllo limiti, ruoli AI paralleli esclusi dall'MVP. | Esecuzione parallela. | Meno throughput, piu' prevedibilita'. | Si. |
 | Frontend vanilla servito dal backend | Schermata unica e nessun requisito di SPA complessa. | React/Vue/Angular. | Meno dipendenze, UI sufficiente per demo. | Si. |
-| Provider LLM non fissato | Requisiti non indicano vendor/modello. | Fissare provider subito. | Serve decisione prima dell'implementazione AI reale. | Si, punto aperto prioritario. |
+| Provider LLM OpenAI | Supportato direttamente da Spring AI e sufficiente per MVP reale controllato. | Anthropic, Gemini, Azure OpenAI, Ollama, solo fake. | Base pronta per adapter reali; segreti server-side e fake default preservato. | `DEC-004` |
 
 Punti aperti:
-- provider e modello LLM;
 - valori iniziali dei limiti `max-experts`, `max-turns`, `max-messages`, `timeout`;
 - target numerici di performance/concorrenza;
 - formato esatto degli output strutturati AI;

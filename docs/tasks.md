@@ -63,11 +63,11 @@ Stati: `TODO`, `IMPLEMENTED`, `VERIFIED_STATIC`, `BLOCKED_RUNTIME`, `DONE`.
 | `TASK-017` | `DONE` | Rendering team da eventi `TEAM_PLANNED`/`EXPERT_CREATED`; card con avatar, ruolo, missione, personalita' e accento UI; verifica browser desktop/mobile senza overflow. | Verificato con Java 21.0.11. |
 | `TASK-018` | `DONE` | Rendering progressivo `DEBATE_MESSAGE`, associazione esperto/colore, turno attivo e contenuto via `textContent`; verifica browser desktop/mobile e XSS come testo. | Verificato con Java 21.0.11. |
 | `TASK-019` | `DONE` | Sintesi finale da evento `FINAL_ANSWER`, rationale, stop reason e stato error/complete visibili; `ArenaPageTests`; verifica browser su flusso valido e domanda vuota. | Verificato con Java 21.0.11. |
-| `TASK-020` | `TODO` | Non iniziato. | Decisione provider/modello LLM. |
-| `TASK-021` | `TODO` | Non iniziato. | Dipende da `TASK-020`. |
+| `TASK-020` | `DONE` | Decisione `DEC-004`: OpenAI via Spring AI, modello iniziale `gpt-5-mini`, fake AI ancora default locale/test. | Review documentale completata il 2026-06-29. |
+| `TASK-021` | `DONE` | Aggiunti `spring-ai-bom` 2.0.0 e solo starter `spring-ai-starter-model-openai`; dependency tree e `mvnw test` passano. | Verificato con Java 21.0.11. |
 | `TASK-022` | `TODO` | Non iniziato. | Dipende da `TASK-021`. |
 | `TASK-023` | `TODO` | Non iniziato. | Dipende da `TASK-022`. |
-| `TASK-024` | `TODO` | Non iniziato. | Dipende da `TASK-021`. |
+| `TASK-024` | `DONE` | Properties `arena.ai.*`, Spring AI model auto-config disabilitate di default, retry limitati, API key assente dal repo; `mvnw test` passa. | Verificato con Java 21.0.11; grep segreti senza match. |
 | `TASK-025` | `TODO` | Non iniziato. | Logging con correlation id. |
 | `TASK-026` | `TODO` | Non iniziato. | Dipende da `TASK-018` e `TASK-023`. |
 | `TASK-027` | `DONE` | Focus visibile, stato finale annunciabile, errore campo con `aria-invalid`, motion riducibile gia' preservata e testi lunghi senza overflow. | Verifica browser desktop/mobile e `mvnw test`. |

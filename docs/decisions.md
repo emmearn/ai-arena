@@ -40,3 +40,16 @@ Fonte di verita' per decisioni significative di prodotto, architettura, sicurezz
 | Alternative | Nessun rate limit; rate limit via proxy esterno soltanto; introdurre una libreria dedicata o uno store distribuito. |
 | Impatti | Sufficiente per demo e uso locale; non e' adatto da solo a deploy multi-istanza o traffico pubblico elevato. I valori vanno rivalutati quando saranno definiti provider LLM, costi e target di concorrenza. |
 | Riferimenti | `docs/security.md#9-api-e-integrazioni`, `docs/tasks.md#task-014` |
+
+## DEC-004 - Provider LLM OpenAI via Spring AI
+
+| Campo | Contenuto |
+| --- | --- |
+| Stato | Accepted |
+| Data | 2026-06-29 |
+| Contesto | L'MVP usa un adapter AI fake deterministico; per proseguire verso AI reale serve scegliere un provider, un modello iniziale, dipendenze Spring AI minime e regole di configurazione dei segreti. |
+| Decisione | Il primo provider LLM supportato e' OpenAI tramite Spring AI `spring-ai-starter-model-openai`. Il modello applicativo iniziale e' `gpt-5-mini`, configurato come default in `arena.ai.model` e `spring.ai.openai.chat.model`. Tutte le auto-configurazioni Spring AI model restano disabilitate di default con `spring.ai.model.*=none`, cosi' l'app continua a partire senza API key e il fake rimane il comportamento locale/test finche' gli adapter reali non sono implementati. |
+| Motivazione | OpenAI e' supportato direttamente da Spring AI, e' compatibile con l'ecosistema ChatGPT/API, riduce il numero di dipendenze iniziali e permette di usare una sola integrazione per validazione, planning, dibattito, supervisione e sintesi. |
+| Alternative | Anthropic, Google Gemini, Azure OpenAI, provider locali/Ollama, mantenere solo fake AI. Le alternative restano possibili tramite porte AI e configurazione futura, ma aumenterebbero subito variabilita' di SDK, costi, opzioni modello e test contract. |
+| Impatti | Richiede API key OpenAI server-side tramite variabile d'ambiente/secret manager quando gli adapter reali verranno attivati; nessuna password ChatGPT o credenziale utente e' richiesta. I timeout applicativi partono da `arena.ai.request-timeout=30s`; retry Spring AI iniziale limitato a 2 tentativi. Nessuna API key viene salvata in repo o inviata al frontend. |
+| Riferimenti | `docs/architecture.md#2-stack-tecnologico`, `docs/security.md#2-segreti`, `docs/tasks.md#task-020` |
