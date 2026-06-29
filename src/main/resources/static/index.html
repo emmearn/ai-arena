@@ -6,6 +6,7 @@
 	<title>AI Arena</title>
 	<link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
 	<link rel="stylesheet" href="/styles.css">
+	<script src="/app.js" defer></script>
 </head>
 <body>
 	<main class="app-shell">
@@ -13,9 +14,9 @@
 			<div class="brand">
 				<img src="/assets/logo.png" alt="AI Arena" class="brand-logo">
 			</div>
-			<div class="session-status" aria-live="polite">
+			<div class="session-status" data-state="idle" aria-live="polite">
 				<span class="status-dot"></span>
-				<span>Ready</span>
+				<span id="session-status-label">Ready</span>
 			</div>
 		</header>
 
@@ -23,13 +24,17 @@
 			<div class="question-copy">
 				<p class="eyebrow">Ask the arena</p>
 				<h2 id="question-title">One question, multiple expert perspectives.</h2>
+				<p id="validation-status" class="validation-status" data-state="idle" aria-live="polite">Ready for a question.</p>
 			</div>
-			<form class="question-form">
+			<form class="question-form" id="question-form" novalidate>
 				<label class="sr-only" for="question">Question</label>
-				<textarea id="question" name="question" rows="3" placeholder="How should we evaluate this decision?"></textarea>
-				<button type="submit" disabled>
+				<div class="field-stack">
+					<textarea id="question" name="question" rows="3" placeholder="How should we evaluate this decision?" aria-describedby="question-error validation-status"></textarea>
+					<p id="question-error" class="field-error" aria-live="polite"></p>
+				</div>
+				<button type="submit" id="start-session">
 					<span aria-hidden="true">></span>
-					Start session
+					<span class="button-label">Start session</span>
 				</button>
 			</form>
 		</section>

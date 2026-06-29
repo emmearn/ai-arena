@@ -34,7 +34,26 @@ class ArenaPageTests {
 		assertThat(body).contains("Progressive exchange");
 		assertThat(body).contains("Final answer");
 		assertThat(body).contains("/assets/logo.png");
+		assertThat(body).contains("/app.js");
+		assertThat(body).contains("id=\"question-form\"");
+		assertThat(body).contains("id=\"question-error\"");
+		assertThat(body).contains("id=\"validation-status\"");
 		assertThat(body).doesNotContain("Live reasoning arena");
 		assertThat(body).doesNotContain("<h1>AI Arena</h1>");
+	}
+
+	@Test
+	void servesArenaInteractionScript() throws Exception {
+		String body = mockMvc.perform(get("/app.js"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith("text/javascript"))
+			.andReturn()
+			.getResponse()
+			.getContentAsString();
+
+		assertThat(body).contains("Enter a question before starting the arena.");
+		assertThat(body).contains("VALIDATION_ACCEPTED");
+		assertThat(body).contains("VALIDATION_REJECTED");
+		assertThat(body).contains("/api/arena/sessions");
 	}
 }

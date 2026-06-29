@@ -148,11 +148,35 @@ p {
 	font-size: 1.45rem;
 }
 
+.validation-status {
+	margin: 12px 0 0;
+	font-weight: 700;
+}
+
+.validation-status[data-state="accepted"] {
+	color: var(--teal);
+}
+
+.validation-status[data-state="rejected"],
+.validation-status[data-state="error"] {
+	color: var(--error);
+}
+
+.validation-status[data-state="validating"],
+.validation-status[data-state="running"] {
+	color: var(--gold);
+}
+
 .question-form {
 	display: grid;
 	grid-template-columns: 1fr auto;
 	gap: 12px;
 	align-items: stretch;
+}
+
+.field-stack {
+	display: grid;
+	gap: 8px;
 }
 
 textarea {
@@ -172,6 +196,19 @@ textarea:focus {
 	box-shadow: 0 0 0 3px rgba(76, 201, 216, 0.18);
 }
 
+textarea[aria-invalid="true"] {
+	border-color: var(--error);
+	box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.16);
+}
+
+.field-error {
+	min-height: 20px;
+	margin: 0;
+	color: var(--error);
+	font-size: 0.9rem;
+	font-weight: 700;
+}
+
 button {
 	display: inline-flex;
 	align-items: center;
@@ -184,8 +221,55 @@ button {
 	background: linear-gradient(180deg, rgba(216, 180, 90, 0.92), rgba(167, 124, 42, 0.92));
 	color: #111318;
 	font-weight: 800;
-	cursor: not-allowed;
+	cursor: pointer;
+	transition: border-color 160ms ease, filter 160ms ease, opacity 160ms ease, transform 160ms ease;
+}
+
+button:hover:not(:disabled) {
+	filter: brightness(1.08);
+}
+
+button:focus-visible {
+	outline: 3px solid rgba(76, 201, 216, 0.34);
+	outline-offset: 3px;
+}
+
+button:active:not(:disabled) {
+	transform: translateY(1px);
+}
+
+button:disabled {
+	cursor: progress;
 	opacity: 0.72;
+}
+
+.session-status[data-state="accepted"] {
+	border-color: rgba(81, 184, 159, 0.5);
+	background: rgba(81, 184, 159, 0.16);
+}
+
+.session-status[data-state="validating"],
+.session-status[data-state="running"] {
+	border-color: rgba(216, 180, 90, 0.5);
+	background: rgba(216, 180, 90, 0.13);
+}
+
+.session-status[data-state="rejected"],
+.session-status[data-state="error"] {
+	border-color: rgba(255, 107, 107, 0.5);
+	background: rgba(255, 107, 107, 0.13);
+}
+
+.session-status[data-state="validating"] .status-dot,
+.session-status[data-state="running"] .status-dot {
+	background: var(--gold);
+	box-shadow: 0 0 18px rgba(216, 180, 90, 0.85);
+}
+
+.session-status[data-state="rejected"] .status-dot,
+.session-status[data-state="error"] .status-dot {
+	background: var(--error);
+	box-shadow: 0 0 18px rgba(255, 107, 107, 0.72);
 }
 
 .arena-grid {
