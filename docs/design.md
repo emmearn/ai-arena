@@ -51,10 +51,10 @@ Archetipi visuali consigliati:
 | --- | --- | --- | --- |
 | Analitico | Cyan profondo | Prisma, lente, griglia | preciso, razionale |
 | Critico | Rosso corallo scuro | Scudo, alert, taglio diagonale | prudente, sfidante |
-| Strategico | Oro soft | Bussola, corona minima, nodo | sintetico, orientato alla decisione |
+| Strategico | Oro brand | Bussola, corona minima, nodo | sintetico, orientato alla decisione |
 | Creativo | Viola controllato | Spark sobrio, forma fluida | generativo, divergente |
 | Tecnico | Verde teal | Circuito lineare, parentesi | concreto, verificabile |
-| Giudice | Avorio caldo + grafite | Bilancia astratta, sigillo, anello | autorevole, conclusivo |
+| Giudice | Champagne + oro brand + grafite | Bilancia astratta, sigillo, anello | autorevole, conclusivo |
 
 ## 4. Layout generale
 
@@ -73,29 +73,34 @@ Non progettare schermate fisse, ma rispettare queste regole:
 
 ## 5. Palette colori
 
-Palette base scura premium con accenti controllati. Evitare dominanza monocromatica viola/blu.
+Palette base scura premium con accenti controllati e allineati al logo ufficiale. Il brand usa oro, ambra e champagne su base grafite; gli accenti freddi restano per differenziare esperti e stati tecnici, evitando una UI monocromatica giallo/arancio.
 
 | Token | Valore | Uso |
 | --- | --- | --- |
-| `color-bg` | `#0D0F14` | Sfondo principale. |
-| `color-surface` | `#171A21` | Pannelli e aree contenuto. |
-| `color-surface-glass` | `rgba(255,255,255,0.07)` | Glassmorphism leggero. |
-| `color-border` | `rgba(255,255,255,0.14)` | Separazioni. |
-| `color-text` | `#F3F5F7` | Testo primario. |
-| `color-muted` | `#A7AFBC` | Testo secondario. |
-| `color-cyan` | `#4CC9D8` | Esperto analitico, focus freddo. |
-| `color-coral` | `#E46363` | Critica, rischio, contrasto dialettico. |
-| `color-gold` | `#D8B45A` | Giudizio, sintesi, momento decisivo. |
-| `color-teal` | `#51B89F` | Validazione positiva, tecnico. |
+| `color-bg` | `#0B0D10` | Sfondo principale grafite, non saturo. |
+| `color-surface` | `#15171D` | Pannelli e aree contenuto. |
+| `color-surface-raised` | `#1B1E25` | Superfici in evidenza e stati attivi. |
+| `color-surface-glass` | `rgba(255,241,214,0.07)` | Glassmorphism leggero con temperatura brand. |
+| `color-border` | `rgba(255,210,120,0.18)` | Separazioni calde e sobrie. |
+| `color-text` | `#F7F1E6` | Testo primario champagne. |
+| `color-muted` | `#B8AFA2` | Testo secondario caldo. |
+| `color-gold` | `#FFC21A` | CTA, focus brand, giudizio, sintesi, momento decisivo. |
+| `color-amber` | `#F28A16` | Hover, gradienti sottili, accenti brand secondari. |
+| `color-copper` | `#B45A16` | Ombre calde, bordi e profondita' leggera. |
+| `color-champagne` | `#F5DCA8` | Dettagli premium, label della sintesi. |
+| `color-cyan` | `#42BFD0` | Esperto analitico, focus freddo secondario. |
+| `color-coral` | `#D85B55` | Critica, rischio, contrasto dialettico. |
+| `color-teal` | `#58C3A6` | Validazione positiva, tecnico. |
 | `color-violet` | `#8F7AF5` | Creativita' controllata. |
 | `color-error` | `#FF6B6B` | Errori osservabili. |
 | `color-success` | `#65D6A4` | Esiti positivi. |
-| `color-warning` | `#F0C66A` | Limiti, timeout, arresti controllati. |
+| `color-warning` | `#F0B84A` | Limiti, timeout, arresti controllati. |
 
 Gradienti:
 - usare gradienti sottili su superfici o bordi, non come unico linguaggio;
-- preferire combinazioni grafite/cyan/gold o grafite/teal/coral;
+- preferire combinazioni grafite/oro/ambra con cyan o teal come contrasto funzionale;
 - evitare sfondi saturi a piena pagina;
+- non usare l'arancio pieno del logo come background dominante della pagina;
 - glassmorphism: blur leggero, bordo visibile, contrasto testo sempre verificato.
 
 ## 6. Tipografia

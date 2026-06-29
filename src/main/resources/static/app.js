@@ -10,11 +10,18 @@ const teamStatus = document.querySelector("#team-status");
 const expertList = document.querySelector("#expert-list");
 const debateStatus = document.querySelector("#debate-status");
 const messageList = document.querySelector("#message-list");
+const finalPanel = document.querySelector(".final-panel");
+const finalAnswer = document.querySelector("#final-answer");
+const finalRationale = document.querySelector("#final-rationale");
+const finalStopReason = document.querySelector("#final-stop-reason");
 
 const defaultTeamStatus = "Waiting for an accepted question.";
 const defaultTeamEmptyState = "Accepted questions will assemble the expert team here.";
 const defaultDebateStatus = "Waiting for the arena to start.";
 const defaultDebateEmptyState = "Accepted questions will stream debate messages here.";
+const defaultFinalAnswer = "The final response will appear here when the arena completes.";
+const defaultFinalRationale = "Waiting for the debate outcome.";
+const defaultFinalStopReason = "Not available yet.";
 const expertsById = new Map();
 
 const statusCopy = {
@@ -23,7 +30,8 @@ const statusCopy = {
 	accepted: "Accepted",
 	rejected: "Rejected",
 	error: "Error",
-	running: "Running"
+	running: "Running",
+	complete: "Complete"
 };
 
 form?.addEventListener("submit", async (event) => {
@@ -42,6 +50,7 @@ form?.addEventListener("submit", async (event) => {
 	setValidationState("validating", "Validating question...");
 	resetTeamPanel();
 	resetDebatePanel();
+	resetFinalPanel();
 
 	try {
 		await streamArenaSession(question);
@@ -132,11 +141,16 @@ function handleSseBlock(block) {
 	}
 
 	if (eventType === "SUPERVISOR_DECISION") {
-		debateStatus.textContent = payload.reason || "Supervisor is deciding whether to continue.";
+		renderSupervisorDecision(payload);
+	}
+
+	if (eventType === "FINAL_ANSWER") {
+		renderFinalAnswer(payload);
 	}
 
 	if (eventType === "ERROR") {
 		setValidationState("error", payload.message || "Unable to run arena session.");
+		renderStreamError(payload);
 	}
 }
 
@@ -172,6 +186,13 @@ function resetTeamPanel() {
 function resetDebatePanel() {
 	debateStatus.textContent = defaultDebateStatus;
 	messageList.replaceChildren(createEmptyState(defaultDebateEmptyState));
+}
+
+function resetFinalPanel() {
+	finalPanel.dataset.state = "idle";
+	finalAnswer.textContent = defaultFinalAnswer;
+	finalRationale.textContent = defaultFinalRationale;
+	finalStopReason.textContent = defaultFinalStopReason;
 }
 
 function renderTeamPlan(payload) {
@@ -249,7 +270,7 @@ function renderDebateMessage(payload) {
 	const expert = expertsById.get(payload.expertId) || {
 		name: "Arena expert",
 		role: payload.expertId,
-		accent: "#4cc9d8"
+		accent: "#42bfd0"
 	};
 	const turn = Number(payload.turn) || messageList.querySelectorAll(".message-card").length + 1;
 
@@ -269,7 +290,7 @@ function renderDebateMessage(payload) {
 	author.textContent = expert.name;
 
 	const detail = document.createElement("span");
-	detail.textContent = `Turn ${turn} · ${formatMessageType(payload.messageType)}`;
+	detail.textContent = `Turn ${turn} - ${formatMessageType(payload.messageType)}`;
 
 	meta.append(author, detail);
 
@@ -284,6 +305,34 @@ function renderDebateMessage(payload) {
 	card.append(meta, role, content);
 	messageList.append(card);
 	debateStatus.textContent = `${expert.name} is speaking.`;
+}
+
+function renderSupervisorDecision(payload) {
+	const reason = payload.reason || "Supervisor is deciding whether to continue.";
+	debateStatus.textContent = reason;
+	if (payload.action && String(payload.action).toUpperCase() !== "CONTINUE") {
+		finalPanel.dataset.state = "deciding";
+		finalStopReason.textContent = reason;
+	}
+}
+
+function renderFinalAnswer(payload) {
+	finalPanel.dataset.state = "complete";
+	clearActiveExpert();
+	setSessionState("complete");
+	validationStatus.dataset.state = "accepted";
+	validationStatus.textContent = "Question accepted. Arena complete.";
+	debateStatus.textContent = "Debate complete. Final answer ready.";
+	finalAnswer.textContent = payload.content || "The arena completed without a final response.";
+	finalRationale.textContent = payload.rationale || "The final answer was synthesized from the available debate.";
+	finalStopReason.textContent = payload.stopReason || "The arena reached a controlled stop.";
+}
+
+function renderStreamError(payload) {
+	finalPanel.dataset.state = "error";
+	finalAnswer.textContent = "The arena could not complete this session.";
+	finalRationale.textContent = payload.message || "A controlled error interrupted the run.";
+	finalStopReason.textContent = "Stopped because an error occurred.";
 }
 
 function clearActiveExpert() {
@@ -309,7 +358,7 @@ function initialsFor(value) {
 }
 
 function safeAccent(value) {
-	return /^#[0-9a-f]{6}$/i.test(value || "") ? value : "#4cc9d8";
+	return /^#[0-9a-f]{6}$/i.test(value || "") ? value : "#42bfd0";
 }
 
 function cssEscape(value) {

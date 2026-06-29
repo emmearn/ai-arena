@@ -62,6 +62,18 @@ Stati: `TODO`, `IMPLEMENTED`, `VERIFIED_STATIC`, `BLOCKED_RUNTIME`, `DONE`.
 | `TASK-016` | `DONE` | Input domanda collegato allo stream SSE; errore vuoto vicino al campo; stati validazione accepted/rejected visibili; test web e verifica browser su vuoto/valido/rifiutato. | Verificato con Java 21.0.11. |
 | `TASK-017` | `DONE` | Rendering team da eventi `TEAM_PLANNED`/`EXPERT_CREATED`; card con avatar, ruolo, missione, personalita' e accento UI; verifica browser desktop/mobile senza overflow. | Verificato con Java 21.0.11. |
 | `TASK-018` | `DONE` | Rendering progressivo `DEBATE_MESSAGE`, associazione esperto/colore, turno attivo e contenuto via `textContent`; verifica browser desktop/mobile e XSS come testo. | Verificato con Java 21.0.11. |
+| `TASK-019` | `DONE` | Sintesi finale da evento `FINAL_ANSWER`, rationale, stop reason e stato error/complete visibili; `ArenaPageTests`; verifica browser su flusso valido e domanda vuota. | Verificato con Java 21.0.11. |
+| `TASK-020` | `TODO` | Non iniziato. | Decisione provider/modello LLM. |
+| `TASK-021` | `TODO` | Non iniziato. | Dipende da `TASK-020`. |
+| `TASK-022` | `TODO` | Non iniziato. | Dipende da `TASK-021`. |
+| `TASK-023` | `TODO` | Non iniziato. | Dipende da `TASK-022`. |
+| `TASK-024` | `TODO` | Non iniziato. | Dipende da `TASK-021`. |
+| `TASK-025` | `TODO` | Non iniziato. | Logging con correlation id. |
+| `TASK-026` | `TODO` | Non iniziato. | Dipende da `TASK-018` e `TASK-023`. |
+| `TASK-027` | `DONE` | Focus visibile, stato finale annunciabile, errore campo con `aria-invalid`, motion riducibile gia' preservata e testi lunghi senza overflow. | Verifica browser desktop/mobile e `mvnw test`. |
+| `TASK-028` | `DONE` | Palette allineata al nuovo `logo.png`, layout desktop/mobile verificato, logo leggibile, sintesi e metadati responsive senza overlap. | Verifica browser 1280x720 e 390x844; nessun errore console. |
+| `TASK-029` | `TODO` | Non iniziato. | Dipende da `TASK-024`. |
+| `TASK-030` | `TODO` | Non iniziato. | Dipende da `TASK-029`. |
 | `TASK-031` | `DONE` | Nomi tecnici migrati a `OrchestratedAiExpert`/`expert`; evento SSE `EXPERT_CREATED`; property `arena.limits.max-experts`; `mvnw test` passa. | Verificato con Java 21.0.11. |
 | `TASK-032` | `TODO` | Non iniziato. | Evoluzione non MVP: modello dominio Judge. |
 | `TASK-033` | `TODO` | Non iniziato. | Evoluzione non MVP: porta AI dedicata al Judge. |

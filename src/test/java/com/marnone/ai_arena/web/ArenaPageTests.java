@@ -42,6 +42,9 @@ class ArenaPageTests {
 		assertThat(body).contains("id=\"team-status\"");
 		assertThat(body).contains("id=\"message-list\"");
 		assertThat(body).contains("id=\"debate-status\"");
+		assertThat(body).contains("id=\"final-answer\"");
+		assertThat(body).contains("id=\"final-rationale\"");
+		assertThat(body).contains("id=\"final-stop-reason\"");
 		assertThat(body).contains("Accepted questions will assemble the expert team here.");
 		assertThat(body).contains("Accepted questions will stream debate messages here.");
 		assertThat(body).doesNotContain("<h3>Analyst</h3>");
@@ -63,6 +66,9 @@ class ArenaPageTests {
 		assertThat(body).contains("VALIDATION_REJECTED");
 		assertThat(body).contains("EXPERT_CREATED");
 		assertThat(body).contains("DEBATE_MESSAGE");
+		assertThat(body).contains("FINAL_ANSWER");
+		assertThat(body).contains("renderFinalAnswer");
+		assertThat(body).contains("renderStreamError");
 		assertThat(body).contains("/api/arena/sessions");
 		assertThat(body).contains("document.createElement(\"article\")");
 		assertThat(body).contains("textContent = payload.mission");

@@ -62,12 +62,22 @@
 				</div>
 			</section>
 
-			<section class="final-panel" aria-labelledby="final-title">
+			<section class="final-panel" aria-labelledby="final-title" data-state="idle" aria-live="polite">
 				<div class="judge-mark" aria-hidden="true">O</div>
-				<div>
+				<div class="final-content">
 					<p class="eyebrow">Synthesis</p>
 					<h2 id="final-title">Final answer</h2>
-					<p>The final response and stop reason will appear here when the arena completes.</p>
+					<p id="final-answer" class="final-answer">The final response will appear here when the arena completes.</p>
+					<dl class="final-meta">
+						<div>
+							<dt>Rationale</dt>
+							<dd id="final-rationale">Waiting for the debate outcome.</dd>
+						</div>
+						<div>
+							<dt>Stop reason</dt>
+							<dd id="final-stop-reason">Not available yet.</dd>
+						</div>
+					</dl>
 				</div>
 			</section>
 		</section>
