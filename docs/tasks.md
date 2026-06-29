@@ -60,6 +60,7 @@ Stati: `TODO`, `IMPLEMENTED`, `VERIFIED_STATIC`, `BLOCKED_RUNTIME`, `DONE`.
 | `TASK-014` | `DONE` | `ArenaRequestLimitFilter`, properties `arena.http.*`, decisione `DEC-003`; test su payload troppo grande e rate limit. | Verificato con Java 21.0.11. |
 | `TASK-015` | `DONE` | Pagina statica single-screen con logo, input, stato, team, dibattito e sintesi; `ArenaPageTests`; verifica browser desktop/mobile senza errori console critici. | Verificato con Java 21.0.11. |
 | `TASK-016` | `DONE` | Input domanda collegato allo stream SSE; errore vuoto vicino al campo; stati validazione accepted/rejected visibili; test web e verifica browser su vuoto/valido/rifiutato. | Verificato con Java 21.0.11. |
+| `TASK-017` | `DONE` | Rendering team da eventi `TEAM_PLANNED`/`EXPERT_CREATED`; card con avatar, ruolo, missione, personalita' e accento UI; verifica browser desktop/mobile senza overflow. | Verificato con Java 21.0.11. |
 | `TASK-031` | `DONE` | Nomi tecnici migrati a `OrchestratedAiExpert`/`expert`; evento SSE `EXPERT_CREATED`; property `arena.limits.max-experts`; `mvnw test` passa. | Verificato con Java 21.0.11. |
 | `TASK-032` | `TODO` | Non iniziato. | Evoluzione non MVP: modello dominio Judge. |
 | `TASK-033` | `TODO` | Non iniziato. | Evoluzione non MVP: porta AI dedicata al Judge. |

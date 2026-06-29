@@ -6,6 +6,11 @@ const submitButtonLabel = submitButton?.querySelector(".button-label");
 const sessionStatus = document.querySelector(".session-status");
 const sessionStatusLabel = document.querySelector("#session-status-label");
 const validationStatus = document.querySelector("#validation-status");
+const teamStatus = document.querySelector("#team-status");
+const expertList = document.querySelector("#expert-list");
+
+const defaultTeamStatus = "Waiting for an accepted question.";
+const defaultTeamEmptyState = "Accepted questions will assemble the expert team here.";
 
 const statusCopy = {
 	idle: "Ready",
@@ -30,6 +35,7 @@ form?.addEventListener("submit", async (event) => {
 
 	setBusy(true);
 	setValidationState("validating", "Validating question...");
+	resetTeamPanel();
 
 	try {
 		await streamArenaSession(question);
@@ -108,6 +114,11 @@ function handleSseBlock(block) {
 		setSessionState("running");
 		validationStatus.dataset.state = "accepted";
 		validationStatus.textContent = "Question accepted. Arena running...";
+		renderTeamPlan(payload);
+	}
+
+	if (eventType === "EXPERT_CREATED") {
+		renderExpert(payload);
 	}
 
 	if (eventType === "ERROR") {
@@ -136,6 +147,88 @@ function setValidationState(state, message) {
 function setSessionState(state) {
 	sessionStatus.dataset.state = state;
 	sessionStatusLabel.textContent = statusCopy[state] || statusCopy.idle;
+}
+
+function resetTeamPanel() {
+	teamStatus.textContent = defaultTeamStatus;
+	expertList.replaceChildren(createEmptyState(defaultTeamEmptyState));
+}
+
+function renderTeamPlan(payload) {
+	const count = Number(payload.expertCount) || 0;
+	const roles = Array.isArray(payload.roles) ? payload.roles : [];
+	const roleSummary = roles.length ? roles.join(", ") : "expert team";
+	const countLabel = count === 1 ? "1 expert" : `${count} experts`;
+	teamStatus.textContent = `Planning ${countLabel}: ${roleSummary}.`;
+	expertList.replaceChildren(createEmptyState("Creating expert identities..."));
+}
+
+function renderExpert(payload) {
+	if (!payload.name || !payload.role || !payload.mission) {
+		return;
+	}
+	if (expertList.querySelector(".empty-state")) {
+		expertList.replaceChildren();
+	}
+
+	const card = document.createElement("article");
+	card.className = "expert-card";
+	card.dataset.expertId = payload.id || "";
+	card.style.setProperty("--accent", safeAccent(payload.uiAccent));
+
+	const avatar = document.createElement("div");
+	avatar.className = "avatar";
+	avatar.setAttribute("aria-hidden", "true");
+	avatar.textContent = initialsFor(payload.name);
+
+	const content = document.createElement("div");
+	content.className = "expert-content";
+
+	const headingRow = document.createElement("div");
+	headingRow.className = "expert-heading";
+
+	const name = document.createElement("h3");
+	name.textContent = payload.name;
+
+	const role = document.createElement("span");
+	role.className = "role-badge";
+	role.textContent = payload.role;
+
+	headingRow.append(name, role);
+
+	const mission = document.createElement("p");
+	mission.textContent = payload.mission;
+
+	const personality = document.createElement("p");
+	personality.className = "expert-personality";
+	personality.textContent = payload.personality || "professional and focused";
+
+	content.append(headingRow, mission, personality);
+	card.append(avatar, content);
+	expertList.append(card);
+
+	const createdCount = expertList.querySelectorAll(".expert-card").length;
+	teamStatus.textContent = createdCount === 1 ? "1 expert ready." : `${createdCount} experts ready.`;
+}
+
+function createEmptyState(message) {
+	const emptyState = document.createElement("p");
+	emptyState.className = "empty-state";
+	emptyState.textContent = message;
+	return emptyState;
+}
+
+function initialsFor(value) {
+	return value
+		.split(/\s+/)
+		.filter(Boolean)
+		.slice(0, 2)
+		.map((part) => part.charAt(0).toUpperCase())
+		.join("");
+}
+
+function safeAccent(value) {
+	return /^#[0-9a-f]{6}$/i.test(value || "") ? value : "#4cc9d8";
 }
 
 function showFieldError(message) {
