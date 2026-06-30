@@ -42,7 +42,7 @@ MVP:
 
 Evoluzioni future:
 - tool calling, MCP, RAG, memoria persistente, ruoli AI paralleli, votazione, modelli differenti, cronologia conversazioni;
-- LLM-as-a-Judge separato dal supervisore, con valutazione qualitativa strutturata di contributi, dibattito o risposta finale.
+- LLM-as-a-Judge separato dal supervisore, con valutazione qualitativa strutturata della risposta finale e possibile evoluzione consultiva su contributi o dibattito.
 
 ## 3. Attori e casi d'uso
 
@@ -52,7 +52,7 @@ Evoluzioni future:
 | Sistema | Valida, pianifica, crea esperti AI orchestrati, coordina dibattito, arresta e sintetizza. |
 | Esperto AI orchestrato | Contribuisce al dibattito secondo ruolo, missione e personalita'. |
 | Supervisore | Gestisce turni, limiti, loop, criterio di arresto e sintesi finale nell'MVP. |
-| Judge | Evoluzione futura: valuta qualita' di contributi, dibattito o risposta finale con rubrica esplicita e output strutturato. |
+| Judge | Valuta la qualita' della risposta finale con rubrica esplicita e output strutturato; contributi/dibattito restano evoluzione futura. |
 
 | Caso d'uso | Flusso principale | Alternative/errori |
 | --- | --- | --- |
@@ -72,7 +72,7 @@ Evoluzioni future:
 | Dibattito | Team e domanda | Messaggi progressivi | Gli esperti AI orchestrati propongono, criticano, correggono, convergono | Esperti AI orchestrati, supervisore |
 | Supervisione | Messaggi, limiti, stato | Prossimo turno, arresto o sintesi | Prevenire loop e rispettare limiti | Supervisore |
 | Risposta finale | Dibattito concluso | Risposta motivata | Presente per ogni richiesta valida conclusa | Sistema |
-| Valutazione qualitativa | Contributi, dibattito o risposta finale | Giudizio strutturato | Evoluzione non MVP: migliorare qualita' e affidabilita' senza sostituire i controlli applicativi | Judge, sistema |
+| Valutazione qualitativa | Risposta finale | Giudizio strutturato | Migliorare qualita' e affidabilita' senza sostituire i controlli applicativi | Judge, sistema |
 | UI singola | Stati e risultati | Vista completa del processo | Processo decisionale osservabile | Utente |
 
 ## 5. User stories
@@ -362,7 +362,7 @@ Assunzioni:
 - gli utenti non sono autenticati;
 - la persistenza della cronologia non e' richiesta;
 - i limiti operativi esistono come valori disponibili al sistema;
-- la qualita' della risposta e' valutata nell'MVP tramite osservabilita' del processo e presenza di sintesi motivata; scoring automatico e Judge strutturato sono evoluzioni documentate, non requisito immediato.
+- la qualita' della risposta e' valutata anche tramite Judge strutturato post-sintesi; metriche di successo di prodotto e uso consultivo durante il dibattito restano evoluzioni documentate.
 
 Vincoli:
 - sorgente vision: `docs/vision.md`;

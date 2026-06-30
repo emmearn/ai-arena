@@ -39,6 +39,7 @@ public class SessionEventMapper {
 			.map(SessionEvent::debateMessage)
 			.forEach(events::add);
 		events.add(SessionEvent.supervisorDecision(new DecisionEvent(SupervisorAction.STOP, result.debate().stopReason(), null)));
+		events.add(SessionEvent.judgement(toJudgementEvent(result.judgedFinalAnswer())));
 		events.add(SessionEvent.finalAnswer(toFinalEvent(result.finalAnswer())));
 		return List.copyOf(events);
 	}
@@ -70,6 +71,17 @@ public class SessionEventMapper {
 	private static FinalEvent toFinalEvent(FinalAnswer finalAnswer) {
 		Objects.requireNonNull(finalAnswer, "finalAnswer must not be null");
 		return new FinalEvent(finalAnswer.content(), finalAnswer.rationale(), finalAnswer.stopReason());
+	}
+
+	private static JudgementEvent toJudgementEvent(JudgedFinalAnswer judgedFinalAnswer) {
+		Objects.requireNonNull(judgedFinalAnswer, "judgedFinalAnswer must not be null");
+		return new JudgementEvent(
+			judgedFinalAnswer.judgement().verdict(),
+			judgedFinalAnswer.judgement().rubric(),
+			judgedFinalAnswer.judgement().reason(),
+			judgedFinalAnswer.judgement().revisionHints(),
+			judgedFinalAnswer.fallbackApplied()
+		);
 	}
 
 	private static String reasonOrDefault(ValidationResult validation, String defaultReason) {

@@ -14,7 +14,7 @@ AI Arena e' una web application monolitica, stateless rispetto alla persistenza 
 | `REQ-005`, `REQ-006` | Factory runtime di ruoli AI orchestrati senza registry persistente di dominio. |
 | `REQ-007`, `NFR-001` | Streaming/eventi progressivi dal backend alla UI. |
 | `REQ-008`, `REQ-009`, `REQ-010`, `NFR-002` | Orchestrator con stato di sessione richiesta, limiti, arresto e sintesi finale. |
-| Evoluzione Judge | Separazione tra orchestrazione del dibattito e valutazione qualitativa strutturata; modello e porta Judge sono presenti, integrazione runtime futura. |
+| Evoluzione Judge | Separazione tra orchestrazione del dibattito e valutazione qualitativa strutturata; il Judge e' integrato come quality gate post-sintesi e resta consultivo rispetto a sicurezza e limiti. |
 | `NFR-004`, `NFR-006` | Error model uniforme, logging tecnico e test tracciabili. |
 
 ## 2. Stack tecnologico
@@ -52,16 +52,16 @@ Regole:
 - i limiti vengono applicati sia in pianificazione sia durante il dibattito;
 - il dominio non deve importare framework;
 - lo streaming espone stati/eventi, non dettagli interni o prompt completi.
-- il Supervisor controlla il flusso del dibattito; il Judge, quando introdotto, valuta qualita' con rubrica esplicita e non sostituisce limiti, validazione o policy applicative.
+- il Supervisor controlla il flusso del dibattito; il Judge valuta qualita' con rubrica esplicita dopo la sintesi finale e non sostituisce limiti, validazione o policy applicative.
 
 Stato attuale:
 - `SupervisorAiPort` espone oggi sia `decide(...)` per prossimo turno/arresto sia `synthesize(...)` per produrre la risposta finale;
 - `DebateOrchestrator` usa il Supervisor per il controllo sequenziale del dibattito;
 - `FinalAnswerService` delega la sintesi finale al `SupervisorAiPort`;
-- `JudgeRequest`, `Judgement`, `JudgeVerdict`, `JudgeRubric` e `JudgeAiPort` esistono come contratto separato per valutazioni qualitative strutturate;
+- `JudgeRequest`, `Judgement`, `JudgeVerdict`, `JudgeRubric`, `JudgeAiPort` e `JudgeService` esistono come quality gate post-sintesi separato;
 - `SpringAiAdapter` implementa le porte AI via Spring AI `ChatModel` con output JSON strutturati e validati;
 - `arena.ai.adapter=fake` mantiene il comportamento locale/test, mentre `arena.ai.adapter=openai` abilita l'adapter reale insieme a `spring.ai.model.chat=openai` e API key server-side;
-- non esiste ancora un `JudgeService` integrato nel flusso runtime.
+- lo stream SSE espone l'evento `JUDGEMENT` prima di `FINAL_ANSWER`.
 
 Direzione evolutiva:
 - mantenere il Supervisor responsabile di orchestrazione, limiti, loop, timeout e scelta del prossimo esperto AI orchestrato;
@@ -89,7 +89,7 @@ src/main/java/com/marnone/ai_arena/
     DebateOrchestrator
     SupervisorService
     FinalAnswerService
-    JudgeService (future)
+    JudgeService
   domain/
     Question
     ValidationResult
@@ -149,7 +149,7 @@ Convenzioni:
 | `SupervisorService` | Decidere prossimo turno, arresto e ragione. | `REQ-008`, `NFR-002` |
 | `FinalAnswerService` | Produrre sintesi motivata dal dibattito. | `REQ-010` |
 | `JudgeAiPort` | Esporre una valutazione qualitativa strutturata separata dal Supervisor. | Evoluzione Judge |
-| `JudgeService` (future) | Valutare contributi, dibattito o risposta finale tramite rubrica esplicita e output strutturato validato. | Evoluzione Judge |
+| `JudgeService` | Valutare la risposta finale tramite rubrica esplicita e output strutturato validato, applicando accept/revise/reject e fallback controllato. | Evoluzione Judge |
 | `ArenaProperties` | Esporre limiti configurabili. | `REQ-009` |
 | `SpringAiAdapter` | Incapsulare Spring AI e provider LLM. | `REQ-002`-`REQ-010` |
 
@@ -187,19 +187,20 @@ Utente -> ArenaController -> RunArenaSessionUseCase
       -> OrchestratedAiExpertAiPort*
       -> SupervisorService after each turn
   -> FinalAnswerService
+  -> JudgeService
   -> ArenaController streams events to UI
 ```
 
-Flusso futuro con Judge opzionale:
+Flusso Judge post-sintesi:
 
 ```text
 FinalAnswerService -> JudgeService
   -> JudgeAiPort
   -> Judgement ACCEPT | REVISE | REJECT
-  -> accept final answer, request revision, or fail controlled according to policy
+  -> accept final answer, add controlled revision note, or replace with controlled rejection message
 ```
 
-Il Judge puo' essere inserito prima della consegna della risposta finale oppure, in una fase successiva, come segnale consultivo per il Supervisor durante il dibattito. In entrambi i casi il giudizio e' input al controllo applicativo, non autorita' unica: limiti, sicurezza e fallback restano nel sistema.
+Il Judge e' inserito prima della consegna della risposta finale. In una fase successiva potra' diventare segnale consultivo per il Supervisor durante il dibattito. In entrambi i casi il giudizio e' input al controllo applicativo, non autorita' unica: limiti, sicurezza e fallback restano nel sistema.
 
 Eventi stream minimi:
 
@@ -210,6 +211,7 @@ TEAM_PLANNED
 EXPERT_CREATED
 DEBATE_MESSAGE
 SUPERVISOR_DECISION
+JUDGEMENT
 FINAL_ANSWER
 ERROR
 ```
@@ -250,7 +252,7 @@ Categorie errori:
 | Richiesta ostile | Nessun team, rifiuto motivato, log tecnico sintetico. |
 | Provider AI non disponibile | Evento errore, fine controllata. |
 | Timeout/limite | Arresto controllato, sintesi se ci sono contributi utili. |
-| Judge non disponibile | Proseguire con comportamento MVP o errore controllato secondo configurazione; non perdere la ragione di arresto del Supervisor. |
+| Judge non disponibile | Consegnare la sintesi con giudizio fallback `ACCEPT`, rubrica neutra e `fallbackApplied=true`; non perdere la ragione di arresto del Supervisor. |
 | Output Judge invalido | Scartare il giudizio, registrare evento tecnico minimizzato e usare fallback controllato. |
 | Errore inatteso | Evento errore generico, log tecnico correlato. |
 
@@ -302,7 +304,7 @@ Punto aperto: target numerici di latenza e concorrenza non definiti nei requisit
 | --- | --- | --- |
 | Unit domain | `ArenaLimits`, `ArenaSessionState`, decisioni e invarianti | Nessuna dipendenza Spring o AI. |
 | Unit application | Validazione, planning, factory, orchestrator, supervisor, sintesi | AI ports mockate; coprire rifiuto, successo, limite, timeout, errore. |
-| Unit/application future | JudgeService e integrazione post-sintesi | AI ports mockate; coprire verdict, revisione, reject e fallback. |
+| Unit/application | JudgeService e integrazione post-sintesi | AI ports mockate; coprire verdict, revisione, reject e fallback. |
 | Integration web | Controller e stream eventi | Verificare ordine eventi, error mapping e risposta finale. |
 | Contract AI adapter | Parsing output strutturato e fallback | Test con risposte simulate del provider. |
 | End-to-end light | Richiesta valida e richiesta rifiutata | Provider AI fake/deterministico. |
@@ -358,4 +360,4 @@ README.md:
 Punti aperti:
 - valori iniziali dei limiti `max-experts`, `max-turns`, `max-messages`, `timeout`;
 - target numerici di performance/concorrenza;
-- momento di integrazione del Judge nel flusso runtime: solo post-sintesi o anche consultivo per il Supervisor.
+- eventuale uso consultivo del Judge nel Supervisor durante il dibattito.

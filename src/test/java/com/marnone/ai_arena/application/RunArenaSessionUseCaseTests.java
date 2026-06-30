@@ -19,6 +19,10 @@ import com.marnone.ai_arena.ai.AiClientPort;
 import com.marnone.ai_arena.ai.FakeAiAdapter;
 import com.marnone.ai_arena.config.ArenaProperties;
 import com.marnone.ai_arena.domain.DebateMessage;
+import com.marnone.ai_arena.domain.JudgeRequest;
+import com.marnone.ai_arena.domain.JudgeRubric;
+import com.marnone.ai_arena.domain.JudgeVerdict;
+import com.marnone.ai_arena.domain.Judgement;
 import com.marnone.ai_arena.domain.OrchestratedAiExpert;
 import com.marnone.ai_arena.domain.Question;
 import com.marnone.ai_arena.domain.ValidationResult;
@@ -42,6 +46,7 @@ class RunArenaSessionUseCaseTests {
 		assertThat(result.finalAnswer().content()).contains("AI Arena");
 		assertThat(result.finalAnswer().content()).contains("Key debate basis");
 		assertThat(result.finalAnswer().rationale()).contains("3 deterministic debate messages");
+		assertThat(result.judgedFinalAnswer().judgement().verdict()).isEqualTo(JudgeVerdict.ACCEPT);
 		assertThat(result.isCompleted()).isTrue();
 	}
 
@@ -56,6 +61,7 @@ class RunArenaSessionUseCaseTests {
 		assertThat(result.team()).isEmpty();
 		assertThat(result.debate()).isNull();
 		assertThat(result.finalAnswer()).isNull();
+		assertThat(result.judgedFinalAnswer()).isNull();
 		assertThat(result.isCompleted()).isFalse();
 	}
 
@@ -70,6 +76,7 @@ class RunArenaSessionUseCaseTests {
 		assertThat(result.team()).isEmpty();
 		assertThat(result.debate()).isNull();
 		assertThat(result.finalAnswer()).isNull();
+		assertThat(result.judgedFinalAnswer()).isNull();
 	}
 
 	@Test
@@ -90,6 +97,28 @@ class RunArenaSessionUseCaseTests {
 	}
 
 	@Test
+	void judgeRejectionReplacesFinalAnswerWithControlledMessage() {
+		RunArenaSessionUseCase useCase = useCaseWith(new ArenaProperties(), new RejectingJudgeAiAdapter());
+
+		ArenaSessionResult result = useCase.run("How should AI Arena present a risky answer?");
+
+		assertThat(result.judgedFinalAnswer().judgement().verdict()).isEqualTo(JudgeVerdict.REJECT);
+		assertThat(result.finalAnswer().content()).isEqualTo("The arena could not produce a reliable final answer for this question.");
+		assertThat(result.finalAnswer().rationale()).contains("Judge rejected");
+	}
+
+	@Test
+	void judgeProviderFailureFallsBackToSynthesizedAnswer() {
+		RunArenaSessionUseCase useCase = useCaseWith(new ArenaProperties(), new FailingJudgeAiAdapter());
+
+		ArenaSessionResult result = useCase.run("How should AI Arena handle judge failure?");
+
+		assertThat(result.judgedFinalAnswer().fallbackApplied()).isTrue();
+		assertThat(result.judgedFinalAnswer().judgement().verdict()).isEqualTo(JudgeVerdict.ACCEPT);
+		assertThat(result.finalAnswer().content()).contains("Fake final answer for:");
+	}
+
+	@Test
 	void logsValidSessionWithCorrelationIdAndNoQuestionPayload(CapturedOutput output) {
 		RunArenaSessionUseCase useCase = useCaseWith(new ArenaProperties());
 		MDC.put("requestId", "request-test-123");
@@ -101,6 +130,7 @@ class RunArenaSessionUseCaseTests {
 		}
 
 		assertThat(output).contains("Arena session started correlationId=request-test-123 inputLength=");
+		assertThat(output).contains("Arena final answer judged correlationId=request-test-123");
 		assertThat(output).contains("Arena session completed correlationId=request-test-123");
 		assertThat(output).contains("stopReasonCategory=SUPERVISOR");
 		assertThat(output).doesNotContain("How should AI Arena present");
@@ -143,12 +173,14 @@ class RunArenaSessionUseCaseTests {
 		OrchestratedAiExpertFactory expertFactory = new OrchestratedAiExpertFactory(aiClientPort);
 		DebateOrchestrator debateOrchestrator = new DebateOrchestrator(aiClientPort, aiClientPort, FIXED_CLOCK);
 		FinalAnswerService finalAnswerService = new FinalAnswerService(aiClientPort);
+		JudgeService judgeService = new JudgeService((com.marnone.ai_arena.ai.JudgeAiPort) aiClientPort);
 		return new RunArenaSessionUseCase(
 			validationService,
 			planningService,
 			expertFactory,
 			debateOrchestrator,
 			finalAnswerService,
+			judgeService,
 			properties,
 			FIXED_CLOCK
 		);
@@ -172,6 +204,27 @@ class RunArenaSessionUseCaseTests {
 			int turn
 		) {
 			throw new IllegalStateException("provider failed at C:\\secret\\provider.java");
+		}
+	}
+
+	private static class RejectingJudgeAiAdapter extends FakeAiAdapter {
+
+		@Override
+		public Judgement judge(JudgeRequest request) {
+			return new Judgement(
+				JudgeVerdict.REJECT,
+				new JudgeRubric(2, 2, 2, 2, 4, 2),
+				"Answer is not reliable enough.",
+				List.of("Regenerate with stronger support.")
+			);
+		}
+	}
+
+	private static class FailingJudgeAiAdapter extends FakeAiAdapter {
+
+		@Override
+		public Judgement judge(JudgeRequest request) {
+			throw new IllegalStateException("judge provider failed with sensitive prompt");
 		}
 	}
 }

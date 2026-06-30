@@ -9,6 +9,10 @@ import java.util.Objects;
 import com.marnone.ai_arena.domain.ArenaLimits;
 import com.marnone.ai_arena.domain.DebateMessage;
 import com.marnone.ai_arena.domain.FinalAnswer;
+import com.marnone.ai_arena.domain.JudgeRequest;
+import com.marnone.ai_arena.domain.JudgeRubric;
+import com.marnone.ai_arena.domain.JudgeVerdict;
+import com.marnone.ai_arena.domain.Judgement;
 import com.marnone.ai_arena.domain.MessageType;
 import com.marnone.ai_arena.domain.Question;
 import com.marnone.ai_arena.domain.RequestClassification;
@@ -20,7 +24,7 @@ import com.marnone.ai_arena.domain.ValidationResult;
 /**
  * Deterministic AI adapter for local development and tests until a real LLM provider is selected.
  */
-public class FakeAiAdapter implements AiClientPort {
+public class FakeAiAdapter implements AiClientPort, JudgeAiPort {
 
 	@Override
 	public ValidationResult validate(Question question) {
@@ -102,6 +106,17 @@ public class FakeAiAdapter implements AiClientPort {
 			"Fake final answer for: " + question.text() + ". " + debateBasis,
 			"Synthesized from " + messages.size() + " deterministic debate messages and stop reason: " + stopReason,
 			stopReason
+		);
+	}
+
+	@Override
+	public Judgement judge(JudgeRequest request) {
+		Objects.requireNonNull(request, "request must not be null");
+		return new Judgement(
+			JudgeVerdict.ACCEPT,
+			new JudgeRubric(4, 4, 4, 4, 5, 4),
+			"Fake judge accepted the deterministic final answer.",
+			List.of()
 		);
 	}
 

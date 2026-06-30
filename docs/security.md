@@ -169,7 +169,7 @@ Futuro:
 | XSS da contenuto generato | UI, stream eventi | Render come testo, sanitizzazione, nessun HTML generato fidato. | Rischio se in futuro si abilita Markdown/HTML. |
 | Disclosure tecnica | Error handling, logging | Messaggi utente generici, stacktrace solo log sicuri, path e provider nascosti. | Log accessibili impropriamente restano rischio operativo. |
 | Output AI malformato | Planning, team, supervisor, final answer | Response validation, fallback/errore controllato, test con risposte simulate. | LLM puo' produrre casi non previsti. |
-| Giudizio Judge instabile o allucinato | Judge futuro, final answer, supervisor consultivo | Rubrica esplicita, output strutturato validato, fallback controllato, test su verdict e risposte malformate. | Bias, variabilita' e falsa sicurezza restano rischi residui del modello. |
+| Giudizio Judge instabile o allucinato | Judge post-sintesi, final answer, futuro supervisor consultivo | Rubrica esplicita, output strutturato validato, fallback controllato, test su verdict e risposte malformate. | Bias, variabilita' e falsa sicurezza restano rischi residui del modello. |
 | Trasporto insicuro | Web app, provider LLM | HTTPS/TLS, no verifica TLS disabilitata. | Configurazione deploy errata. |
 | Persistenza involontaria dati | Logging, temp files | Minimizzazione, divieto log payload completi, niente DB MVP. | Provider esterno puo' avere policy proprie da valutare. |
 

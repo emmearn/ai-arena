@@ -11,6 +11,7 @@ import com.marnone.ai_arena.ai.FakeAiAdapter;
 import com.marnone.ai_arena.ai.SpringAiAdapter;
 import com.marnone.ai_arena.application.DebateOrchestrator;
 import com.marnone.ai_arena.application.FinalAnswerService;
+import com.marnone.ai_arena.application.JudgeService;
 import com.marnone.ai_arena.application.PlanningService;
 import com.marnone.ai_arena.application.RunArenaSessionUseCase;
 import com.marnone.ai_arena.application.SessionEventMapper;
@@ -25,13 +26,13 @@ public class ApplicationConfiguration {
 
 	@Bean
 	@ConditionalOnProperty(prefix = "arena.ai", name = "adapter", havingValue = "openai")
-	AiClientPort springAiClientPort(ChatModel chatModel, ArenaProperties arenaProperties) {
+	SpringAiAdapter springAiClientPort(ChatModel chatModel, ArenaProperties arenaProperties) {
 		return new SpringAiAdapter(chatModel, arenaProperties.getAi().getRequestTimeout());
 	}
 
 	@Bean
 	@ConditionalOnMissingBean(AiClientPort.class)
-	AiClientPort aiClientPort() {
+	FakeAiAdapter aiClientPort() {
 		return new FakeAiAdapter();
 	}
 
@@ -61,12 +62,23 @@ public class ApplicationConfiguration {
 	}
 
 	@Bean
+	JudgeService judgeService(AiClientPort aiClientPort) {
+		if (aiClientPort instanceof com.marnone.ai_arena.ai.JudgeAiPort judgeAiPort) {
+			return new JudgeService(judgeAiPort);
+		}
+		return new JudgeService(request -> {
+			throw new IllegalStateException("Judge AI adapter is not available.");
+		});
+	}
+
+	@Bean
 	RunArenaSessionUseCase runArenaSessionUseCase(
 		ValidationService validationService,
 		PlanningService planningService,
 		OrchestratedAiExpertFactory expertFactory,
 		DebateOrchestrator debateOrchestrator,
 		FinalAnswerService finalAnswerService,
+		JudgeService judgeService,
 		ArenaProperties arenaProperties
 	) {
 		return new RunArenaSessionUseCase(
@@ -75,6 +87,7 @@ public class ApplicationConfiguration {
 			expertFactory,
 			debateOrchestrator,
 			finalAnswerService,
+			judgeService,
 			arenaProperties
 		);
 	}

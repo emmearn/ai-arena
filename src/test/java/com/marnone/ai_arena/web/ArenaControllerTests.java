@@ -34,10 +34,12 @@ class ArenaControllerTests {
 		assertThat(body).contains("event:EXPERT_CREATED");
 		assertThat(body).contains("event:DEBATE_MESSAGE");
 		assertThat(body).contains("event:SUPERVISOR_DECISION");
+		assertThat(body).contains("event:JUDGEMENT");
 		assertThat(body).contains("event:FINAL_ANSWER");
 		assertThat(body.indexOf("event:VALIDATION_STARTED")).isLessThan(body.indexOf("event:VALIDATION_ACCEPTED"));
 		assertThat(body.indexOf("event:TEAM_PLANNED")).isLessThan(body.indexOf("event:DEBATE_MESSAGE"));
-		assertThat(body.indexOf("event:SUPERVISOR_DECISION")).isLessThan(body.indexOf("event:FINAL_ANSWER"));
+		assertThat(body.indexOf("event:SUPERVISOR_DECISION")).isLessThan(body.indexOf("event:JUDGEMENT"));
+		assertThat(body.indexOf("event:JUDGEMENT")).isLessThan(body.indexOf("event:FINAL_ANSWER"));
 	}
 
 	@Test
@@ -49,6 +51,7 @@ class ArenaControllerTests {
 		assertThat(body).contains("event:VALIDATION_STARTED");
 		assertThat(body).contains("event:VALIDATION_REJECTED");
 		assertThat(body).doesNotContain("event:TEAM_PLANNED");
+		assertThat(body).doesNotContain("event:JUDGEMENT");
 		assertThat(body).doesNotContain("event:FINAL_ANSWER");
 	}
 

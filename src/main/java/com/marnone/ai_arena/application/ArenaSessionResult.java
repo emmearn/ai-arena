@@ -14,7 +14,8 @@ public record ArenaSessionResult(
 	TeamPlan plan,
 	List<OrchestratedAiExpert> team,
 	DebateResult debate,
-	FinalAnswer finalAnswer
+	FinalAnswer finalAnswer,
+	JudgedFinalAnswer judgedFinalAnswer
 ) {
 
 	public ArenaSessionResult {
@@ -26,7 +27,7 @@ public record ArenaSessionResult(
 		if (validation.status() == ValidationStatus.VALID) {
 			throw new IllegalArgumentException("valid validation cannot create a rejected session result");
 		}
-		return new ArenaSessionResult(validation, null, List.of(), null, null);
+		return new ArenaSessionResult(validation, null, List.of(), null, null, null);
 	}
 
 	public static ArenaSessionResult completed(
@@ -34,7 +35,7 @@ public record ArenaSessionResult(
 		TeamPlan plan,
 		List<OrchestratedAiExpert> team,
 		DebateResult debate,
-		FinalAnswer finalAnswer
+		JudgedFinalAnswer judgedFinalAnswer
 	) {
 		if (validation.status() != ValidationStatus.VALID) {
 			throw new IllegalArgumentException("completed session result requires valid validation");
@@ -44,7 +45,8 @@ public record ArenaSessionResult(
 			Objects.requireNonNull(plan, "plan must not be null"),
 			team,
 			Objects.requireNonNull(debate, "debate must not be null"),
-			Objects.requireNonNull(finalAnswer, "finalAnswer must not be null")
+			Objects.requireNonNull(judgedFinalAnswer, "judgedFinalAnswer must not be null").finalAnswer(),
+			judgedFinalAnswer
 		);
 	}
 

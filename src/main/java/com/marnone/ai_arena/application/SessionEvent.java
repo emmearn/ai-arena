@@ -37,6 +37,10 @@ public record SessionEvent(SessionEventType type, Object payload) {
 		return new SessionEvent(SessionEventType.SUPERVISOR_DECISION, payload);
 	}
 
+	public static SessionEvent judgement(JudgementEvent payload) {
+		return new SessionEvent(SessionEventType.JUDGEMENT, payload);
+	}
+
 	public static SessionEvent finalAnswer(FinalEvent payload) {
 		return new SessionEvent(SessionEventType.FINAL_ANSWER, payload);
 	}

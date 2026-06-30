@@ -14,6 +14,7 @@ const finalPanel = document.querySelector(".final-panel");
 const finalAnswer = document.querySelector("#final-answer");
 const finalRationale = document.querySelector("#final-rationale");
 const finalStopReason = document.querySelector("#final-stop-reason");
+const finalJudgement = document.querySelector("#final-judgement");
 
 const defaultTeamStatus = "Waiting for an accepted question.";
 const defaultTeamEmptyState = "Accepted questions will assemble the expert team here.";
@@ -22,6 +23,7 @@ const defaultDebateEmptyState = "Accepted questions will stream debate messages 
 const defaultFinalAnswer = "The final response will appear here when the arena completes.";
 const defaultFinalRationale = "Waiting for the debate outcome.";
 const defaultFinalStopReason = "Not available yet.";
+const defaultFinalJudgement = "Waiting for quality review.";
 const expertsById = new Map();
 
 const statusCopy = {
@@ -144,6 +146,10 @@ function handleSseBlock(block) {
 		renderSupervisorDecision(payload);
 	}
 
+	if (eventType === "JUDGEMENT") {
+		renderJudgement(payload);
+	}
+
 	if (eventType === "FINAL_ANSWER") {
 		renderFinalAnswer(payload);
 	}
@@ -193,6 +199,7 @@ function resetFinalPanel() {
 	finalAnswer.textContent = defaultFinalAnswer;
 	finalRationale.textContent = defaultFinalRationale;
 	finalStopReason.textContent = defaultFinalStopReason;
+	finalJudgement.textContent = defaultFinalJudgement;
 }
 
 function renderTeamPlan(payload) {
@@ -314,6 +321,14 @@ function renderSupervisorDecision(payload) {
 		finalPanel.dataset.state = "deciding";
 		finalStopReason.textContent = reason;
 	}
+}
+
+function renderJudgement(payload) {
+	const verdict = String(payload.verdict || "UNKNOWN").toUpperCase();
+	const overall = payload.rubric?.overall ? `Overall ${payload.rubric.overall}/5` : "No score";
+	const fallback = payload.fallbackApplied ? " - fallback review" : "";
+	finalPanel.dataset.state = verdict === "REJECT" ? "error" : "deciding";
+	finalJudgement.textContent = `${verdict} - ${overall}${fallback}. ${payload.reason || "Quality review completed."}`;
 }
 
 function renderFinalAnswer(payload) {

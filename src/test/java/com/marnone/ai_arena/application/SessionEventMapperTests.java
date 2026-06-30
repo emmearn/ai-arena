@@ -37,6 +37,7 @@ class SessionEventMapperTests {
 			SessionEventType.DEBATE_MESSAGE,
 			SessionEventType.DEBATE_MESSAGE,
 			SessionEventType.SUPERVISOR_DECISION,
+			SessionEventType.JUDGEMENT,
 			SessionEventType.FINAL_ANSWER
 		);
 		assertThat(events.get(1).payload()).isInstanceOf(ValidationEvent.class);
@@ -45,7 +46,8 @@ class SessionEventMapperTests {
 		assertThat(events.get(3).payload()).isInstanceOf(ExpertEvent.class);
 		assertThat(events.get(6).payload()).isInstanceOf(MessageEvent.class);
 		assertThat(events.get(9).payload()).isInstanceOf(DecisionEvent.class);
-		assertThat(events.get(10).payload()).isInstanceOf(FinalEvent.class);
+		assertThat(events.get(10).payload()).isInstanceOf(JudgementEvent.class);
+		assertThat(events.get(11).payload()).isInstanceOf(FinalEvent.class);
 	}
 
 	@Test
@@ -81,12 +83,14 @@ class SessionEventMapperTests {
 		OrchestratedAiExpertFactory expertFactory = new OrchestratedAiExpertFactory(fakeAiAdapter);
 		DebateOrchestrator debateOrchestrator = new DebateOrchestrator(fakeAiAdapter, fakeAiAdapter, FIXED_CLOCK);
 		FinalAnswerService finalAnswerService = new FinalAnswerService(fakeAiAdapter);
+		JudgeService judgeService = new JudgeService(fakeAiAdapter);
 		return new RunArenaSessionUseCase(
 			validationService,
 			planningService,
 			expertFactory,
 			debateOrchestrator,
 			finalAnswerService,
+			judgeService,
 			properties,
 			FIXED_CLOCK
 		);

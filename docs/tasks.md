@@ -77,9 +77,9 @@ Stati: `TODO`, `IMPLEMENTED`, `VERIFIED_STATIC`, `BLOCKED_RUNTIME`, `DONE`.
 | `TASK-031` | `DONE` | Nomi tecnici migrati a `OrchestratedAiExpert`/`expert`; evento SSE `EXPERT_CREATED`; property `arena.limits.max-experts`; `mvnw test` passa. | Verificato con Java 21.0.11. |
 | `TASK-032` | `DONE` | Aggiunti `JudgeRequest`, `Judgement`, `JudgeVerdict`, `JudgeRubric` con invarianti e test dominio su scoring, verdict e campi obbligatori. | Verificato con `JudgeModelTests` e suite Maven il 2026-06-29. |
 | `TASK-033` | `DONE` | Aggiunta `JudgeAiPort` separata dal Supervisor; `SpringAiAdapter` implementa il contratto Judge con output JSON validato e test valido/malformed/verdict/provider error. | Verificato con `JudgeAiPortTests`, `SpringAiAdapterTests` e suite Maven il 2026-06-29. |
-| `TASK-034` | `TODO` | Non iniziato. | Evoluzione non MVP: quality gate post-sintesi. |
+| `TASK-034` | `DONE` | `JudgeService` integrato post-sintesi; evento SSE `JUDGEMENT`; UI mostra verdict/rubrica compatta; test use case/web su accept, reject e fallback. | Verificato con test mirati e suite Maven il 2026-06-30. |
 | `TASK-035` | `TODO` | Non iniziato. | Evoluzione non MVP: uso consultivo nel Supervisor dopo test. |
-| `TASK-036` | `TODO` | Non iniziato. | Evoluzione non MVP: test fallback e output malformati. |
+| `TASK-036` | `DONE` | Rafforzati test Judge su output incompleti, verdict instabili, hint incoerenti, provider failure, fallback e log senza prompt/input/output sensibili. | Verificato con test mirati e suite Maven il 2026-06-30. |
 
 ## 4. Task
 
@@ -169,7 +169,7 @@ Task con sicurezza obbligatoria:
 | `DEBT-002` | Nessun database e nessuna cronologia. | Esclusi dall'MVP. | Requisito approvato per memoria o storico. |
 | `DEBT-003` | Rate limit semplice in-process. | Sufficiente per MVP/demo. | Deploy pubblico con traffico reale o piu' istanze. |
 | `DEBT-004` | Scoring qualita' risposta assente. | Escluso dai requisiti MVP. | Requisito approvato di valutazione automatica. |
-| `DEBT-005` | `SupervisorAiPort` copre oggi sia decisione di flusso sia sintesi runtime. | Accettabile nell'MVP fake e nel flusso core gia' implementato; modello e porta Judge sono gia' separati. | `TASK-034` per integrare `JudgeService` dopo la sintesi finale. |
+| `DEBT-005` | `SupervisorAiPort` copre oggi sia decisione di flusso sia sintesi runtime. | Accettabile nell'MVP fake e nel flusso core gia' implementato; Judge post-sintesi e porta dedicata sono separati. | `TASK-035` se il giudizio deve diventare segnale consultivo del Supervisor. |
 
 ## 9. Funzionalita' future
 
@@ -182,7 +182,7 @@ Task con sicurezza obbligatoria:
 | `FUTURE-005` | Ruoli AI paralleli. | Nuova architettura concorrenza e gestione costi. |
 | `FUTURE-006` | Votazione strutturata. | Nuovi requisiti di decisione/supervisione. |
 | `FUTURE-007` | Modelli differenti per ruoli AI orchestrati. | Decisione costi, provider, fallback. |
-| `FUTURE-008` | LLM-as-a-Judge separato dal Supervisor. | `DEC-002`, modello dominio Judge, porta AI dedicata, fallback e test. |
+| `FUTURE-008` | Uso consultivo del Judge nel Supervisor. | `TASK-035`, test su limiti prevalenti e nessun loop aggiuntivo. |
 
 ## 10. Tracciabilita'
 

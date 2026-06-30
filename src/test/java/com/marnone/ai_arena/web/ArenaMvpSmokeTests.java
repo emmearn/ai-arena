@@ -49,6 +49,7 @@ class ArenaMvpSmokeTests {
 		assertThat(body).contains("event:EXPERT_CREATED");
 		assertThat(body).contains("event:DEBATE_MESSAGE");
 		assertThat(body).contains("event:SUPERVISOR_DECISION");
+		assertThat(body).contains("event:JUDGEMENT");
 		assertThat(body).contains("event:FINAL_ANSWER");
 		assertThat(body).doesNotContain("event:ERROR");
 		assertThat(countOccurrences(body, "event:EXPERT_CREATED")).isEqualTo(3);
@@ -66,6 +67,7 @@ class ArenaMvpSmokeTests {
 			"event:EXPERT_CREATED",
 			"event:DEBATE_MESSAGE",
 			"event:SUPERVISOR_DECISION",
+			"event:JUDGEMENT",
 			"event:FINAL_ANSWER"
 		);
 	}
@@ -80,6 +82,7 @@ class ArenaMvpSmokeTests {
 		assertThat(body).doesNotContain("event:TEAM_PLANNED");
 		assertThat(body).doesNotContain("event:EXPERT_CREATED");
 		assertThat(body).doesNotContain("event:DEBATE_MESSAGE");
+		assertThat(body).doesNotContain("event:JUDGEMENT");
 		assertThat(body).doesNotContain("event:FINAL_ANSWER");
 		assertThat(body).doesNotContain("event:ERROR");
 		assertEventOrder(body, "event:VALIDATION_STARTED", "event:VALIDATION_REJECTED");

@@ -197,6 +197,32 @@ class SpringAiAdapterTests {
 	}
 
 	@Test
+	void rejectsJudgeReviseWithoutHints() {
+		SpringAiAdapter adapter = adapterWith(
+			"""
+			{"verdict":"REVISE","rubric":{"relevance":5,"correctness":4,"completeness":3,"clarity":4,"safety":5,"overall":4},"reason":"Needs revision.","revisionHints":[]}
+			"""
+		);
+
+		assertThatThrownBy(() -> adapter.judge(judgeRequest()))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessageContaining("malformed");
+	}
+
+	@Test
+	void rejectsJudgeAcceptWithHallucinatedRevisionHints() {
+		SpringAiAdapter adapter = adapterWith(
+			"""
+			{"verdict":"ACCEPT","rubric":{"relevance":5,"correctness":5,"completeness":5,"clarity":5,"safety":5,"overall":5},"reason":"Looks ready.","revisionHints":["Still rewrite it completely."]}
+			"""
+		);
+
+		assertThatThrownBy(() -> adapter.judge(judgeRequest()))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessageContaining("malformed");
+	}
+
+	@Test
 	void wrapsJudgeProviderFailureInControlledException() {
 		SpringAiAdapter adapter = new SpringAiAdapter(prompt -> {
 			throw new IllegalStateException("judge provider unavailable");

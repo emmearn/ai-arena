@@ -35,6 +35,7 @@ public class RunArenaSessionUseCase {
 	private final OrchestratedAiExpertFactory expertFactory;
 	private final DebateOrchestrator debateOrchestrator;
 	private final FinalAnswerService finalAnswerService;
+	private final JudgeService judgeService;
 	private final ArenaProperties arenaProperties;
 	private final Clock clock;
 
@@ -44,9 +45,10 @@ public class RunArenaSessionUseCase {
 		OrchestratedAiExpertFactory expertFactory,
 		DebateOrchestrator debateOrchestrator,
 		FinalAnswerService finalAnswerService,
+		JudgeService judgeService,
 		ArenaProperties arenaProperties
 	) {
-		this(validationService, planningService, expertFactory, debateOrchestrator, finalAnswerService, arenaProperties, Clock.systemUTC());
+		this(validationService, planningService, expertFactory, debateOrchestrator, finalAnswerService, judgeService, arenaProperties, Clock.systemUTC());
 	}
 
 	RunArenaSessionUseCase(
@@ -55,6 +57,7 @@ public class RunArenaSessionUseCase {
 		OrchestratedAiExpertFactory expertFactory,
 		DebateOrchestrator debateOrchestrator,
 		FinalAnswerService finalAnswerService,
+		JudgeService judgeService,
 		ArenaProperties arenaProperties,
 		Clock clock
 	) {
@@ -63,6 +66,7 @@ public class RunArenaSessionUseCase {
 		this.expertFactory = Objects.requireNonNull(expertFactory, "expertFactory must not be null");
 		this.debateOrchestrator = Objects.requireNonNull(debateOrchestrator, "debateOrchestrator must not be null");
 		this.finalAnswerService = Objects.requireNonNull(finalAnswerService, "finalAnswerService must not be null");
+		this.judgeService = Objects.requireNonNull(judgeService, "judgeService must not be null");
 		this.arenaProperties = Objects.requireNonNull(arenaProperties, "arenaProperties must not be null");
 		this.clock = Objects.requireNonNull(clock, "clock must not be null");
 	}
@@ -136,13 +140,25 @@ public class RunArenaSessionUseCase {
 			);
 
 			stage = "final_answer";
-			FinalAnswer finalAnswer = finalAnswerService.synthesize(question, debate);
-			eventConsumer.accept(SessionEvent.finalAnswer(new FinalEvent(finalAnswer.content(), finalAnswer.rationale(), finalAnswer.stopReason())));
+			FinalAnswer synthesizedAnswer = finalAnswerService.synthesize(question, debate);
 			log.info(
 				"Arena final answer synthesized correlationId={} contentLength={} rationaleLength={}",
 				correlationId,
-				safeLength(finalAnswer.content()),
-				safeLength(finalAnswer.rationale())
+				safeLength(synthesizedAnswer.content()),
+				safeLength(synthesizedAnswer.rationale())
+			);
+
+			stage = "judgement";
+			JudgedFinalAnswer judgedFinalAnswer = judgeService.judge(question, debate, synthesizedAnswer);
+			eventConsumer.accept(SessionEvent.judgement(toJudgementEvent(judgedFinalAnswer)));
+			FinalAnswer finalAnswer = judgedFinalAnswer.finalAnswer();
+			eventConsumer.accept(SessionEvent.finalAnswer(new FinalEvent(finalAnswer.content(), finalAnswer.rationale(), finalAnswer.stopReason())));
+			log.info(
+				"Arena final answer judged correlationId={} verdict={} overallScore={} fallbackApplied={}",
+				correlationId,
+				judgedFinalAnswer.judgement().verdict(),
+				judgedFinalAnswer.judgement().rubric().overall(),
+				judgedFinalAnswer.fallbackApplied()
 			);
 			log.info(
 				"Arena session completed correlationId={} durationMs={} expertCount={} messageCount={} stopReasonCategory={}",
@@ -152,7 +168,7 @@ public class RunArenaSessionUseCase {
 				debate.messages().size(),
 				stopReasonCategory(debate.stopReason())
 			);
-			return ArenaSessionResult.completed(validation, plan, team, debate, finalAnswer);
+			return ArenaSessionResult.completed(validation, plan, team, debate, judgedFinalAnswer);
 		}
 		catch (RuntimeException ex) {
 			log.error(
@@ -193,6 +209,16 @@ public class RunArenaSessionUseCase {
 
 	private static MessageEvent toMessageEvent(DebateMessage message) {
 		return new MessageEvent(message.id(), message.expertId(), message.turn(), message.type(), message.content());
+	}
+
+	private static JudgementEvent toJudgementEvent(JudgedFinalAnswer judgedFinalAnswer) {
+		return new JudgementEvent(
+			judgedFinalAnswer.judgement().verdict(),
+			judgedFinalAnswer.judgement().rubric(),
+			judgedFinalAnswer.judgement().reason(),
+			judgedFinalAnswer.judgement().revisionHints(),
+			judgedFinalAnswer.fallbackApplied()
+		);
 	}
 
 	private static String reasonOrDefault(ValidationResult validation, String defaultReason) {

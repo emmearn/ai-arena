@@ -168,7 +168,7 @@ Illustrazioni:
 - Il turno corrente deve essere piu' evidente dei turni passati.
 - I messaggi non devono spostare layout critici in modo brusco.
 - La risposta finale deve essere chiaramente separata dal dibattito.
-- L'eventuale valutazione Judge futura non deve aggiungere complessita' visiva obbligatoria: puo' restare implicita nella qualita' della sintesi o apparire come stato compatto solo se utile.
+- La valutazione Judge non deve aggiungere complessita' visiva obbligatoria: appare come metadato compatto nel pannello finale con verdict, score e fallback quando presente.
 - Gli errori devono spiegare il problema senza linguaggio tecnico non necessario.
 - Non usare tabelle per contenuti di dibattito o esperti AI orchestrati nella UI finale.
 - Non sovraccaricare l'utente con configurazioni avanzate nell'MVP.
@@ -232,5 +232,5 @@ Token e regole:
 - Ogni stato applicativo visibile deve avere label breve, icona o segnale coerente.
 - Ogni esperto AI orchestrato visualizzato deve avere identita' cromatica e avatar coerenti per tutta la sessione.
 - Il giudice/sintesi deve essere sempre distinguibile dagli esperti AI orchestrati.
-- La distinzione interna Supervisor/Judge non richiede nuove aree UI nell'MVP.
+- La distinzione interna Supervisor/Judge non richiede nuove aree UI: il giudizio resta nel pannello finale.
 - L'implementazione deve preservare leggibilita', accessibilita' e gerarchia anche con contenuti generati lunghi.
