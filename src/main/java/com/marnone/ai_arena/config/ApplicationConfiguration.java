@@ -15,6 +15,7 @@ import com.marnone.ai_arena.application.JudgeService;
 import com.marnone.ai_arena.application.PlanningService;
 import com.marnone.ai_arena.application.RunArenaSessionUseCase;
 import com.marnone.ai_arena.application.SessionEventMapper;
+import com.marnone.ai_arena.application.SupervisorJudgementAdvisor;
 import com.marnone.ai_arena.application.OrchestratedAiExpertFactory;
 import com.marnone.ai_arena.application.ValidationService;
 
@@ -52,8 +53,8 @@ public class ApplicationConfiguration {
 	}
 
 	@Bean
-	DebateOrchestrator debateOrchestrator(AiClientPort aiClientPort) {
-		return new DebateOrchestrator(aiClientPort, aiClientPort);
+	DebateOrchestrator debateOrchestrator(AiClientPort aiClientPort, SupervisorJudgementAdvisor supervisorJudgementAdvisor) {
+		return new DebateOrchestrator(aiClientPort, aiClientPort, supervisorJudgementAdvisor);
 	}
 
 	@Bean
@@ -67,6 +68,16 @@ public class ApplicationConfiguration {
 			return new JudgeService(judgeAiPort);
 		}
 		return new JudgeService(request -> {
+			throw new IllegalStateException("Judge AI adapter is not available.");
+		});
+	}
+
+	@Bean
+	SupervisorJudgementAdvisor supervisorJudgementAdvisor(AiClientPort aiClientPort) {
+		if (aiClientPort instanceof com.marnone.ai_arena.ai.JudgeAiPort judgeAiPort) {
+			return new SupervisorJudgementAdvisor(aiClientPort, judgeAiPort);
+		}
+		return new SupervisorJudgementAdvisor(aiClientPort, request -> {
 			throw new IllegalStateException("Judge AI adapter is not available.");
 		});
 	}

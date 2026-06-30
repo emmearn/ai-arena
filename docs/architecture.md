@@ -52,11 +52,11 @@ Regole:
 - i limiti vengono applicati sia in pianificazione sia durante il dibattito;
 - il dominio non deve importare framework;
 - lo streaming espone stati/eventi, non dettagli interni o prompt completi.
-- il Supervisor controlla il flusso del dibattito; il Judge valuta qualita' con rubrica esplicita dopo la sintesi finale e non sostituisce limiti, validazione o policy applicative.
+- il Supervisor controlla il flusso del dibattito; il Judge valuta qualita' con rubrica esplicita dopo la sintesi finale e puo' dare un segnale consultivo allo STOP del Supervisor, senza sostituire limiti, validazione o policy applicative.
 
 Stato attuale:
 - `SupervisorAiPort` espone oggi sia `decide(...)` per prossimo turno/arresto sia `synthesize(...)` per produrre la risposta finale;
-- `DebateOrchestrator` usa il Supervisor per il controllo sequenziale del dibattito;
+- `DebateOrchestrator` usa il Supervisor per il controllo sequenziale del dibattito e `SupervisorJudgementAdvisor` come segnale consultivo quando il Supervisor vuole fermarsi;
 - `FinalAnswerService` delega la sintesi finale al `SupervisorAiPort`;
 - `JudgeRequest`, `Judgement`, `JudgeVerdict`, `JudgeRubric`, `JudgeAiPort` e `JudgeService` esistono come quality gate post-sintesi separato;
 - `SpringAiAdapter` implementa le porte AI via Spring AI `ChatModel` con output JSON strutturati e validati;
@@ -65,8 +65,8 @@ Stato attuale:
 
 Direzione evolutiva:
 - mantenere il Supervisor responsabile di orchestrazione, limiti, loop, timeout e scelta del prossimo esperto AI orchestrato;
-- introdurre un Judge separato per valutazione qualitativa di contributi, dibattito o risposta finale;
-- lasciare al Supervisor la facolta' di usare un giudizio strutturato per continuare, revisionare, accettare o fermare, solo dopo test dedicati.
+- mantenere il Judge separato per valutazione qualitativa, con uso post-sintesi e segnale consultivo durante il dibattito;
+- estendere il Judge a contributi o dibattito completo solo con nuovi requisiti e UX dedicata.
 
 ## 4. Struttura progetto
 
@@ -87,6 +87,7 @@ src/main/java/com/marnone/ai_arena/
     PlanningService
     OrchestratedAiExpertFactory
     DebateOrchestrator
+    SupervisorJudgementAdvisor
     SupervisorService
     FinalAnswerService
     JudgeService
@@ -146,6 +147,7 @@ Convenzioni:
 | `PlanningService` | Classificare richiesta e produrre piano team. | `REQ-003`, `REQ-004`, `REQ-012` |
 | `OrchestratedAiExpertFactory` | Creare esperti AI orchestrati coerenti e distinguibili. | `REQ-005`, `REQ-006` |
 | `DebateOrchestrator` | Gestire turni, messaggi progressivi e stato dibattito. | `REQ-007`, `REQ-008`, `REQ-009` |
+| `SupervisorJudgementAdvisor` | Usare il Judge come segnale consultivo quando il Supervisor propone STOP, senza superare limiti o scegliere esperti fuori dal controllo applicativo. | Evoluzione Judge |
 | `SupervisorService` | Decidere prossimo turno, arresto e ragione. | `REQ-008`, `NFR-002` |
 | `FinalAnswerService` | Produrre sintesi motivata dal dibattito. | `REQ-010` |
 | `JudgeAiPort` | Esporre una valutazione qualitativa strutturata separata dal Supervisor. | Evoluzione Judge |
@@ -186,6 +188,7 @@ Utente -> ArenaController -> RunArenaSessionUseCase
   -> DebateOrchestrator
       -> OrchestratedAiExpertAiPort*
       -> SupervisorService after each turn
+      -> SupervisorJudgementAdvisor only after Supervisor STOP and before limits are exhausted
   -> FinalAnswerService
   -> JudgeService
   -> ArenaController streams events to UI
@@ -200,7 +203,21 @@ FinalAnswerService -> JudgeService
   -> accept final answer, add controlled revision note, or replace with controlled rejection message
 ```
 
-Il Judge e' inserito prima della consegna della risposta finale. In una fase successiva potra' diventare segnale consultivo per il Supervisor durante il dibattito. In entrambi i casi il giudizio e' input al controllo applicativo, non autorita' unica: limiti, sicurezza e fallback restano nel sistema.
+Il Judge e' inserito prima della consegna della risposta finale ed e' usato anche come segnale consultivo quando il Supervisor propone STOP durante il dibattito. In entrambi i casi il giudizio e' input al controllo applicativo, non autorita' unica: limiti, sicurezza e fallback restano nel sistema.
+
+Flusso consultivo durante il dibattito:
+
+```text
+SupervisorDecision STOP
+  -> controlli applicativi su maxMessages, maxTurns, timeout, team valido
+  -> SupervisorJudgementAdvisor
+      -> draft sintetico tramite SupervisorAiPort
+      -> JudgeAiPort con evaluationTarget=supervisor-stop
+  -> ACCEPT: mantenere STOP del Supervisor
+  -> REVISE/REJECT: consentire un altro turno solo se i limiti lo permettono
+```
+
+Il Judge non sceglie il prossimo esperto AI orchestrato e non puo' estendere il dibattito oltre i limiti configurati. Se il Judge non e' disponibile o produce output non valido, lo STOP del Supervisor viene mantenuto.
 
 Eventi stream minimi:
 
@@ -252,7 +269,7 @@ Categorie errori:
 | Richiesta ostile | Nessun team, rifiuto motivato, log tecnico sintetico. |
 | Provider AI non disponibile | Evento errore, fine controllata. |
 | Timeout/limite | Arresto controllato, sintesi se ci sono contributi utili. |
-| Judge non disponibile | Consegnare la sintesi con giudizio fallback `ACCEPT`, rubrica neutra e `fallbackApplied=true`; non perdere la ragione di arresto del Supervisor. |
+| Judge non disponibile | In post-sintesi consegnare la sintesi con giudizio fallback `ACCEPT`, rubrica neutra e `fallbackApplied=true`; durante il dibattito mantenere lo STOP del Supervisor. |
 | Output Judge invalido | Scartare il giudizio, registrare evento tecnico minimizzato e usare fallback controllato. |
 | Errore inatteso | Evento errore generico, log tecnico correlato. |
 
@@ -304,7 +321,7 @@ Punto aperto: target numerici di latenza e concorrenza non definiti nei requisit
 | --- | --- | --- |
 | Unit domain | `ArenaLimits`, `ArenaSessionState`, decisioni e invarianti | Nessuna dipendenza Spring o AI. |
 | Unit application | Validazione, planning, factory, orchestrator, supervisor, sintesi | AI ports mockate; coprire rifiuto, successo, limite, timeout, errore. |
-| Unit/application | JudgeService e integrazione post-sintesi | AI ports mockate; coprire verdict, revisione, reject e fallback. |
+| Unit/application | JudgeService, SupervisorJudgementAdvisor e integrazione Judge | AI ports mockate; coprire verdict, revisione, reject, fallback, limiti prevalenti e nessun loop aggiuntivo. |
 | Integration web | Controller e stream eventi | Verificare ordine eventi, error mapping e risposta finale. |
 | Contract AI adapter | Parsing output strutturato e fallback | Test con risposte simulate del provider. |
 | End-to-end light | Richiesta valida e richiesta rifiutata | Provider AI fake/deterministico. |
@@ -360,4 +377,4 @@ README.md:
 Punti aperti:
 - valori iniziali dei limiti `max-experts`, `max-turns`, `max-messages`, `timeout`;
 - target numerici di performance/concorrenza;
-- eventuale uso consultivo del Judge nel Supervisor durante il dibattito.
+- eventuale scoring Judge su singoli contributi o dibattito completo.

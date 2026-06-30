@@ -16,6 +16,10 @@ import com.marnone.ai_arena.ai.SupervisorAiPort;
 import com.marnone.ai_arena.domain.ArenaLimits;
 import com.marnone.ai_arena.domain.DebateMessage;
 import com.marnone.ai_arena.domain.FinalAnswer;
+import com.marnone.ai_arena.domain.JudgeRequest;
+import com.marnone.ai_arena.domain.JudgeRubric;
+import com.marnone.ai_arena.domain.JudgeVerdict;
+import com.marnone.ai_arena.domain.Judgement;
 import com.marnone.ai_arena.domain.MessageType;
 import com.marnone.ai_arena.domain.Question;
 import com.marnone.ai_arena.domain.OrchestratedAiExpert;
@@ -105,6 +109,68 @@ class DebateOrchestratorTests {
 		assertThat(result.stopReason()).contains("inconsistent");
 	}
 
+	@Test
+	void usesJudgeAsConsultativeSignalAfterSupervisorStop() {
+		AlwaysStopSupervisor supervisor = new AlwaysStopSupervisor();
+		SequencedJudge judge = new SequencedJudge(
+			new Judgement(JudgeVerdict.REVISE, rubric(3), "Need one more perspective.", List.of("Ask another expert.")),
+			new Judgement(JudgeVerdict.ACCEPT, rubric(5), "Ready after the extra perspective.", List.of())
+		);
+		SupervisorJudgementAdvisor advisor = new SupervisorJudgementAdvisor(supervisor, judge);
+		DebateOrchestrator orchestrator = new DebateOrchestrator(fakeAiAdapter, supervisor, advisor);
+
+		DebateResult result = orchestrator.run(question(), team(), limits(6, 24, Duration.ofSeconds(90)));
+
+		assertThat(result.messages()).hasSize(2);
+		assertThat(result.messages()).extracting(DebateMessage::expertId).containsExactly("expert-1", "expert-2");
+		assertThat(result.stopReason()).isEqualTo("Supervisor says the debate can stop.");
+		assertThat(judge.calls).isEqualTo(2);
+	}
+
+	@Test
+	void limitsPrevailOverJudgeRequestForMoreDebate() {
+		AlwaysStopSupervisor supervisor = new AlwaysStopSupervisor();
+		SequencedJudge judge = new SequencedJudge(
+			new Judgement(JudgeVerdict.REVISE, rubric(3), "Need one more perspective.", List.of("Ask another expert."))
+		);
+		SupervisorJudgementAdvisor advisor = new SupervisorJudgementAdvisor(supervisor, judge);
+		DebateOrchestrator orchestrator = new DebateOrchestrator(fakeAiAdapter, supervisor, advisor);
+
+		DebateResult result = orchestrator.run(question(), team(), limits(1, 24, Duration.ofSeconds(90)));
+
+		assertThat(result.messages()).hasSize(1);
+		assertThat(result.stopReason()).contains("maximum turn");
+		assertThat(judge.calls).isZero();
+	}
+
+	@Test
+	void judgeCannotCreateUnboundedExtraLoop() {
+		AlwaysStopSupervisor supervisor = new AlwaysStopSupervisor();
+		AlwaysReviseJudge judge = new AlwaysReviseJudge();
+		SupervisorJudgementAdvisor advisor = new SupervisorJudgementAdvisor(supervisor, judge);
+		DebateOrchestrator orchestrator = new DebateOrchestrator(fakeAiAdapter, supervisor, advisor);
+
+		DebateResult result = orchestrator.run(question(), team(), limits(6, 3, Duration.ofSeconds(90)));
+
+		assertThat(result.messages()).hasSize(3);
+		assertThat(result.stopReason()).contains("maximum message");
+		assertThat(judge.calls).isEqualTo(2);
+	}
+
+	@Test
+	void unavailableConsultativeJudgeKeepsSupervisorStop() {
+		AlwaysStopSupervisor supervisor = new AlwaysStopSupervisor();
+		SupervisorJudgementAdvisor advisor = new SupervisorJudgementAdvisor(supervisor, request -> {
+			throw new IllegalStateException("judge unavailable with hidden prompt");
+		});
+		DebateOrchestrator orchestrator = new DebateOrchestrator(fakeAiAdapter, supervisor, advisor);
+
+		DebateResult result = orchestrator.run(question(), team(), limits(6, 24, Duration.ofSeconds(90)));
+
+		assertThat(result.messages()).hasSize(1);
+		assertThat(result.stopReason()).isEqualTo("Supervisor says the debate can stop.");
+	}
+
 	private static Question question() {
 		return new Question("How should AI Arena structure the debate?", Instant.EPOCH);
 	}
@@ -119,6 +185,10 @@ class DebateOrchestratorTests {
 
 	private static ArenaLimits limits(int maxTurns, int maxMessages, Duration timeout) {
 		return new ArenaLimits(4, maxTurns, maxMessages, timeout, 4000);
+	}
+
+	private static JudgeRubric rubric(int overall) {
+		return new JudgeRubric(overall, overall, overall, overall, overall, overall);
 	}
 
 	private static class AlwaysContinueSupervisor implements SupervisorAiPort {
@@ -141,6 +211,51 @@ class DebateOrchestratorTests {
 		@Override
 		public FinalAnswer synthesize(Question question, List<DebateMessage> messages, String stopReason) {
 			return new FinalAnswer("unused", "unused", stopReason);
+		}
+	}
+
+	private static class AlwaysStopSupervisor implements SupervisorAiPort {
+
+		@Override
+		public SupervisorDecision decide(List<DebateMessage> messages, ArenaLimits limits) {
+			return SupervisorDecision.stop("Supervisor says the debate can stop.");
+		}
+
+		@Override
+		public FinalAnswer synthesize(Question question, List<DebateMessage> messages, String stopReason) {
+			return new FinalAnswer("Draft answer.", "Draft rationale.", stopReason);
+		}
+	}
+
+	private static class SequencedJudge implements com.marnone.ai_arena.ai.JudgeAiPort {
+
+		private final List<Judgement> judgements;
+		private int calls;
+
+		private SequencedJudge(Judgement... judgements) {
+			this.judgements = List.of(judgements);
+		}
+
+		@Override
+		public Judgement judge(JudgeRequest request) {
+			calls++;
+			return judgements.get(Math.min(calls - 1, judgements.size() - 1));
+		}
+	}
+
+	private static class AlwaysReviseJudge implements com.marnone.ai_arena.ai.JudgeAiPort {
+
+		private int calls;
+
+		@Override
+		public Judgement judge(JudgeRequest request) {
+			calls++;
+			return new Judgement(
+				JudgeVerdict.REVISE,
+				rubric(3),
+				"Need more debate.",
+				List.of("Ask another expert.")
+			);
 		}
 	}
 

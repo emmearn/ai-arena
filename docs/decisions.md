@@ -25,7 +25,7 @@ Fonte di verita' per decisioni significative di prodotto, architettura, sicurezz
 | Decisione | Il Supervisor resta responsabile del controllo del flusso: continua/ferma, prossimo esperto AI orchestrato, limiti, loop e timeout. LLM-as-a-Judge diventa una responsabilita' separata per valutazione qualitativa strutturata di contributi, dibattito o risposta finale tramite rubrica esplicita e output validato. |
 | Motivazione | Separare le responsabilita' evita che un solo componente mescoli orchestrazione, sintesi e valutazione; migliora qualita', testabilita', affidabilita' e facilita l'introduzione incrementale di quality gate. |
 | Alternative | Lasciare valutazione, sintesi e orchestrazione dentro `SupervisorAiPort`; introdurre subito refactor completo; usare solo euristiche deterministiche senza Judge LLM. |
-| Impatti | `JudgeAiPort`, `JudgeService`, `JudgeRequest`, `Judgement`, `JudgeVerdict` e `JudgeRubric` sono separati dal Supervisor; il quality gate post-sintesi usa output validato e fallback controllato. Resta futura l'integrazione consultiva nel Supervisor. |
+| Impatti | `JudgeAiPort`, `JudgeService`, `SupervisorJudgementAdvisor`, `JudgeRequest`, `Judgement`, `JudgeVerdict` e `JudgeRubric` sono separati dal Supervisor; il quality gate post-sintesi usa output validato e fallback controllato, mentre l'uso durante il dibattito resta consultivo e subordinato ai limiti. |
 | Riferimenti | `docs/architecture.md`, `docs/tasks.md`, `docs/security.md`, `docs/design.md` |
 
 ## DEC-003 - Limiti HTTP MVP in-process

@@ -32,15 +32,34 @@ public class DebateOrchestrator {
 
 	private final DebateAiPort debateAiPort;
 	private final SupervisorAiPort supervisorAiPort;
+	private final SupervisorJudgementAdvisor judgementAdvisor;
 	private final Clock clock;
 
 	public DebateOrchestrator(DebateAiPort debateAiPort, SupervisorAiPort supervisorAiPort) {
-		this(debateAiPort, supervisorAiPort, Clock.systemUTC());
+		this(debateAiPort, supervisorAiPort, null, Clock.systemUTC());
+	}
+
+	public DebateOrchestrator(
+		DebateAiPort debateAiPort,
+		SupervisorAiPort supervisorAiPort,
+		SupervisorJudgementAdvisor judgementAdvisor
+	) {
+		this(debateAiPort, supervisorAiPort, judgementAdvisor, Clock.systemUTC());
 	}
 
 	DebateOrchestrator(DebateAiPort debateAiPort, SupervisorAiPort supervisorAiPort, Clock clock) {
+		this(debateAiPort, supervisorAiPort, null, clock);
+	}
+
+	DebateOrchestrator(
+		DebateAiPort debateAiPort,
+		SupervisorAiPort supervisorAiPort,
+		SupervisorJudgementAdvisor judgementAdvisor,
+		Clock clock
+	) {
 		this.debateAiPort = Objects.requireNonNull(debateAiPort, "debateAiPort must not be null");
 		this.supervisorAiPort = Objects.requireNonNull(supervisorAiPort, "supervisorAiPort must not be null");
+		this.judgementAdvisor = judgementAdvisor;
 		this.clock = Objects.requireNonNull(clock, "clock must not be null");
 	}
 
@@ -92,6 +111,10 @@ public class DebateOrchestrator {
 
 			SupervisorDecision decision = supervisorAiPort.decide(List.copyOf(messages), limits);
 			if (decision.action() == SupervisorAction.STOP) {
+				if (shouldContinueAfterJudgeAdvice(question, experts, messages, limits, startedAt, turn, decision)) {
+					nextExpert = nextExpertAfter(experts, nextExpert);
+					continue;
+				}
 				return new DebateResult(messages, explicitReason(decision.reason()));
 			}
 			OrchestratedAiExpert selectedExpert = expertById(experts, decision.nextExpertId());
@@ -100,6 +123,26 @@ public class DebateOrchestrator {
 			}
 			nextExpert = selectedExpert;
 		}
+	}
+
+	private boolean shouldContinueAfterJudgeAdvice(
+		Question question,
+		List<OrchestratedAiExpert> experts,
+		List<DebateMessage> messages,
+		ArenaLimits limits,
+		Instant startedAt,
+		int turn,
+		SupervisorDecision decision
+	) {
+		if (judgementAdvisor == null || experts.size() < 2) {
+			return false;
+		}
+		if (isTimedOut(startedAt, limits.timeout()) || messages.size() >= limits.maxMessages() || turn >= limits.maxTurns()) {
+			return false;
+		}
+		return judgementAdvisor
+			.adviseStop(question, List.copyOf(messages), explicitReason(decision.reason()))
+			.requestMoreDebate();
 	}
 
 	private boolean isTimedOut(Instant startedAt, Duration timeout) {
@@ -116,6 +159,14 @@ public class DebateOrchestrator {
 			.filter(expert -> expert.id().equals(id))
 			.findFirst()
 			.orElse(null);
+	}
+
+	private static OrchestratedAiExpert nextExpertAfter(List<OrchestratedAiExpert> experts, OrchestratedAiExpert currentExpert) {
+		int currentIndex = experts.indexOf(currentExpert);
+		if (currentIndex < 0) {
+			return experts.getFirst();
+		}
+		return experts.get((currentIndex + 1) % experts.size());
 	}
 
 	private static String explicitReason(String reason) {
